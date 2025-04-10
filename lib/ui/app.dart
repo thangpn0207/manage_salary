@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:manage_salary/bloc/activity/activity_bloc.dart';
 import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
 import 'package:manage_salary/bloc/theme/cubit/theme_cubit.dart';
 import 'package:manage_salary/core/dependency/injection.dart';
@@ -14,7 +15,6 @@ import 'package:manage_salary/core/routes/app_router.dart';
 import 'package:manage_salary/core/theme/app_theme.dart';
 import 'package:manage_salary/core/util/deep_link_handler.dart';
 import 'package:manage_salary/core/util/log_util.dart';
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -101,13 +101,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       providers: [
         BlocProvider(create: (context) => getIt<ThemeCubit>()),
         BlocProvider(create: (context) => getIt<LocaleCubit>()),
+        BlocProvider(create: (context) => getIt<ActivityBloc>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return BlocBuilder<LocaleCubit, Locale>(
             builder: (context, locale) {
               return ScreenUtilInit(
-                designSize: const Size(1280, 720),
+                designSize: const Size(360, 690),
                 minTextAdapt: true,
                 splitScreenMode: true,
                 builder: (context, child) {
@@ -126,9 +127,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                       GlobalWidgetsLocalizations.delegate,
                       GlobalCupertinoLocalizations.delegate,
                     ],
-                    
                     builder: (context, child) {
-                
                       return child ?? const SizedBox.shrink();
                     },
                   );

@@ -75,9 +75,12 @@ class AppTheme {
         displayLarge: TextStyle(color: AppColors.onSurface),
         displayMedium: TextStyle(color: AppColors.onSurface),
         displaySmall: TextStyle(color: AppColors.onSurface),
-        headlineLarge: TextStyle(color: AppColors.onSurface),
-        headlineMedium: TextStyle(color: AppColors.onSurface),
-        headlineSmall: TextStyle(color: AppColors.onSurface),
+        headlineLarge:
+            TextStyle(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+        headlineMedium:
+            TextStyle(color: AppColors.onSurface, fontWeight: FontWeight.bold),
+        headlineSmall:
+            TextStyle(color: AppColors.onSurface, fontWeight: FontWeight.bold),
         titleLarge: TextStyle(color: AppColors.onSurface),
         titleMedium: TextStyle(color: AppColors.onSurface),
         titleSmall: TextStyle(color: AppColors.onSurface),
