@@ -55,7 +55,7 @@ class ActivityListItem extends StatelessWidget {
 
   // Format date like "Apr 22"
   String _formatDate(DateTime date) {
-    return DateFormat('MMM d YYYY').format(date); // e.g., Apr 22
+    return DateFormat('MMM d yyyy').format(date); // e.g., Apr 22
   }
 
   @override
