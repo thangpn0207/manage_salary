@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:manage_salary/ui/home/home_screen.dart';
 import 'package:manage_salary/ui/settings/settings_screen.dart';
 
+import '../../core/constants/colors.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -18,15 +20,12 @@ class _MainScreenState extends State<MainScreen> {
   final NotchBottomBarController _controller =
       NotchBottomBarController(index: 0);
 
-  int maxCount = 3;
+  int maxCount = 2;
 
   /// widget list
   final List<Widget> bottomBarPages = [
     HomeScreen(),
     SettingsScreen(),
-    Container(
-      color: Colors.green,
-    ),
   ];
 
   @override
@@ -39,7 +38,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
@@ -83,14 +81,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   activeItem: Icon(
                     Icons.home_filled,
-                    color: Colors.blueAccent,
-                  ),
-                ),
-                BottomBarItem(
-                  inActiveItem: Icon(Icons.star, color: Colors.white),
-                  activeItem: Icon(
-                    Icons.star,
-                    color: Colors.blueAccent,
+                    color: AppColors.primary,
                   ),
                 ),
                 BottomBarItem(
@@ -100,7 +91,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   activeItem: Icon(
                     Icons.settings,
-                    color: Colors.pink,
+                    color: AppColors.secondary,
                   ),
                 ),
               ],

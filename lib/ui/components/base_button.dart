@@ -58,7 +58,6 @@ class BaseButton extends StatelessWidget {
       case ButtonSize.large:
         return 60.0; // Example height for large
       case ButtonSize.medium:
-      default:
         return 48.0; // Example height for medium (often Material default)
     }
   }
@@ -69,6 +68,11 @@ class BaseButton extends StatelessWidget {
   ButtonStyle _getEffectiveButtonStyle(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ButtonStyle? themeStyle = theme.elevatedButtonTheme.style;
+    // Define a standard border radius
+    const double borderRadiusValue = 12.0; // You can adjust this value
+    final RoundedRectangleBorder shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(borderRadiusValue),
+    );
 
     // Define base styles per size (can be adjusted)
     ButtonStyle sizeStyle;
@@ -76,20 +80,25 @@ class BaseButton extends StatelessWidget {
       case ButtonSize.small:
         sizeStyle = ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          textStyle: theme.textTheme.labelMedium, // Smaller text for small buttons
+          textStyle:
+              theme.textTheme.labelMedium, // Smaller text for small buttons
+          shape: shape, // Apply the shape
         );
         break;
       case ButtonSize.large:
         sizeStyle = ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-           textStyle: theme.textTheme.labelLarge?.copyWith(fontSize: 18), // Larger text
+          textStyle:
+              theme.textTheme.labelLarge?.copyWith(fontSize: 18), // Larger text
+          shape: shape, // Apply the shape
         );
         break;
       case ButtonSize.medium:
-      default:
-         sizeStyle = ElevatedButton.styleFrom(
+        // Added default here for clarity
+        sizeStyle = ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-           textStyle: theme.textTheme.labelLarge, // Default button text style
+          textStyle: theme.textTheme.labelLarge, // Default button text style
+          shape: shape, // Apply the shape
         );
         break;
     }
@@ -98,11 +107,12 @@ class BaseButton extends StatelessWidget {
     // The 'style' passed to the constructor takes highest priority.
     // Then the size-specific style.
     // Finally, the theme's button style.
-    return style?.merge(sizeStyle.merge(themeStyle)) ?? sizeStyle.merge(themeStyle);
-    // A simpler merge if you only want the explicit style to override everything:
-    // return style ?? sizeStyle.merge(themeStyle);
-  }
 
+    // If themeStyle already has a shape, sizeStyle's shape will override it.
+    // If the custom 'style' has a shape, it will override sizeStyle's shape.
+    final ButtonStyle mergedWithSize = sizeStyle.merge(themeStyle);
+    return style?.merge(mergedWithSize) ?? mergedWithSize;
+  }
 
   @override
   Widget build(BuildContext context) {

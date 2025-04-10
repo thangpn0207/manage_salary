@@ -55,9 +55,59 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  /// `Hello World`
-  String get helloWorld {
-    return Intl.message('Hello World', name: 'helloWorld', desc: '', args: []);
+  /// `Total Balance`
+  String get totalBalance {
+    return Intl.message(
+      'Total Balance',
+      name: 'totalBalance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Income`
+  String get income {
+    return Intl.message('Income', name: 'income', desc: '', args: []);
+  }
+
+  /// `Expenses`
+  String get expenses {
+    return Intl.message('Expenses', name: 'expenses', desc: '', args: []);
+  }
+
+  /// `Add Activity`
+  String get addActivity {
+    return Intl.message(
+      'Add Activity',
+      name: 'addActivity',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dark mode`
+  String get darkMode {
+    return Intl.message('Dark mode', name: 'darkMode', desc: '', args: []);
+  }
+
+  /// `Language`
+  String get language {
+    return Intl.message('Language', name: 'language', desc: '', args: []);
+  }
+
+  /// `Clear Cache`
+  String get clearCache {
+    return Intl.message('Clear Cache', name: 'clearCache', desc: '', args: []);
+  }
+
+  /// `Settings`
+  String get settings {
+    return Intl.message('Settings', name: 'settings', desc: '', args: []);
+  }
+
+  /// `DashBoard`
+  String get dashboard {
+    return Intl.message('DashBoard', name: 'dashboard', desc: '', args: []);
   }
 }
 
@@ -65,7 +115,10 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
   const AppLocalizationDelegate();
 
   List<Locale> get supportedLocales {
-    return const <Locale>[Locale.fromSubtags(languageCode: 'en')];
+    return const <Locale>[
+      Locale.fromSubtags(languageCode: 'en'),
+      Locale.fromSubtags(languageCode: 'vi', countryCode: 'VN'),
+    ];
   }
 
   @override

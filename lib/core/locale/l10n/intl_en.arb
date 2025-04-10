@@ -1,3 +1,11 @@
 {
-    "helloWorld": "Hello World"
+  "totalBalance": "Total Balance",
+  "income": "Income",
+  "expenses": "Expenses",
+  "addActivity": "Add Activity",
+  "darkMode": "Dark mode",
+  "language": "Language",
+  "clearCache": "Clear Cache",
+  "settings": "Settings",
+  "dashboard": "DashBoard"
 }
