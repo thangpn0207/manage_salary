@@ -1,0 +1,171 @@
+name: Build & Deploy Flutter App
+
+on:
+  # 1. Trigger on push to main branch ONLY IF it came from merging develop
+  # We check this inside the job using event context
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+
+  # 2. Trigger on tag push for releases
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build_and_deploy:
+    name: Build & Deploy Flutter App
+    # Check if the trigger is a tag push OR a merged PR from develop to main
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'develop')
+
+    runs-on: ubuntu-latest # Use macos-latest if you need iOS builds
+
+    steps:
+      # 1. Checkout Code
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # Fetch depth 0 is needed to get tags correctly for versioning/naming if needed elsewhere
+        # Also helps if analyzing git history is needed, but increases checkout time.
+        # fetch-depth: 0
+
+      # 2. Setup Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      # 4. Get Flutter Dependencies
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # 5. Determine Build Type and Version Info
+      - name: Determine Build Info
+        id: build_info
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "build_type=release" >> $GITHUB_OUTPUT
+            echo "version_tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+            echo "deploy_message=Release Build from tag ${{ github.ref_name }} (${{ github.sha }})" >> $GITHUB_OUTPUT
+            echo "deploy_dist_key=${{ secrets.DEPLOYGATE_DISTRIBUTION_KEY }}" >> $GITHUB_OUTPUT # Use release key
+          else # pull_request merge event
+            echo "build_type=debug" >> $GITHUB_OUTPUT # Or 'release' if you prefer release builds for main
+            # Use commit sha for versioning on main branch builds
+            commit_sha=${{ github.event.pull_request.head.sha }}
+            commit_sha_short=$(echo $commit_sha | cut -c1-7)
+            echo "version_tag=main-${commit_sha_short}" >> $GITHUB_OUTPUT
+            echo "deploy_message=Main branch build from merge commit ${commit_sha_short}" >> $GITHUB_OUTPUT
+            echo "deploy_dist_key=${{ secrets.DEPLOYGATE_MAIN_DISTRIBUTION_KEY || secrets.DEPLOYGATE_DISTRIBUTION_KEY }}" >> $GITHUB_OUTPUT # Use main key, fallback to release key or none
+          fi
+          # Extract App Name (basic)
+          app_name=$(grep -oP '(?<=name: ).*' pubspec.yaml | head -n 1 | tr -d ' ')
+          echo "app_name=${app_name:-flutter_app}" >> $GITHUB_OUTPUT # Default name if extraction fails
+
+
+      # -------- Android Build --------
+      - name: Decode Android Keystore
+        id: decode_keystore
+        # Only decode if building release AND secrets exist
+        if: steps.build_info.outputs.build_type == 'release' && secrets.ANDROID_KEYSTORE_BASE64 != ''
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo $KEYSTORE_BASE64 | base64 --decode > ${{ runner.temp }}/upload-keystore.jks
+          echo "keystorePath=${{ runner.temp }}/upload-keystore.jks" >> $GITHUB_OUTPUT
+
+      - name: Setup Android Signing Config
+        # Only setup if building release AND keystore was decoded
+        if: steps.build_info.outputs.build_type == 'release' && steps.decode_keystore.outputs.keystorePath
+        run: |
+          echo "storeFile=${{ steps.decode_keystore.outputs.keystorePath }}" > android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+
+      - name: Build Android App
+        run: |
+          if [[ "${{ steps.build_info.outputs.build_type }}" == "release" && -f "android/key.properties" ]]; then
+            echo "Building Release APK..."
+            flutter build apk --release
+          else
+            echo "WARNING: Building Debug APK (Reason: build_type is debug OR signing secrets missing for release build)."
+            flutter build apk --debug
+          fi
+          # Or build App Bundle: flutter build appbundle --release / --debug
+
+      - name: Rename Android Artifact
+        id: android_artifact
+        run: |
+          app_name="${{ steps.build_info.outputs.app_name }}"
+          version_tag="${{ steps.build_info.outputs.version_tag }}"
+          build_type="${{ steps.build_info.outputs.build_type }}" # 'release' or 'debug'
+
+          # Find the correct APK based on build type
+          apk_path=$(find build/app/outputs/flutter-apk -name "app-${build_type}.apk" | head -n 1)
+          # Fallback for potential flavor naming variations (adjust pattern if needed)
+          if [ -z "$apk_path" ]; then
+             apk_path=$(find build/app/outputs/flutter-apk -name "*-${build_type}.apk" | head -n 1)
+          fi
+
+          if [ -z "$apk_path" ]; then
+              echo "::error::Could not find built ${build_type} APK!"
+              exit 1
+          fi
+
+          new_name="${app_name}-${version_tag}-${build_type}.apk"
+          mv "$apk_path" "$new_name"
+          echo "path=$new_name" >> $GITHUB_OUTPUT
+          echo "name=$new_name" >> $GITHUB_OUTPUT
+          echo "Built artifact: $new_name"
+
+
+      # -------- iOS Build (Requires macos-latest runner) --------
+      # Add conditional iOS build steps here if needed, similar to Android
+      # Remember to run on macos-latest and adjust if conditions based on build_type
+
+      # -------- Deploy to DeployGate --------
+      - name: Upload Android APK to DeployGate
+        # Run only if an artifact path was successfully generated
+        if: steps.android_artifact.outputs.path
+        uses: deploygate/action-deploygate-upload@v1
+        with:
+          api_token: ${{ secrets.DEPLOYGATE_API_KEY }}
+          owner_name: ${{ secrets.DEPLOYGATE_USER_NAME }}
+          app_file_path: ${{ steps.android_artifact.outputs.path }}
+          message: "${{ steps.build_info.outputs.deploy_message }} - ${{ secrets.DEPLOYGATE_MESSAGE }}"
+          distribution_key: ${{ steps.build_info.outputs.deploy_dist_key }} # Dynamically set distribution key
+          # release_note: "..." # Optional
+
+      # -------- Create GitHub Release (Only for Tag pushes) --------
+      - name: Create GitHub Release
+        # IMPORTANT: Only run this step for tag push events
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            Release based on tag ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+
+            **Artifacts:**
+            - Android: ${{ steps.android_artifact.outputs.name }}
+            # - iOS: ${{ steps.ios_artifact.outputs.name }} # Uncomment if building iOS
+
+            Uploaded to DeployGate (Release Distribution).
+          draft: false
+          prerelease: false
+          files: |
+            ${{ steps.android_artifact.outputs.path }}
+            # ${{ steps.ios_artifact.outputs.path }} # Uncomment if building iOS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
