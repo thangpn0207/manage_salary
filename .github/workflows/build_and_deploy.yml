@@ -53,7 +53,7 @@ jobs:
         run: |
           echo "Creating android/key.properties file..."
           # Define the relative path to the decoded keystore
-          KEYSTORE_RELATIVE_PATH="keystore.jks" # Relative to android directory
+          KEYSTORE_RELATIVE_PATH="../keystore.jks" # Relative to android directory
 
           # Write secrets and the relative keystore path into the key.properties file
           echo "storeFile=${KEYSTORE_RELATIVE_PATH}" > android/key.properties # Use > to overwrite/create file
