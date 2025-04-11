@@ -1,6 +1,7 @@
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:manage_salary/ui/home/home_screen.dart';
+import 'package:manage_salary/ui/settings/budget/budget_management_screen.dart';
 import 'package:manage_salary/ui/settings/settings_screen.dart';
 
 import '../../core/constants/colors.dart';
@@ -20,11 +21,12 @@ class _MainScreenState extends State<MainScreen> {
   final NotchBottomBarController _controller =
       NotchBottomBarController(index: 0);
 
-  int maxCount = 2;
+  int maxCount = 3;
 
   /// widget list
   final List<Widget> bottomBarPages = [
     HomeScreen(),
+    BudgetManagementScreen(),
     SettingsScreen(),
   ];
 
@@ -81,6 +83,16 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   activeItem: Icon(
                     Icons.home_filled,
+                    color: AppColors.primary,
+                  ),
+                ),
+                BottomBarItem(
+                  inActiveItem: Icon(
+                    Icons.shopping_bag,
+                    color: Colors.white,
+                  ),
+                  activeItem: Icon(
+                    Icons.shopping_bag,
                     color: AppColors.primary,
                   ),
                 ),

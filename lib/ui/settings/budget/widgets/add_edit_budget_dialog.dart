@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:manage_salary/core/extensions/string_extension.dart';
 
 import '../../../../models/budget.dart';
 
@@ -55,9 +54,40 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
     super.dispose();
   }
 
-  String _formatEnumName(dynamic enumValue) {
+  String _formatEnumBudgetCategoryName(BudgetCategory enumValue) {
     if (enumValue == null) return '';
-    return enumValue.name.capitalizeFirstLetter();
+    String name = enumValue.name;
+    // Split by uppercase letters and join with space
+    name = name.replaceAllMapped(
+        RegExp(r'([A-Z])'), (match) => ' \${match.group(1)}');
+    // Capitalize first letter (using extension or basic)
+    try {
+      name = name[0].toUpperCase() + name.substring(1).trim();
+    } catch (_) {
+      if (name.isNotEmpty) {
+        name = name[0].toUpperCase() + name.substring(1);
+      }
+    }
+    name = name.replaceFirst('And', '&');
+    return name.trim();
+  }
+
+  String _formatEnumBudgetPeriodName(BudgetPeriod enumValue) {
+    if (enumValue == null) return '';
+    String name = enumValue.name;
+    // Split by uppercase letters and join with space
+    name = name.replaceAllMapped(
+        RegExp(r'([A-Z])'), (match) => ' \${match.group(1)}');
+    // Capitalize first letter (using extension or basic)
+    try {
+      name = name[0].toUpperCase() + name.substring(1).trim();
+    } catch (_) {
+      if (name.isNotEmpty) {
+        name = name[0].toUpperCase() + name.substring(1);
+      }
+    }
+    name = name.replaceFirst('And', '&');
+    return name.trim();
   }
 
   @override
@@ -73,7 +103,7 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
               items: _categories.map((BudgetCategory category) {
                 return DropdownMenuItem<BudgetCategory>(
                   value: category,
-                  child: Text(_formatEnumName(category)),
+                  child: Text(_formatEnumBudgetCategoryName(category)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -89,7 +119,7 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
               items: _periods.map((BudgetPeriod period) {
                 return DropdownMenuItem<BudgetPeriod>(
                   value: period,
-                  child: Text(_formatEnumName(period)),
+                  child: Text(_formatEnumBudgetPeriodName(period)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -122,8 +152,7 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
                 id: widget.budget?.id ?? DateTime.now().toString(),
                 category: _selectedCategory,
                 period: _selectedPeriod,
-                amount: amount
-            );
+                amount: amount);
 
             widget.onSave(budget);
             Navigator.of(context).pop();

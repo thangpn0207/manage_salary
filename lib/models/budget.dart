@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart'; // Import equatable
-import 'package:uuid/uuid.dart'; // For default ID generation
 import 'package:manage_salary/ui/settings/budget/widgets/add_edit_budget_dialog.dart';
 
 /// Represents a budget set for a specific category over a period.
@@ -9,12 +8,17 @@ class Budget extends Equatable {
   final double amount;
   final BudgetPeriod period;
 
-  const Budget({
+  Budget({
     String? id,
     required this.category,
     required this.amount,
     required this.period,
-  }) : id = id ?? const Uuid().v4();
+  })  : assert(amount >= 0, 'Amount must be non-negative'),
+        // Enforce positive amount storage
+        id = id ??
+            DateTime.now()
+                .millisecondsSinceEpoch
+                .toString(); // Simple unique ID generation;
 
   @override
   List<Object?> get props => [id, category, amount, period];
