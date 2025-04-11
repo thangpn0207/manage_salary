@@ -1,17 +1,16 @@
 
+import 'package:manage_salary/core/constants/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:manage_salary/ui/settings/budget/widgets/add_edit_budget_dialog.dart';
 import 'package:manage_salary/core/extensions/string_extension.dart'; // For formatting
 import 'package:manage_salary/core/util/money_util.dart';
 
 import '../../../../bloc/activity/activity_bloc.dart';
 import '../../../../bloc/activity/activity_event.dart';
 import '../../../../bloc/activity/activity_state.dart';
-import '../../../../core/constants/enums.dart';
 import '../../../../models/budget.dart';
 // Import the Add/Edit Dialog (will create next)
-// import 'widgets/add_edit_budget_dialog.dart';
-
 class BudgetManagementScreen extends StatelessWidget {
   const BudgetManagementScreen({super.key});
 
@@ -23,7 +22,7 @@ class BudgetManagementScreen extends StatelessWidget {
     name = name.replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' \${match.group(1)}');
     // Capitalize first letter (using extension or basic)
     try {
-      name = name.capitalizeFirstLetter();
+    name = name[0].toUpperCase() + name.substring(1).trim();
     } catch (_) {
       if (name.isNotEmpty) {
         name = name[0].toUpperCase() + name.substring(1);
@@ -35,7 +34,6 @@ class BudgetManagementScreen extends StatelessWidget {
 
   // Helper to get icon for category
    IconData _getIconForCategory(ActivityType type) {
-    // Reusing icon logic from other places
     switch (type) {
       case ActivityType.shopping: return Icons.shopping_bag_outlined;
       case ActivityType.foodAndDrinks: return Icons.restaurant_menu_outlined;
@@ -86,22 +84,17 @@ class BudgetManagementScreen extends StatelessWidget {
                  onDismissed: (direction) {
                    // Dispatch event to remove the budget
                    context.read<ActivityBloc>().add(RemoveBudget(budget.id));
-                   ScaffoldMessenger.of(context).showSnackBar(
+                   ScaffoldMessenger.of(context).showSnackBar( 
                      SnackBar(content: Text('\${_formatEnumName(budget.category)} budget removed')),
                    );
                  },
                  child: ListTile(
-                   leading: Icon(_getIconForCategory(budget.category)),
+                   leading: Icon(_getIconForCategory( _convertBudgetCategoryToActivityType(budget.category))),
                    title: Text(_formatEnumName(budget.category)),
                    subtitle: Text('Period: \${_formatEnumName(budget.period)}'),
                    trailing: Text(MoneyUtil.formatDefault(budget.amount)),
                    onTap: () {
-                     // TODO: Implement edit functionality
-                     // Show the Add/Edit dialog in edit mode
-                     // _showAddEditBudgetDialog(context, budgetToEdit: budget);
-                     ScaffoldMessenger.of(context).showSnackBar(
-                       const SnackBar(content: Text('Edit functionality not yet implemented.')),
-                     );
+                    _showAddEditBudgetDialog(context, budgetToEdit: budget);
                    },
                  ),
               );
@@ -111,38 +104,46 @@ class BudgetManagementScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-           // TODO: Implement add functionality
-           // Show the Add/Edit dialog in add mode
-           // _showAddEditBudgetDialog(context);
-           ScaffoldMessenger.of(context).showSnackBar(
-             const SnackBar(content: Text('Add functionality not yet implemented.')),
-           );
+           _showAddEditBudgetDialog(context);
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  /*
   // Function to show the Add/Edit Budget Dialog (placeholder)
-  void _showAddEditBudgetDialog(BuildContext context, {Budget? budgetToEdit}) {
+  void _showAddEditBudgetDialog(BuildContext context, {Budget? budgetToEdit}) {   
      showDialog(
         context: context,
         builder: (_) => AddEditBudgetDialog(
               budget: budgetToEdit,
-              // Pass existing budget for editing, null for adding
-              onSave: (newOrUpdatedBudget) {
+              onSave: (Budget newOrUpdatedBudget) {
                  if (budgetToEdit == null) {
-                   // Add new budget
                    context.read<ActivityBloc>().add(AddBudget(newOrUpdatedBudget));
                  } else {
-                   // Update existing budget
                    context.read<ActivityBloc>().add(UpdateBudget(newOrUpdatedBudget));
                  }
               },
             ),
      );
   }
-  */
+
+  ActivityType _convertBudgetCategoryToActivityType(BudgetCategory budgetCategory){
+    switch(budgetCategory){
+      case BudgetCategory.foodAndDrinks:
+        return ActivityType.foodAndDrinks;
+      case BudgetCategory.transportation:
+        return ActivityType.travel;
+      case BudgetCategory.entertainment:
+        return ActivityType.entertainment;
+      case BudgetCategory.utilities:
+        return ActivityType.utilities;
+      case BudgetCategory.expenseOther:
+        return ActivityType.expenseOther;
+      default:
+       return ActivityType.expenseOther;
+
+    }
+  }
 
 }
