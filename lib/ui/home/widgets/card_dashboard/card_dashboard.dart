@@ -13,41 +13,41 @@ import 'package:manage_salary/ui/home/widgets/chart/chart_session.dart';
 import '../../../../bloc/activity/activity_bloc.dart';
 import '../../../../bloc/activity/activity_state.dart';
 import '../../../../core/constants/colors.dart';
-import '../../../../core/constants/enums.dart';
+import '../../../../core/constants/enums.dart'; // Ensure correct import
 import '../../../../core/locale/generated/l10n.dart';
 import '../../../../models/chart_display_data.dart';
 
 class DashboardCard extends StatelessWidget {
   const DashboardCard({super.key});
 
-  // Helper to format category enum names (reuse from previous examples)
-  String _formatEnumName(ActivityPaying value) {
+  // Helper to format category enum names
+  String _formatEnumName(ActivityType value) { // Changed enum type here
     String name = value.name;
-    // Simple split and capitalize for enums like 'foodAndDrink'
+    // Simple split and capitalize for enums like 'foodAndDrink' or 'expenseOther'
     if (name.contains(RegExp(r'[A-Z]'))) {
       name = name.replaceAllMapped(
           RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}');
-      name = name[0].toUpperCase() + name.substring(1).trim();
-      name = name.replaceFirst('And', '&'); // Specific replacement if needed
-    } else {
-      // Handle single-word enums
-      name = name[0].toUpperCase() + name.substring(1);
     }
+    name = name[0].toUpperCase() + name.substring(1).trim();
+    name = name.replaceFirst('And', '&'); // Specific replacement if needed
+
     return name;
   }
 
   // Define colors for the chart (match the image theme)
   final List<Color> _chartColors = const [
-    Color(0xFF006064), // Deep Cyan – bold and readable
-    Color(0xFFFF7043), // Bright Coral – vibrant contrast
-    Color(0xFF66BB6A), // Soft Green – natural and balanced
-    Color(0xFFFFCA28), // Amber/Yellow – eye-catching
-    Color(0xFFAB47BC), // Violet – deep and distinct
+    Color(0xFF006064), // Deep Cyan
+    Color(0xFFFF7043), // Bright Coral
+    Color(0xFF66BB6A), // Soft Green
+    Color(0xFFFFCA28), // Amber/Yellow
+    Color(0xFFAB47BC), // Violet
+    Color(0xFF26A69A), // Teal
+    Color(0xFFEC407A), // Pink
   ];
 
-  // --- NEW: Helper to prepare aggregated chart data ---
+  // Helper to prepare aggregated chart data
   List<ChartDisplayData> _prepareChartData(
-      Map<ActivityPaying, double> expensesByType, double totalExpenses) {
+      Map<ActivityType, double> expensesByType, double totalExpenses) { // Changed enum type here
     if (totalExpenses <= 0 || expensesByType.isEmpty) {
       return [];
     }
@@ -59,7 +59,7 @@ class DashboardCard extends StatelessWidget {
     final List<ChartDisplayData> displayData = [];
     int colorIndex = 0;
     double otherTotal = 0.0;
-    const int maxIndividualCategories = 4; // Show top 4
+    const int maxIndividualCategories = 5; // Show top 5 potentially
 
     // Process top categories
     for (int i = 0;
@@ -70,7 +70,7 @@ class DashboardCard extends StatelessWidget {
       final color = _chartColors[colorIndex % _chartColors.length];
       colorIndex++;
       displayData.add(ChartDisplayData(
-        name: _formatEnumName(entry.key),
+        name: _formatEnumName(entry.key), // Use updated formatter
         value: entry.value,
         percentage: percentage,
         color: color,
@@ -87,7 +87,6 @@ class DashboardCard extends StatelessWidget {
     // Add "Other" category if it has value
     if (otherTotal > 0) {
       final percentage = (otherTotal / totalExpenses) * 100;
-      // Ensure "Other" gets the next available color
       final color = _chartColors[colorIndex % _chartColors.length];
       displayData.add(ChartDisplayData(
         name: 'Other',
@@ -106,57 +105,55 @@ class DashboardCard extends StatelessWidget {
       builder: (context, state) {
         // Prepare data for the Pie Chart using the new helper
         final double totalExpensesForChart = state.thisMonthExpenses;
+        // Ensure state.expensesByType uses ActivityType as key
+        final Map<ActivityType, double> expensesData = state.expensesByType;
         final List<ChartDisplayData> chartDisplayItems =
-            _prepareChartData(state.expensesByType, totalExpensesForChart);
+            _prepareChartData(expensesData, totalExpensesForChart);
+
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w),
           child: Tilt(
             borderRadius: BorderRadius.circular(30),
             tiltConfig: const TiltConfig(
-              angle: 30, // Reduced angle slightly
-              leaveDuration: Duration(milliseconds: 800), // Faster leave
-              leaveCurve: Curves.elasticOut, // Different curve
+              angle: 30,
+              leaveDuration: Duration(milliseconds: 800),
+              leaveCurve: Curves.elasticOut,
             ),
             lightConfig: const LightConfig(
-              color: Colors.white, // Brighter light source
+              color: Colors.white,
               minIntensity: 0.2,
               maxIntensity: 0.8,
             ),
             shadowConfig: const ShadowConfig(
-              disable: false, // Keep shadow
-              color: Colors.black54, // Darker shadow
+              disable: false,
+              color: Colors.black54,
             ),
             childLayout: ChildLayout(
               outer: [
                 Positioned(
                   top: 20.h,
-                  left: 0, // Align outer elements if needed
+                  left: 0,
                   right: 0,
                   child: TiltParallax(
-                    size: const Offset(15, 15), // Reduced parallax
+                    size: const Offset(15, 15),
                     child: _buildTotalBalance(context, state.netBalance),
                   ),
                 ),
                 Positioned(
-                  top: 90.h, // Adjusted position
-                  left: 20.w, // Added horizontal positioning
+                  top: 90.h,
+                  left: 20.w,
                   right: 20.w,
                   child: TiltParallax(
-                    size: const Offset(25, 25), // Adjusted parallax
+                    size: const Offset(25, 25),
                     child: _buildIncomeExpenseRow(context,
                         state.thisMonthIncome, state.thisMonthExpenses),
                   ),
                 ),
-                // --- Chart Section ---
-                // Position it lower and ensure it doesn't overlap badly
                 Positioned(
-                  // Adjust top/bottom/left/right as needed for your layout
                   bottom: 20.h,
-                  // Position from bottom
                   left: 10.w,
                   right: 10.w,
                   height: 200.h,
-                  // Give chart section explicit height
                   child: TiltParallax(
                     size: const Offset(20, 20),
                     child: (chartDisplayItems.isNotEmpty)
@@ -166,33 +163,27 @@ class DashboardCard extends StatelessWidget {
                 ),
               ],
             ),
-            // --- Main Card Content ---
             child: Container(
-              // Removed fixed width/height, let content define size or use constraints
-              // height: 350.h, // Example height constraint
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30), // Match Tilt border
+                borderRadius: BorderRadius.circular(30),
                 gradient: const LinearGradient(
-                  begin: Alignment.topLeft, // Adjusted gradient direction
+                  begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primary, // Use your defined AppColors
-                    AppColors.onSurface, // Use your defined AppColors
+                    AppColors.primary,
+                    AppColors.onSurface, // Consider if this should be darker
                   ],
-                  stops: [0.1, 0.9], // Adjust stops for gradient spread
+                  stops: [0.1, 0.9],
                 ),
                 boxShadow: [
-                  // Add subtle inner shadow for depth if desired
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 5,
                     spreadRadius: -2,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              // Add padding inside the container if needed
-              // padding: EdgeInsets.all(16.w),
             ),
           ),
         );
@@ -204,32 +195,29 @@ class DashboardCard extends StatelessWidget {
 
   Widget _buildTotalBalance(BuildContext context, double balance) {
     final theme = Theme.of(context);
-    final balanceColor = balance >= 0
-        ? AppColors.onSurface
-        : theme.colorScheme.error; // Use AppColors
+    // Determine color based on balance
+    final balanceColor = balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
+
     return Padding(
-      // Add padding to prevent text touching edges
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Take minimum space
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             S.current.totalBalance,
             style: theme.textTheme.titleMedium?.copyWith(
-                color: AppColors.onSurface
-                    .withValues(alpha: 0.8)), // Use AppColors
+                color: AppColors.onSurface.withOpacity(0.8)), // Use AppColors
           ),
-          SizedBox(height: 4.h), // Reduced space
+          SizedBox(height: 4.h),
           Text(
             MoneyUtil.formatDefault(balance),
             style: theme.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: balanceColor,
+                color: balanceColor, // Apply determined color
                 shadows: [
-                  // Add subtle shadow to text for readability
                   Shadow(
                     blurRadius: 1.0,
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: Colors.black.withOpacity(0.2),
                     offset: const Offset(1.0, 1.0),
                   ),
                 ]),
@@ -242,16 +230,15 @@ class DashboardCard extends StatelessWidget {
   Widget _buildIncomeExpenseRow(
       BuildContext context, double income, double expenses) {
     return Row(
-      // Removed SizedBox wrapper, let Row manage width
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribute space
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
             child: CardInfo(
           title: S.current.income,
           amount: income,
           amountColor: AppColors.upGreen,
-        )), // Use AppColors
-        SizedBox(width: 10.w), // Reduced spacing
+        )),
+        SizedBox(width: 10.w),
         Expanded(
             child: CardInfo(
           title: S.current.expenses,
@@ -264,15 +251,12 @@ class DashboardCard extends StatelessWidget {
 
   Widget _buildEmptyChartPlaceholder(BuildContext context) {
     return Container(
-      // Removed fixed height, let alignment handle it
       alignment: Alignment.center,
-      padding: EdgeInsets.all(16.w), // Add padding
+      padding: EdgeInsets.all(16.w),
       child: Text(
         "No expense data for this period to display chart.",
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context)
-                .hintColor
-                .withValues(alpha: 0.7)), // More subtle
+            color: Theme.of(context).hintColor.withOpacity(0.7)),
         textAlign: TextAlign.center,
       ),
     );

@@ -1,17 +1,15 @@
 
 import 'package:equatable/equatable.dart';
-
-import 'package:manage_salary/core/constants/enums.dart'; // Assuming ActivityType is here
+import 'package:manage_salary/core/constants/enums.dart';
+import 'package:uuid/uuid.dart'; // For default ID generation
 
 /// Represents a budget set for a specific category over a period.
 class Budget extends Equatable {
   final String id;
   final ActivityType category; // Link to expense category
   final double amount;
-  final BudgetPeriod period; // e.g., Monthly, Weekly
-  final DateTime startDate; // Usually the start of the period (e.g., 1st of month)
-  // Optional: endDate can be calculated or stored
-  // Optional: Add year/month fields for easier querying if needed
+  final BudgetPeriod period;
+  final DateTime startDate;
 
   const Budget({
     required this.id,
@@ -39,5 +37,40 @@ class Budget extends Equatable {
       startDate: startDate ?? this.startDate,
     );
   }
-}
 
+  // --- JSON Serialization ---
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'category': category.name, // Store enum name
+      'amount': amount,
+      'period': period.name,     // Store enum name
+      'startDate': startDate.toIso8601String(), // Store date as ISO string
+    };
+  }
+
+  factory Budget.fromJson(Map<String, dynamic> json) {
+    try {
+      return Budget(
+        id: json['id'] as String? ?? const Uuid().v4(), // Generate ID if missing
+        category: ActivityType.values.byName(json['category'] as String? ?? ActivityType.expenseOther.name),
+        amount: (json['amount'] as num? ?? 0.0).toDouble(),
+        period: BudgetPeriod.values.byName(json['period'] as String? ?? BudgetPeriod.monthly.name),
+        startDate: DateTime.tryParse(json['startDate'] as String? ?? '') ?? DateTime.now(),
+      );
+    } catch (e, stackTrace) {
+      print("Error deserializing Budget: $e
+$stackTrace
+Data: $json");
+      // Provide a fallback budget
+      return Budget(
+        id: const Uuid().v4(),
+        category: ActivityType.expenseOther,
+        amount: 0.0,
+        period: BudgetPeriod.monthly,
+        startDate: DateTime.now(),
+      );
+    }
+  }
+}

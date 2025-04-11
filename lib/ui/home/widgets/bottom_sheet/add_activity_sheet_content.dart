@@ -3,6 +3,8 @@ import 'package:flutter/services.dart'; // For TextInputFormatters
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
+// Removed unused import for string_extension.dart
+// import 'package:manage_salary/core/extensions/string_extension.dart';
 
 import '../../../../core/constants/enums.dart';
 import '../../../../models/activity_data.dart';
@@ -24,9 +26,8 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(2000), // Or relevant start date
-      lastDate:
-          DateTime.now().add(const Duration(days: 365)), // Or relevant end date
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -39,16 +40,16 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   void _submitForm() {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final formData = _formKey.currentState?.value;
+      if (formData == null) return;
 
       final activityData = ActivityData(
-        nature: formData?['activityNature'],
-        activityType: formData?['activityType'],
-        title: formData?['title'],
-        amount: double.tryParse(formData?['amount'] ?? '0') ?? 0,
+        nature: formData['activityNature'] as ActivityNature,
+        type: formData['activityType'] as ActivityType,
+        title: formData['title'] as String,
+        amount: double.tryParse(formData['amount']?.toString() ?? '0') ?? 0.0,
         date: _selectedDate,
       );
 
-      // Pop the bottom sheet and return the data
       Navigator.pop(context, activityData);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,36 +58,52 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
     }
   }
 
-  // Get icon for dropdown item (optional but nice)
-  IconData _getIconForActivity(ActivityPaying type) {
-    // Reuse the logic from ActivityListItem or define it here
-    // (Copied from previous example for completeness)
+  // Get icon for dropdown item
+  IconData _getIconForActivity(ActivityType type) {
     switch (type) {
-      case ActivityPaying.salary:
+      case ActivityType.salary:
         return Icons.wallet;
-      case ActivityPaying.shopping:
+      case ActivityType.freelance:
+        return Icons.work_history_outlined;
+      case ActivityType.investment:
+        return Icons.trending_up;
+      case ActivityType.incomeOther:
+        return Icons.attach_money;
+      case ActivityType.shopping:
         return Icons.shopping_bag_outlined;
-      case ActivityPaying.foodAndDrinks:
+      case ActivityType.foodAndDrinks:
         return Icons.restaurant_menu_outlined;
-      case ActivityPaying.utilities:
+      case ActivityType.utilities:
         return Icons.lightbulb_outline;
-      case ActivityPaying.rent:
+      case ActivityType.rent:
         return Icons.house_outlined;
-      case ActivityPaying.groceries:
+      case ActivityType.groceries:
         return Icons.shopping_cart_outlined;
-      case ActivityPaying.entertainment:
+      case ActivityType.entertainment:
         return Icons.movie_filter_outlined;
-      case ActivityPaying.education:
+      case ActivityType.education:
         return Icons.school_outlined;
-      case ActivityPaying.healthcare:
+      case ActivityType.healthcare:
         return Icons.local_hospital_outlined;
-      case ActivityPaying.travel:
+      case ActivityType.travel:
         return Icons.flight_takeoff_outlined;
-      case ActivityPaying.savings:
-        return Icons.savings_outlined;
-      case ActivityPaying.other:
+      case ActivityType.expenseOther:
+      default:
         return Icons.receipt_long_outlined;
     }
+  }
+
+  // Helper to format enum names nicely for display
+  String _formatEnumName(dynamic enumValue) {
+    if (enumValue == null) return '';
+    String name = enumValue.name;
+    name = name.replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}');
+    // Apply basic capitalization directly
+    if (name.isNotEmpty) {
+      name = name[0].toUpperCase() + name.substring(1);
+    }
+    name = name.replaceFirst('And', '&'); // Specific replacement
+    return name.trim(); // Trim leading/trailing whitespace
   }
 
   @override
@@ -113,7 +130,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              // --- Activity nature Dropdown ---
+              // --- Activity Nature Dropdown ---
               FormBuilderDropdown<ActivityNature>(
                 name: 'activityNature',
                 decoration: InputDecoration(
@@ -131,21 +148,24 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                           value == ActivityNature.income
                               ? Icons.arrow_circle_down_outlined
                               : Icons.arrow_circle_up_outlined,
-                          // Use the helper function to get the icon
                           size: 20,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(value.name),
+                        Text(_formatEnumName(value)), // Use formatting helper
                       ],
                     ),
                   );
                 }).toList(),
                 validator: FormBuilderValidators.required(),
+                onChanged: (value) {
+                  _formKey.currentState?.patchValue({'activityType': null});
+                  setState(() {});
+                },
               ),
               const SizedBox(height: 16),
-              // --- Activity Type Dropdown ---
-              FormBuilderDropdown<ActivityPaying>(
+              // --- Activity Type Dropdown (Dynamically Filtered) ---
+              FormBuilderDropdown<ActivityType>(
                 name: 'activityType',
                 decoration: InputDecoration(
                   labelText: 'Activity Type',
@@ -153,23 +173,46 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items: ActivityPaying.values.map((ActivityPaying value) {
-                  return DropdownMenuItem<ActivityPaying>(
-                    value: value,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _getIconForActivity(value),
-                          // Use the helper function to get the icon
-                          size: 20,
-                          color: Theme.of(context).colorScheme.primary,
+                items: ActivityType.values
+                    .where((type) {
+                      final selectedNature =
+                          _formKey.currentState?.fields['activityNature']?.value;
+                      if (selectedNature == ActivityNature.income) {
+                        return [
+                          ActivityType.salary,
+                          ActivityType.freelance,
+                          ActivityType.investment,
+                          ActivityType.incomeOther
+                        ].contains(type);
+                      } else if (selectedNature == ActivityNature.expense) {
+                        return ![
+                          ActivityType.salary,
+                          ActivityType.freelance,
+                          ActivityType.investment,
+                          ActivityType.incomeOther
+                        ].contains(type);
+                      } else {
+                        // Show only relevant types if nature is selected, otherwise empty
+                        return false;
+                      }
+                    })
+                    .map((ActivityType value) {
+                      return DropdownMenuItem<ActivityType>(
+                        value: value,
+                        child: Row(
+                          children: [
+                            Icon(
+                              _getIconForActivity(value),
+                              size: 20,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(_formatEnumName(value)),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Text(value.name),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                      );
+                    })
+                    .toList(),
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),

@@ -35,7 +35,7 @@ class ActivityUtil {
         .where((a) => a.nature == ActivityNature.expense)
         .forEach((activity) {
       spending.update(
-        activity.type,
+        activity.type, // Use the type field
         (value) => value + activity.amount,
         ifAbsent: () => activity.amount,
       );
@@ -50,7 +50,7 @@ class ActivityUtil {
         .where((a) => a.nature == ActivityNature.income)
         .forEach((activity) {
       incomeMap.update(
-        activity.type,
+        activity.type, // Use the type field
         (value) => value + activity.amount,
         ifAbsent: () => activity.amount,
       );
@@ -101,72 +101,44 @@ class ActivityUtil {
     return (income: income, expense: expense);
   }
 
-  // --- Recurring Activity Generation ---
+  // --- Recurring Activity Generation (Moved to BLoC) ---
+  // The generation logic is now primarily within the ActivityBloc's
+  // _onGenerateRecurringInstances handler for better state access.
+  // Keeping date calculation helpers might still be useful.
 
-  List<ActivityData> generateInstances(
-    RecurringActivity recurring,
-    List<ActivityData> existingActivities,
-    DateTime upToDate,
-  ) {
-    final List<ActivityData> newInstances = [];
-    DateTime nextDate = recurring.startDate;
-
-    // Find the last generated instance for this recurring activity
-    final lastGenerated = existingActivities
-        .where((a) => a.recurringActivityId == recurring.id)
-        .fold<DateTime?>(null, (latest, a) {
-      if (latest == null || a.date.isAfter(latest)) {
-        return a.date;
+  DateTime? calculateNextDueDate(RecurringFrequency frequency, DateTime currentDate) {
+     try {
+      switch (frequency) {
+        case RecurringFrequency.daily:
+          return currentDate.add(const Duration(days: 1));
+        case RecurringFrequency.weekly:
+          return currentDate.add(const Duration(days: 7));
+        case RecurringFrequency.biWeekly:
+          return currentDate.add(const Duration(days: 14));
+        case RecurringFrequency.monthly:
+            var newMonth = currentDate.month + 1;
+            var newYear = currentDate.year;
+            if (newMonth > 12) {
+              newMonth = 1;
+              newYear++;
+            }
+            var daysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
+            var newDay = currentDate.day > daysInNewMonth ? daysInNewMonth : currentDate.day;
+            return DateTime(newYear, newMonth, newDay);
+        case RecurringFrequency.yearly:
+            var newDay = currentDate.day;
+            if (currentDate.month == 2 && currentDate.day == 29) {
+                if (!DateTime(currentDate.year + 1, 1, 1).isUtc) { // Approx leap year check
+                   if (!(((currentDate.year + 1) % 4 == 0) && (((currentDate.year + 1) % 100 != 0) || ((currentDate.year + 1) % 400 == 0)))) {
+                     newDay = 28;
+                   }
+                }
+            }
+            return DateTime(currentDate.year + 1, currentDate.month, newDay);
       }
-      return latest;
-    });
-
-    // Start generating from the day AFTER the last generated instance, or from the start date
-    if (lastGenerated != null) {
-      nextDate = _calculateNextDate(recurring.frequency, lastGenerated);
-    }
-
-    while (nextDate.isBefore(upToDate) &&
-        (recurring.endDate == null || nextDate.isBefore(recurring.endDate!))) {
-      // Only add if an instance with the same date doesn't already exist
-      // (Handles cases where generation might run multiple times)
-      if (!existingActivities.any((a) =>
-          a.recurringActivityId == recurring.id &&
-          DateUtil.isSameDay(a.date, nextDate))) {
-        newInstances.add(ActivityData(
-          nature: recurring.type == ActivityType.salary ||
-                  recurring.type == ActivityType.freelance ||
-                  recurring.type == ActivityType.investment ||
-                  recurring.type == ActivityType.incomeOther
-              ? ActivityNature.income
-              : ActivityNature.expense,
-          title: recurring.title,
-          amount: recurring.amount,
-          date: nextDate,
-          type: recurring.type,
-          recurringActivityId: recurring.id,
-        ));
-      }
-      nextDate = _calculateNextDate(recurring.frequency, nextDate);
-    }
-
-    return newInstances;
-  }
-
-  DateTime _calculateNextDate(RecurringFrequency frequency, DateTime currentDate) {
-    switch (frequency) {
-      case RecurringFrequency.daily:
-        return currentDate.add(const Duration(days: 1));
-      case RecurringFrequency.weekly:
-        return currentDate.add(const Duration(days: 7));
-      case RecurringFrequency.biWeekly:
-        return currentDate.add(const Duration(days: 14));
-      case RecurringFrequency.monthly:
-        // Basic monthly - add 1 month (can have issues with end-of-month)
-        // Consider using a more robust date package for complex scenarios
-        return DateTime(currentDate.year, currentDate.month + 1, currentDate.day);
-      case RecurringFrequency.yearly:
-        return DateTime(currentDate.year + 1, currentDate.month, currentDate.day);
+    } catch (e) {
+      print("Error calculating next due date in Util: $e");
+      return null;
     }
   }
 }
