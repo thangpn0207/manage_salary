@@ -1,8 +1,10 @@
 // activity_state.dart
+
 import 'package:equatable/equatable.dart';
 import 'package:manage_salary/bloc/activity/util/activity_util.dart';
 
 import '../../core/constants/enums.dart';
+import '../../core/util/log_util.dart';
 import '../../models/activity_data.dart';
 // No need to import calculation helpers here anymore
 
@@ -146,7 +148,8 @@ class ActivityState extends Equatable {
         thisMonthExpenses: calculatedState.thisMonthExpenses,
       );
     } catch (e, stackTrace) {
-      print("Error deserializing ActivityState: $e\n$stackTrace\nData: $json");
+      LogUtil.e(
+          "Error deserializing ActivityState: $e\n$stackTrace\nData: $json");
       return ActivityState.initial(); // Fallback
     }
   }

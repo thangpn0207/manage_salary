@@ -27,13 +27,15 @@ class _HomeScreenState extends State<HomeScreen> {
     // If the user added an activity (didn't dismiss), add it to the list
     if (newActivity != null) {
       getIt<ActivityBloc>().add(AddActivity(newActivity));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${newActivity.title} added successfully!'),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${newActivity.title} added successfully!'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 

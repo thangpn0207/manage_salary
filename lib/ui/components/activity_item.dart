@@ -120,7 +120,7 @@ class ActivityListItem extends StatelessWidget {
         onDismissed: (direction) => onDismissed!(activity.id),
         // Call callback with ID
         background: Container(
-          color: Colors.redAccent.withOpacity(0.8),
+          color: Colors.redAccent.withValues(alpha: 0.8),
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 20.0),
           child: const Icon(Icons.delete_outline, color: Colors.white),

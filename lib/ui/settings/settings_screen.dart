@@ -1,4 +1,5 @@
 // presentation/screens/settings_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart'; // For clearing storage
@@ -6,7 +7,8 @@ import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
 import 'package:manage_salary/bloc/theme/cubit/theme_cubit.dart';
 
 import '../../core/constants/colors.dart';
-import '../../core/locale/generated/l10n.dart'; // Import generated localization
+import '../../core/locale/generated/l10n.dart';
+import '../../core/util/log_util.dart'; // Import generated localization
 
 class SettingsScreen extends StatelessWidget {
   // Changed to StatelessWidget
@@ -111,7 +113,8 @@ class SettingsScreen extends StatelessWidget {
               // --- Clear Cache Setting ---
               _buildSettingsTile(
                 context: context,
-                title: S.of(context).clearCache, // Use localization
+                title: S.of(context).clearCache,
+                // Use localization
                 textColor: itemTextColor,
                 trailing:
                     Icon(Icons.arrow_forward_ios, size: 16, color: arrowColor),
@@ -131,7 +134,8 @@ class SettingsScreen extends StatelessWidget {
         context: context,
         builder: (ctx) => AlertDialog(
               title: Text(S.of(ctx).confirmClearCacheTitle), // Use localization
-              content: Text(S.of(ctx).confirmClearCacheContent), // Use localization
+              content:
+                  Text(S.of(ctx).confirmClearCacheContent), // Use localization
               actions: [
                 TextButton(
                     onPressed: () => Navigator.of(ctx).pop(false),
@@ -147,22 +151,24 @@ class SettingsScreen extends StatelessWidget {
       // Check context is still valid
       try {
         await HydratedBloc.storage.clear();
-        print("HydratedBloc storage cleared.");
+        LogUtil.i("HydratedBloc storage cleared.");
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(S.of(context).cacheClearedSuccess), // Use localization
+                content:
+                    Text(S.of(context).cacheClearedSuccess), // Use localization
                 duration: Duration(seconds: 2)),
           );
           // Optional: Reset relevant Blocs if needed after clearing
         }
       } catch (e) {
-        print("Error clearing cache: $e");
+        LogUtil.e("Error clearing cache: $e");
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(S.of(context).cacheClearError), // Use localization
+                content:
+                    Text(S.of(context).cacheClearError), // Use localization
                 backgroundColor: Colors.red),
           );
         }

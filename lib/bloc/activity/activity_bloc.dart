@@ -1,9 +1,11 @@
 // activity_bloc.dart
+
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:manage_salary/bloc/activity/util/activity_util.dart';
 import 'package:uuid/uuid.dart';
 
 // Import events, state, model, enums AS WELL AS calculation helpers
+import '../../core/util/log_util.dart';
 import '../../models/activity_data.dart';
 import 'activity_event.dart';
 import 'activity_state.dart';
@@ -139,7 +141,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     try {
       return ActivityState.fromJson(json);
     } catch (e, stackTrace) {
-      print("Error hydrating ActivityBloc state: $e\n$stackTrace");
+      LogUtil.e("Error hydrating ActivityBloc state: $e\n$stackTrace");
       return null; // Or ActivityState.initial()
     }
   }
@@ -150,7 +152,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     try {
       return state.toJson();
     } catch (e, stackTrace) {
-      print("Error serializing ActivityBloc state: $e\n$stackTrace");
+      LogUtil.e("Error serializing ActivityBloc state: $e\n$stackTrace");
       return null;
     }
   }

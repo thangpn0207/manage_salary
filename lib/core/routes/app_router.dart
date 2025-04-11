@@ -75,7 +75,7 @@ class AppRouter {
 
     // Define routes without transitions for better web performance
     routes: [
-            // Main route
+      // Main route
       GoRoute(
         path: AppRoutes.main,
         pageBuilder: (context, state) => _noTransitionPage(
@@ -98,7 +98,6 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.exchangeCrypto,
         pageBuilder: (context, state) {
-          final cryptoName = state.pathParameters['cryptoName'] ?? 'BTC';
           return _noTransitionPage(
             context: context,
             state: state,
@@ -268,7 +267,6 @@ class AppRouter {
           child: const Scaffold(
             body: Center(
               child: Text('Earn Screen'),
-
             ),
           ),
         ),
