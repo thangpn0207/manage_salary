@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../core/constants/enums.dart';
+import '../core/util/log_util.dart';
 
 class ActivityData extends Equatable {
   final String id; // Unique identifier for the entry
@@ -96,7 +97,8 @@ class ActivityData extends Equatable {
         recurringActivityId: json['recurringActivityId'] as String?,
       );
     } catch (e, stackTrace) {
-      print("Error deserializing ActivityData: $e $stackTrace Data: $json");
+      LogUtil.i(
+          "Error deserializing ActivityData: $e\n$stackTrace\nData: $json");
       // Return a default/error placeholder object
       return ActivityData(
         id: "${DateTime.now().millisecondsSinceEpoch}error",

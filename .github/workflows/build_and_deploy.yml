@@ -1,0 +1,107 @@
+name: Deploy Android to DeployGate on Main Merge (key.properties full)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build_and_deploy_android:
+    name: Build Signed Android App & Deploy to DeployGate
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      # 4. Get Flutter dependencies
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # 5. Analyze code (Optional)
+      - name: Analyze project source
+        run: flutter analyze
+
+      # 6. Run tests (Optional)
+      #      - name: Run Flutter tests
+      #        run: flutter test
+
+      # 7. Decode Keystore File into Android Directory
+      - name: Decode Keystore
+        run: |
+          echo "Decoding Keystore into android/keystore.jks..."
+          # Decode the base64 secret directly into the android subdirectory
+          # Ensure this filename matches what you put in .gitignore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/keystore.jks
+          echo "Keystore decoded."
+
+      # 8. Create key.properties File with Keystore Path
+      - name: Create key.properties
+        run: |
+          echo "Creating android/key.properties file..."
+          # Define the relative path to the decoded keystore
+          KEYSTORE_RELATIVE_PATH="../keystore.jks" # Relative to android directory
+
+          # Write secrets and the relative keystore path into the key.properties file
+          echo "storeFile=${KEYSTORE_RELATIVE_PATH}" > android/key.properties # Use > to overwrite/create file
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties # Use >> to append
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          echo "key.properties file created."
+          # Optional: Display content for verification (mask passwords if needed in logs)
+          # cat android/key.properties
+
+      # 9. Build Signed Release APK (No Env Vars needed for signing)
+      - name: Build Signed Android APK
+        run: |
+          echo "Starting build (Gradle will use android/key.properties)..."
+          flutter build apk --release --build-number=${{ github.run_number }}
+          echo "Build finished."
+
+      # 10. Deploy to DeployGate
+      - name: Upload to DeployGate
+        env:
+          DEPLOYGATE_API_KEY: ${{ secrets.DEPLOYGATE_API_KEY }}
+          DEPLOYGATE_USER_NAME: ${{ secrets.DEPLOYGATE_USER_NAME }}
+          DEPLOYGATE_DIST_KEY: ${{ secrets.DEPLOYGATE_DISTRIBUTION_KEY || '' }}
+        run: |
+          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          RELEASE_NOTES="Build ${{ github.run_number }} (props path) deployed via GitHub Actions. Commit: ${{ github.sha }}"
+
+          echo "Uploading $APK_PATH to DeployGate..."
+          CURL_COMMAND="curl -sfL -F file=@\"$APK_PATH\" \
+                      -F token=\"$DEPLOYGATE_API_KEY\" \
+                      -F message=\"$RELEASE_NOTES\" "
+
+          if [[ -n "$DEPLOYGATE_DIST_KEY" ]]; then
+            CURL_COMMAND+=" -F distribution_key=\"$DEPLOYGATE_DIST_KEY\""
+            echo "Deploying to distribution: $DEPLOYGATE_DIST_KEY"
+          else
+            echo "Deploying without specific distribution key."
+          fi
+
+          CURL_COMMAND+=" https://deploygate.com/api/users/$DEPLOYGATE_USER_NAME/apps"
+          eval $CURL_COMMAND
+          echo "Upload command executed."
+
+      # 11. Cleanup Sensitive Files (Keystore and Properties)
+      - name: Cleanup Sensitive Files
+        if: always() # Ensure this runs even if previous steps fail
+        run: |
+          echo "Cleaning up sensitive files..."
+          # Remove both the generated properties file and the decoded keystore
+          rm -f android/key.properties android/keystore.jks
+          echo "Cleanup complete."

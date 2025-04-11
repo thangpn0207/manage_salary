@@ -1,11 +1,13 @@
 // presentation/screens/dashboard_screen.dart
-import 'dart:math'; // Import math for min function
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_tilt/flutter_tilt.dart';
+import 'package:manage_salary/core/locale/generated/l10n.dart';
+import 'package:manage_salary/core/util/localization_utils.dart'; // Import the utils
 import 'package:manage_salary/core/util/money_util.dart';
 import 'package:manage_salary/ui/home/widgets/card_dashboard/card_info.dart';
 import 'package:manage_salary/ui/home/widgets/chart/chart_session.dart';
@@ -13,46 +15,31 @@ import 'package:manage_salary/ui/home/widgets/chart/chart_session.dart';
 import '../../../../bloc/activity/activity_bloc.dart';
 import '../../../../bloc/activity/activity_state.dart';
 import '../../../../core/constants/colors.dart';
-import '../../../../core/constants/enums.dart'; // Ensure correct import
-import '../../../../core/locale/generated/l10n.dart';
+import '../../../../core/constants/enums.dart';
 import '../../../../models/chart_display_data.dart';
 
 class DashboardCard extends StatelessWidget {
   const DashboardCard({super.key});
 
-  // Helper to format category enum names
-  String _formatEnumName(ActivityType value) { // Changed enum type here
-    String name = value.name;
-    // Simple split and capitalize for enums like 'foodAndDrink' or 'expenseOther'
-    if (name.contains(RegExp(r'[A-Z]'))) {
-      name = name.replaceAllMapped(
-          RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}');
-    }
-    name = name[0].toUpperCase() + name.substring(1).trim();
-    name = name.replaceFirst('And', '&'); // Specific replacement if needed
-
-    return name;
-  }
-
-  // Define colors for the chart (match the image theme)
+  // Define colors for the chart
   final List<Color> _chartColors = const [
     Color(0xFF006064), // Deep Cyan
     Color(0xFFFF7043), // Bright Coral
     Color(0xFF66BB6A), // Soft Green
     Color(0xFFFFCA28), // Amber/Yellow
     Color(0xFFAB47BC), // Violet
-    Color(0xFF26A69A), // Teal
-    Color(0xFFEC407A), // Pink
   ];
 
-  // Helper to prepare aggregated chart data
+  // --- Helper to prepare aggregated chart data --- (Uses localization)
   List<ChartDisplayData> _prepareChartData(
-      Map<ActivityType, double> expensesByType, double totalExpenses) { // Changed enum type here
+      BuildContext context,
+      // Need context for localization
+      Map<ActivityType, double> expensesByType,
+      double totalExpenses) {
     if (totalExpenses <= 0 || expensesByType.isEmpty) {
       return [];
     }
 
-    // Sort entries descending by amount
     final sortedEntries = expensesByType.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
@@ -70,14 +57,14 @@ class DashboardCard extends StatelessWidget {
       final color = _chartColors[colorIndex % _chartColors.length];
       colorIndex++;
       displayData.add(ChartDisplayData(
-        name: _formatEnumName(entry.key), // Use updated formatter
+        name: localizedActivityPaying(context, entry.key), // Use utils
         value: entry.value,
         percentage: percentage,
         color: color,
       ));
     }
 
-    // Calculate "Other" total if there are more categories
+    // Calculate "Other" total
     if (sortedEntries.length > maxIndividualCategories) {
       for (int i = maxIndividualCategories; i < sortedEntries.length; i++) {
         otherTotal += sortedEntries[i].value;
@@ -89,7 +76,7 @@ class DashboardCard extends StatelessWidget {
       final percentage = (otherTotal / totalExpenses) * 100;
       final color = _chartColors[colorIndex % _chartColors.length];
       displayData.add(ChartDisplayData(
-        name: 'Other',
+        name: S.of(context).otherCategory, // Use localized "Other"
         value: otherTotal,
         percentage: percentage,
         color: color,
@@ -105,11 +92,10 @@ class DashboardCard extends StatelessWidget {
       builder: (context, state) {
         // Prepare data for the Pie Chart using the new helper
         final double totalExpensesForChart = state.thisMonthExpenses;
-        // Ensure state.expensesByType uses ActivityType as key
-        final Map<ActivityType, double> expensesData = state.expensesByType;
-        final List<ChartDisplayData> chartDisplayItems =
-            _prepareChartData(expensesData, totalExpensesForChart);
-
+        final List<ChartDisplayData> chartDisplayItems = _prepareChartData(
+            context,
+            state.expensesByType,
+            totalExpensesForChart); // Pass context
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w),
           child: Tilt(
@@ -149,6 +135,7 @@ class DashboardCard extends StatelessWidget {
                         state.thisMonthIncome, state.thisMonthExpenses),
                   ),
                 ),
+                // --- Chart Section ---
                 Positioned(
                   bottom: 20.h,
                   left: 10.w,
@@ -171,13 +158,13 @@ class DashboardCard extends StatelessWidget {
                   end: Alignment.bottomRight,
                   colors: [
                     AppColors.primary,
-                    AppColors.onSurface, // Consider if this should be darker
+                    AppColors.onSurface,
                   ],
                   stops: [0.1, 0.9],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 5,
                     spreadRadius: -2,
                     offset: const Offset(0, 2),
@@ -197,16 +184,16 @@ class DashboardCard extends StatelessWidget {
     final theme = Theme.of(context);
     // Determine color based on balance
     final balanceColor = balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
-
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            S.current.totalBalance,
+            S.of(context).totalBalance, // Use localization
             style: theme.textTheme.titleMedium?.copyWith(
-                color: AppColors.onSurface.withOpacity(0.8)), // Use AppColors
+                color: AppColors.onSurface
+                    .withValues(alpha: 0.8)), // Keep subtle color
           ),
           SizedBox(height: 4.h),
           Text(
@@ -217,7 +204,7 @@ class DashboardCard extends StatelessWidget {
                 shadows: [
                   Shadow(
                     blurRadius: 1.0,
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     offset: const Offset(1.0, 1.0),
                   ),
                 ]),
@@ -234,14 +221,14 @@ class DashboardCard extends StatelessWidget {
       children: [
         Expanded(
             child: CardInfo(
-          title: S.current.income,
+          title: S.of(context).income, // Use localization
           amount: income,
           amountColor: AppColors.upGreen,
         )),
         SizedBox(width: 10.w),
         Expanded(
             child: CardInfo(
-          title: S.current.expenses,
+          title: S.of(context).expenses, // Use localization
           amount: expenses,
           amountColor: Theme.of(context).colorScheme.error,
         )),
@@ -254,9 +241,9 @@ class DashboardCard extends StatelessWidget {
       alignment: Alignment.center,
       padding: EdgeInsets.all(16.w),
       child: Text(
-        "No expense data for this period to display chart.",
+        S.of(context).noChartData, // Use localization
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).hintColor.withOpacity(0.7)),
+            color: Theme.of(context).hintColor.withValues(alpha: 0.7)),
         textAlign: TextAlign.center,
       ),
     );

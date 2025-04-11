@@ -109,6 +109,306 @@ class S {
   String get dashboard {
     return Intl.message('DashBoard', name: 'dashboard', desc: '', args: []);
   }
+
+  /// `No income activities recorded yet.`
+  String get noIncomeActivities {
+    return Intl.message(
+      'No income activities recorded yet.',
+      name: 'noIncomeActivities',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No expense activities recorded yet.`
+  String get noExpenseActivities {
+    return Intl.message(
+      'No expense activities recorded yet.',
+      name: 'noExpenseActivities',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{title} deleted`
+  String activityDeleted(Object title) {
+    return Intl.message(
+      '$title deleted',
+      name: 'activityDeleted',
+      desc: '',
+      args: [title],
+    );
+  }
+
+  /// `Confirm Clear Cache`
+  String get confirmClearCacheTitle {
+    return Intl.message(
+      'Confirm Clear Cache',
+      name: 'confirmClearCacheTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure? This will remove all stored activity data and might reset preferences.`
+  String get confirmClearCacheContent {
+    return Intl.message(
+      'Are you sure? This will remove all stored activity data and might reset preferences.',
+      name: 'confirmClearCacheContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get cancelButton {
+    return Intl.message('Cancel', name: 'cancelButton', desc: '', args: []);
+  }
+
+  /// `Clear`
+  String get clearButton {
+    return Intl.message('Clear', name: 'clearButton', desc: '', args: []);
+  }
+
+  /// `Cache Cleared Successfully.`
+  String get cacheClearedSuccess {
+    return Intl.message(
+      'Cache Cleared Successfully.',
+      name: 'cacheClearedSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error clearing cache.`
+  String get cacheClearError {
+    return Intl.message(
+      'Error clearing cache.',
+      name: 'cacheClearError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add New Activity`
+  String get addNewActivitySheetTitle {
+    return Intl.message(
+      'Add New Activity',
+      name: 'addNewActivitySheetTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Activity Nature`
+  String get activityNatureLabel {
+    return Intl.message(
+      'Activity Nature',
+      name: 'activityNatureLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Activity Type`
+  String get activityTypeLabel {
+    return Intl.message(
+      'Activity Type',
+      name: 'activityTypeLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title / Description`
+  String get titleDescriptionLabel {
+    return Intl.message(
+      'Title / Description',
+      name: 'titleDescriptionLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Amount`
+  String get amountLabel {
+    return Intl.message('Amount', name: 'amountLabel', desc: '', args: []);
+  }
+
+  /// `Date: `
+  String get dateLabelPrefix {
+    return Intl.message('Date: ', name: 'dateLabelPrefix', desc: '', args: []);
+  }
+
+  /// `Change`
+  String get changeButton {
+    return Intl.message('Change', name: 'changeButton', desc: '', args: []);
+  }
+
+  /// `Add Activity`
+  String get addActivityButton {
+    return Intl.message(
+      'Add Activity',
+      name: 'addActivityButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please complete all fields correctly.`
+  String get formValidationError {
+    return Intl.message(
+      'Please complete all fields correctly.',
+      name: 'formValidationError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Income`
+  String get activityNatureIncome {
+    return Intl.message(
+      'Income',
+      name: 'activityNatureIncome',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expense`
+  String get activityNatureExpense {
+    return Intl.message(
+      'Expense',
+      name: 'activityNatureExpense',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Salary`
+  String get activityTypeSalary {
+    return Intl.message(
+      'Salary',
+      name: 'activityTypeSalary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Shopping`
+  String get activityTypeShopping {
+    return Intl.message(
+      'Shopping',
+      name: 'activityTypeShopping',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Food & Drinks`
+  String get activityTypeFoodAndDrinks {
+    return Intl.message(
+      'Food & Drinks',
+      name: 'activityTypeFoodAndDrinks',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Utilities`
+  String get activityTypeUtilities {
+    return Intl.message(
+      'Utilities',
+      name: 'activityTypeUtilities',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rent`
+  String get activityTypeRent {
+    return Intl.message('Rent', name: 'activityTypeRent', desc: '', args: []);
+  }
+
+  /// `Groceries`
+  String get activityTypeGroceries {
+    return Intl.message(
+      'Groceries',
+      name: 'activityTypeGroceries',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Entertainment`
+  String get activityTypeEntertainment {
+    return Intl.message(
+      'Entertainment',
+      name: 'activityTypeEntertainment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Education`
+  String get activityTypeEducation {
+    return Intl.message(
+      'Education',
+      name: 'activityTypeEducation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Healthcare`
+  String get activityTypeHealthcare {
+    return Intl.message(
+      'Healthcare',
+      name: 'activityTypeHealthcare',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Travel`
+  String get activityTypeTravel {
+    return Intl.message(
+      'Travel',
+      name: 'activityTypeTravel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Savings`
+  String get activityTypeSavings {
+    return Intl.message(
+      'Savings',
+      name: 'activityTypeSavings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other`
+  String get activityTypeOther {
+    return Intl.message('Other', name: 'activityTypeOther', desc: '', args: []);
+  }
+
+  /// `Other`
+  String get otherCategory {
+    return Intl.message('Other', name: 'otherCategory', desc: '', args: []);
+  }
+
+  /// `No expense data for this period to display chart.`
+  String get noChartData {
+    return Intl.message(
+      'No expense data for this period to display chart.',
+      name: 'noChartData',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

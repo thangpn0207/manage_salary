@@ -9,6 +9,8 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/constants/enums.dart';
 import '../../../../core/locale/generated/l10n.dart';
+import '../../../../core/util/localization_utils.dart'; // Import the utils
+import '../../../../core/locale/generated/l10n.dart';
 import '../../../../models/activity_data.dart';
 
 class AddActivitySheetContent extends StatefulWidget {
@@ -28,8 +30,9 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      firstDate: DateTime(2000), // Or relevant start date
+      lastDate:
+          DateTime.now().add(const Duration(days: 365)), // Or relevant end date
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -96,20 +99,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
     }
   }
 
-  // Helper to format enum names nicely for display
-  String _formatEnumName(dynamic enumValue) {
-    if (enumValue == null) return '';
-    String name = enumValue.name;
-    name = name.replaceAllMapped(
-        RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}');
-    // Apply basic capitalization directly
-    if (name.isNotEmpty) {
-      name = name[0].toUpperCase() + name.substring(1);
-    }
-    name = name.replaceFirst('And', '&'); // Specific replacement
-    return name.trim(); // Trim leading/trailing whitespace
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -163,12 +152,9 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                   );
                 }).toList(),
                 validator: FormBuilderValidators.required(),
-                onChanged: (value) {
-                  _formKey.currentState?.patchValue({'activityType': null});
-                  setState(() {});
-                },
               ),
               const SizedBox(height: 16),
+              FormBuilderDropdown<ActivityPaying>(
               // --- Activity Type Dropdown (Dynamically Filtered) ---
               FormBuilderDropdown<ActivityType>(
                 name: 'activityType',
@@ -219,8 +205,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),
-
-              // --- Title/Description Field ---
               FormBuilderTextField(
                 name: 'title',
                 decoration: InputDecoration(
@@ -233,8 +217,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),
-
-              // --- Amount Field ---
               FormBuilderTextField(
                 name: 'amount',
                 decoration: InputDecoration(
@@ -279,8 +261,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 ],
               ),
               const SizedBox(height: 24),
-
-              // --- Submit Button ---
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
