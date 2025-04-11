@@ -50,9 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              height: 40.h,
-            ),
             SizedBox(height: 500, child: DashboardCard()),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12.h),

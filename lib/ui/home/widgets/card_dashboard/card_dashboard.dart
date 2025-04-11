@@ -32,7 +32,8 @@ class DashboardCard extends StatelessWidget {
 
   // --- Helper to prepare aggregated chart data --- (Uses localization)
   List<ChartDisplayData> _prepareChartData(
-      BuildContext context, // Need context for localization
+      BuildContext context,
+      // Need context for localization
       Map<ActivityPaying, double> expensesByType,
       double totalExpenses) {
     if (totalExpenses <= 0 || expensesByType.isEmpty) {
@@ -91,8 +92,10 @@ class DashboardCard extends StatelessWidget {
       builder: (context, state) {
         // Prepare data for the Pie Chart using the new helper
         final double totalExpensesForChart = state.thisMonthExpenses;
-        final List<ChartDisplayData> chartDisplayItems =
-            _prepareChartData(context, state.expensesByType, totalExpensesForChart); // Pass context
+        final List<ChartDisplayData> chartDisplayItems = _prepareChartData(
+            context,
+            state.expensesByType,
+            totalExpensesForChart); // Pass context
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w),
           child: Tilt(
@@ -162,7 +165,7 @@ class DashboardCard extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 5,
                     spreadRadius: -2,
                     offset: const Offset(0, 2),
@@ -180,9 +183,8 @@ class DashboardCard extends StatelessWidget {
 
   Widget _buildTotalBalance(BuildContext context, double balance) {
     final theme = Theme.of(context);
-    final balanceColor = balance >= 0
-        ? AppColors.onSurface
-        : theme.colorScheme.error;
+    final balanceColor =
+        balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
@@ -192,7 +194,7 @@ class DashboardCard extends StatelessWidget {
             S.of(context).totalBalance, // Use localization
             style: theme.textTheme.titleMedium?.copyWith(
                 color: AppColors.onSurface
-                    .withOpacity(0.8)), // Keep subtle color
+                    .withValues(alpha: 0.8)), // Keep subtle color
           ),
           SizedBox(height: 4.h),
           Text(
@@ -203,7 +205,7 @@ class DashboardCard extends StatelessWidget {
                 shadows: [
                   Shadow(
                     blurRadius: 1.0,
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     offset: const Offset(1.0, 1.0),
                   ),
                 ]),
@@ -242,9 +244,7 @@ class DashboardCard extends StatelessWidget {
       child: Text(
         S.of(context).noChartData, // Use localization
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context)
-                .hintColor
-                .withOpacity(0.7)),
+            color: Theme.of(context).hintColor.withValues(alpha: 0.7)),
         textAlign: TextAlign.center,
       ),
     );
