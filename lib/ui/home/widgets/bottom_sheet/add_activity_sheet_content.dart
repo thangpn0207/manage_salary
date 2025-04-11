@@ -94,7 +94,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
       case ActivityType.travel:
         return Icons.flight_takeoff_outlined;
       case ActivityType.expenseOther:
-      default:
         return Icons.receipt_long_outlined;
     }
   }
@@ -154,7 +153,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),
-              FormBuilderDropdown<ActivityPaying>(
               // --- Activity Type Dropdown (Dynamically Filtered) ---
               FormBuilderDropdown<ActivityType>(
                 name: 'activityType',

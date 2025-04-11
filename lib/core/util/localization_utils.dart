@@ -13,31 +13,31 @@ String localizedActivityNature(BuildContext context, ActivityNature nature) {
 }
 
 // Helper function to get localized string for ActivityPaying
-String localizedActivityPaying(BuildContext context, ActivityPaying type) {
+String localizedActivityPaying(BuildContext context, ActivityType type) {
   switch (type) {
-    case ActivityPaying.salary:
+    case ActivityType.salary:
       return S.of(context).activityTypeSalary;
-    case ActivityPaying.shopping:
+    case ActivityType.shopping:
       return S.of(context).activityTypeShopping;
-    case ActivityPaying.foodAndDrinks:
+    case ActivityType.foodAndDrinks:
       return S.of(context).activityTypeFoodAndDrinks;
-    case ActivityPaying.utilities:
+    case ActivityType.utilities:
       return S.of(context).activityTypeUtilities;
-    case ActivityPaying.rent:
+    case ActivityType.rent:
       return S.of(context).activityTypeRent;
-    case ActivityPaying.groceries:
+    case ActivityType.groceries:
       return S.of(context).activityTypeGroceries;
-    case ActivityPaying.entertainment:
+    case ActivityType.entertainment:
       return S.of(context).activityTypeEntertainment;
-    case ActivityPaying.education:
+    case ActivityType.education:
       return S.of(context).activityTypeEducation;
-    case ActivityPaying.healthcare:
+    case ActivityType.healthcare:
       return S.of(context).activityTypeHealthcare;
-    case ActivityPaying.travel:
+    case ActivityType.travel:
       return S.of(context).activityTypeTravel;
-    case ActivityPaying.savings:
+    case ActivityType.savings:
       return S.of(context).activityTypeSavings;
-    case ActivityPaying.other:
+    case ActivityType.other:
       return S.of(context).activityTypeOther;
   }
 }
