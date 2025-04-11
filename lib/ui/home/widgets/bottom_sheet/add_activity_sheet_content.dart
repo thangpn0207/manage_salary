@@ -3,10 +3,12 @@ import 'package:flutter/services.dart'; // For TextInputFormatters
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
+
 // Removed unused import for string_extension.dart
 // import 'package:manage_salary/core/extensions/string_extension.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/locale/generated/l10n.dart';
 import '../../../../models/activity_data.dart';
 
 class AddActivitySheetContent extends StatefulWidget {
@@ -40,20 +42,21 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   void _submitForm() {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final formData = _formKey.currentState?.value;
-      if (formData == null) return;
 
       final activityData = ActivityData(
-        nature: formData['activityNature'] as ActivityNature,
-        type: formData['activityType'] as ActivityType,
-        title: formData['title'] as String,
-        amount: double.tryParse(formData['amount']?.toString() ?? '0') ?? 0.0,
+        nature: formData?['activityNature'],
+        type: formData?['activityType'],
+        title: formData?['title'],
+        amount:
+            double.tryParse(formData?['amount']?.replaceAll(',', '') ?? '0') ??
+                0,
         date: _selectedDate,
       );
 
       Navigator.pop(context, activityData);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all fields correctly.')),
+        SnackBar(content: Text(S.of(context).formValidationError)),
       );
     }
   }
@@ -97,7 +100,8 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   String _formatEnumName(dynamic enumValue) {
     if (enumValue == null) return '';
     String name = enumValue.name;
-    name = name.replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}');
+    name = name.replaceAllMapped(
+        RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}');
     // Apply basic capitalization directly
     if (name.isNotEmpty) {
       name = name[0].toUpperCase() + name.substring(1);
@@ -109,6 +113,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final currentLocale = Localizations.localeOf(context).toString();
 
     return SingleChildScrollView(
       child: Padding(
@@ -125,16 +130,15 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Add New Activity',
+                S.of(context).addNewActivitySheetTitle,
                 style: theme.textTheme.headlineSmall
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              // --- Activity Nature Dropdown ---
               FormBuilderDropdown<ActivityNature>(
                 name: 'activityNature',
                 decoration: InputDecoration(
-                  labelText: 'Activity Nature',
+                  labelText: S.of(context).activityNatureLabel,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -152,7 +156,8 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(_formatEnumName(value)), // Use formatting helper
+                        Text(localizedActivityNature(context, value)),
+                        // Use utils
                       ],
                     ),
                   );
@@ -168,51 +173,49 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
               FormBuilderDropdown<ActivityType>(
                 name: 'activityType',
                 decoration: InputDecoration(
-                  labelText: 'Activity Type',
+                  labelText: S.of(context).activityTypeLabel,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                items: ActivityType.values
-                    .where((type) {
-                      final selectedNature =
-                          _formKey.currentState?.fields['activityNature']?.value;
-                      if (selectedNature == ActivityNature.income) {
-                        return [
-                          ActivityType.salary,
-                          ActivityType.freelance,
-                          ActivityType.investment,
-                          ActivityType.incomeOther
-                        ].contains(type);
-                      } else if (selectedNature == ActivityNature.expense) {
-                        return ![
-                          ActivityType.salary,
-                          ActivityType.freelance,
-                          ActivityType.investment,
-                          ActivityType.incomeOther
-                        ].contains(type);
-                      } else {
-                        // Show only relevant types if nature is selected, otherwise empty
-                        return false;
-                      }
-                    })
-                    .map((ActivityType value) {
-                      return DropdownMenuItem<ActivityType>(
-                        value: value,
-                        child: Row(
-                          children: [
-                            Icon(
-                              _getIconForActivity(value),
-                              size: 20,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(_formatEnumName(value)),
-                          ],
+                items: ActivityType.values.where((type) {
+                  final selectedNature =
+                      _formKey.currentState?.fields['activityNature']?.value;
+                  if (selectedNature == ActivityNature.income) {
+                    return [
+                      ActivityType.salary,
+                      ActivityType.freelance,
+                      ActivityType.investment,
+                      ActivityType.incomeOther
+                    ].contains(type);
+                  } else if (selectedNature == ActivityNature.expense) {
+                    return ![
+                      ActivityType.salary,
+                      ActivityType.freelance,
+                      ActivityType.investment,
+                      ActivityType.incomeOther
+                    ].contains(type);
+                  } else {
+                    // Show only relevant types if nature is selected, otherwise empty
+                    return false;
+                  }
+                }).map((ActivityType value) {
+                  return DropdownMenuItem<ActivityType>(
+                    value: value,
+                    child: Row(
+                      children: [
+                        Icon(
+                          _getIconForActivity(value),
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
-                      );
-                    })
-                    .toList(),
+                        const SizedBox(width: 8),
+                        Text(localizedActivityPaying(context, value)),
+                        // Use utils
+                      ],
+                    ),
+                  );
+                }).toList(),
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),
@@ -221,7 +224,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
               FormBuilderTextField(
                 name: 'title',
                 decoration: InputDecoration(
-                  labelText: 'Title / Description',
+                  labelText: S.of(context).titleDescriptionLabel,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -235,9 +238,9 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
               FormBuilderTextField(
                 name: 'amount',
                 decoration: InputDecoration(
-                  labelText: 'Amount',
+                  labelText: S.of(context).amountLabel,
                   prefixText:
-                      '${NumberFormat.simpleCurrency(locale: 'en_US').currencySymbol} ',
+                      '${NumberFormat.simpleCurrency(locale: currentLocale).currencySymbol} ',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -260,13 +263,14 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Date: ${DateFormat.yMd().format(_selectedDate)}',
+                      S.of(context).dateLabelPrefix +
+                          DateFormat.yMd(currentLocale).format(_selectedDate),
                       style: theme.textTheme.titleMedium,
                     ),
                   ),
                   TextButton.icon(
                     icon: const Icon(Icons.calendar_month_outlined),
-                    label: const Text('Change'),
+                    label: Text(S.of(context).changeButton),
                     onPressed: () => _pickDate(context),
                     style: TextButton.styleFrom(
                       foregroundColor: theme.colorScheme.primary,
@@ -281,7 +285,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.add_task_outlined),
-                  label: const Text('Add Activity'),
+                  label: Text(S.of(context).addActivityButton),
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),

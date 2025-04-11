@@ -1,5 +1,7 @@
-import 'package:equatable/equatable.dart'; // Import equatable
-import 'package:manage_salary/ui/settings/budget/widgets/add_edit_budget_dialog.dart';
+import 'package:equatable/equatable.dart';
+
+import '../core/constants/enums.dart';
+import '../ui/settings/budget/widgets/add_edit_budget_dialog.dart'; // Import equatable
 
 /// Represents a budget set for a specific category over a period.
 class Budget extends Equatable {
