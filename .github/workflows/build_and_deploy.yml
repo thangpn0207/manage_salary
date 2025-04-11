@@ -1,39 +1,18 @@
-name: Build, Tag, Deploy Flutter App
+name: Deploy Android to DeployGate on Main Merge (key.properties full)
 
 on:
-  # 1. Trigger when a PR from 'develop' is merged into 'main'
-  pull_request:
-    types: [ closed ]
+  push:
     branches: [ main ]
 
-  # 2. Trigger on tag push (will be triggered by step 7 in the 'pull_request' flow)
-  push:
-    tags:
-      - 'v*.*.*'
-
 jobs:
-  build_tag_deploy:
-    name: Build, Tag & Deploy
-    # Run if:
-    # - It's a tag push OR
-    # - It's a PR merged from develop into main
-    if: |
-      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
-      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'develop')
-
-    # Grant contents write permission to allow pushing tags
-    permissions:
-      contents: write
-
-    runs-on: ubuntu-latest # Use macos-latest if you need iOS builds
+  build_and_deploy_android:
+    name: Build Signed Android App & Deploy to DeployGate
+    runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout Code - Fetch all history to find existing tags if needed
+      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       # 2. Setup Java
       - name: Setup Java
@@ -47,157 +26,82 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true
 
-      # 4. Get Flutter Dependencies
+      # 4. Get Flutter dependencies
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      # 5. Extract Version from pubspec.yaml
-      - name: Extract version from pubspec.yaml
-        id: extract_version
+      # 5. Analyze code (Optional)
+      - name: Analyze project source
+        run: flutter analyze
+
+      # 6. Run tests (Optional)
+      - name: Run Flutter tests
+        run: flutter test
+
+      # 7. Decode Keystore File into Android Directory
+      - name: Decode Keystore
         run: |
-          version=$(grep '^version:' pubspec.yaml | sed 's/version: //g' | sed 's/+.*//')
-          echo "version=${version}" >> $GITHUB_OUTPUT
-          echo "tag_name=v${version}" >> $GITHUB_OUTPUT
-          echo "Extracted version: ${version}"
-          echo "Proposed tag: v${version}"
+          echo "Decoding Keystore into android/keystore.jks..."
+          # Decode the base64 secret directly into the android subdirectory
+          # Ensure this filename matches what you put in .gitignore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/keystore.jks
+          echo "Keystore decoded."
 
-      # 6. Check if tag already exists (optional but good practice)
-      - name: Check if tag already exists
-        id: check_tag
-        if: github.event_name == 'pull_request'
+      # 8. Create key.properties File with Keystore Path
+      - name: Create key.properties
         run: |
-          tag_name="${{ steps.extract_version.outputs.tag_name }}"
-          if git rev-parse "$tag_name" >/dev/null 2>&1; then
-            echo "Tag $tag_name already exists. Skipping tag creation."
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "Tag $tag_name does not exist. Proceeding..."
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+          echo "Creating android/key.properties file..."
+          # Define the relative path to the decoded keystore
+          KEYSTORE_RELATIVE_PATH="keystore.jks" # Relative to android directory
 
-      # 7. Create and Push Tag (Only on merge from develop)
-      - name: Create and Push Tag
-        if: github.event_name == 'pull_request' && steps.check_tag.outputs.exists == 'false'
+          # Write secrets and the relative keystore path into the key.properties file
+          echo "storeFile=${KEYSTORE_RELATIVE_PATH}" > android/key.properties # Use > to overwrite/create file
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_STORE_PASSWORD }}" >> android/key.properties # Use >> to append
+          echo "keyAlias=${{ secrets.ANDROID_KEYSTORE_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}" >> android/key.properties
+          echo "key.properties file created."
+          # Optional: Display content for verification (mask passwords if needed in logs)
+          # cat android/key.properties
+
+      # 9. Build Signed Release APK (No Env Vars needed for signing)
+      - name: Build Signed Android APK
         run: |
-          tag_name="${{ steps.extract_version.outputs.tag_name }}"
-          echo "Creating and pushing tag: $tag_name"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$tag_name" -m "Release $tag_name"
-          git push origin "$tag_name"
+          echo "Starting build (Gradle will use android/key.properties)..."
+          flutter build apk --release --build-number=${{ github.run_number }}
+          echo "Build finished."
 
-      # 8. Determine Build Info (Adjusted)
-      - name: Determine Build Info
-        id: build_info
-        run: |
-          app_name=$(grep -oP '(?<=name: ).*' pubspec.yaml | head -n 1 | tr -d ' ')
-          echo "app_name=${app_name:-flutter_app}" >> $GITHUB_OUTPUT
-
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "build_type=release" >> $GITHUB_OUTPUT
-            echo "version_tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-            echo "deploy_message=Release Build from tag ${{ github.ref_name }} (${{ github.sha }})" >> $GITHUB_OUTPUT
-            echo "deploy_dist_key=${{ secrets.DEPLOYGATE_DISTRIBUTION_KEY }}" >> $GITHUB_OUTPUT
-            echo "is_release_build=true" >> $GITHUB_OUTPUT
-          else # pull_request merge event (first run)
-            echo "build_type=debug" >> $GITHUB_OUTPUT
-            commit_sha=${{ github.event.pull_request.head.sha }}
-            commit_sha_short=$(echo $commit_sha | cut -c1-7)
-            version="${{ steps.extract_version.outputs.version }}"
-            echo "version_tag=main-${version}-${commit_sha_short}" >> $GITHUB_OUTPUT
-            echo "deploy_message=Main branch build (from merge commit ${commit_sha_short}) for version ${version}" >> $GITHUB_OUTPUT
-            echo "deploy_dist_key=${{ secrets.DEPLOYGATE_MAIN_DISTRIBUTION_KEY || secrets.DEPLOYGATE_DISTRIBUTION_KEY }}" >> $GITHUB_OUTPUT
-            echo "is_release_build=false" >> $GITHUB_OUTPUT
-          fi
-
-      # -------- Android Build --------
-      - name: Decode Android Keystore
-        id: decode_keystore
-        # *** CORRECTED if CONDITION ***
-        if: steps.build_info.outputs.build_type == 'release' && env.KEYSTORE_BASE64 != ''
+      # 10. Deploy to DeployGate
+      - name: Upload to DeployGate
         env:
-          # Pass secret to env so 'if' condition can check it
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          DEPLOYGATE_API_KEY: ${{ secrets.DEPLOYGATE_API_KEY }}
+          DEPLOYGATE_USER_NAME: ${{ secrets.DEPLOYGATE_USER_NAME }}
+          DEPLOYGATE_DIST_KEY: ${{ secrets.DEPLOYGATE_DISTRIBUTION_KEY || '' }}
         run: |
-          # Use the environment variable populated from the secret
-          echo $KEYSTORE_BASE64 | base64 --decode > ${{ runner.temp }}/upload-keystore.jks
-          echo "keystorePath=${{ runner.temp }}/upload-keystore.jks" >> $GITHUB_OUTPUT
+          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          RELEASE_NOTES="Build ${{ github.run_number }} (props path) deployed via GitHub Actions. Commit: ${{ github.sha }}"
 
-      - name: Setup Android Signing Config
-        # This step's 'if' is okay: it relies on the output of the previous step.
-        # If decode_keystore was skipped (due to missing secret or not release build),
-        # its output 'keystorePath' will be empty, failing this condition correctly.
-        if: steps.build_info.outputs.build_type == 'release' && steps.decode_keystore.outputs.keystorePath
-        run: |
-          echo "storeFile=${{ steps.decode_keystore.outputs.keystorePath }}" > android/key.properties
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          echo "Uploading $APK_PATH to DeployGate..."
+          CURL_COMMAND="curl -sfL -F file=@\"$APK_PATH\" \
+                      -F token=\"$DEPLOYGATE_API_KEY\" \
+                      -F message=\"$RELEASE_NOTES\" "
 
-      - name: Build Android App
-        run: |
-          # Check build type AND if signing config file exists (implies secrets were present AND decoded)
-          if [[ "${{ steps.build_info.outputs.build_type }}" == "release" && -f "android/key.properties" ]]; then
-            echo "Building Release APK..."
-            flutter build apk --release
+          if [[ -n "$DEPLOYGATE_DIST_KEY" ]]; then
+            CURL_COMMAND+=" -F distribution_key=\"$DEPLOYGATE_DIST_KEY\""
+            echo "Deploying to distribution: $DEPLOYGATE_DIST_KEY"
           else
-            echo "WARNING: Building Debug APK (Reason: build_type is debug OR signing secrets missing/config failed)."
-            flutter build apk --debug
+            echo "Deploying without specific distribution key."
           fi
 
-      - name: Rename Android Artifact
-        id: android_artifact
+          CURL_COMMAND+=" https://deploygate.com/api/users/$DEPLOYGATE_USER_NAME/apps"
+          eval $CURL_COMMAND
+          echo "Upload command executed."
+
+      # 11. Cleanup Sensitive Files (Keystore and Properties)
+      - name: Cleanup Sensitive Files
+        if: always() # Ensure this runs even if previous steps fail
         run: |
-          app_name="${{ steps.build_info.outputs.app_name }}"
-          version_tag="${{ steps.build_info.outputs.version_tag }}"
-          build_type="${{ steps.build_info.outputs.build_type }}"
-
-          apk_path=$(find build/app/outputs/flutter-apk -name "app-${build_type}.apk" | head -n 1)
-          if [ -z "$apk_path" ]; then
-             apk_path=$(find build/app/outputs/flutter-apk -name "*-${build_type}.apk" | head -n 1)
-          fi
-          if [ -z "$apk_path" ]; then
-              echo "::error::Could not find built ${build_type} APK!"
-              exit 1
-          fi
-
-          new_name="${app_name}-${version_tag}-${build_type}.apk"
-          mv "$apk_path" "$new_name"
-          echo "path=$new_name" >> $GITHUB_OUTPUT
-          echo "name=$new_name" >> $GITHUB_OUTPUT
-          echo "Built artifact: $new_name"
-
-      # -------- Deploy to DeployGate --------
-      - name: Upload Android APK to DeployGate
-        if: steps.android_artifact.outputs.path
-        uses: deploygate/action-deploygate-upload@v1
-        with:
-          api_token: ${{ secrets.DEPLOYGATE_API_KEY }}
-          owner_name: ${{ secrets.DEPLOYGATE_USER_NAME }}
-          app_file_path: ${{ steps.android_artifact.outputs.path }}
-          message: "${{ steps.build_info.outputs.deploy_message }} - ${{ secrets.DEPLOYGATE_MESSAGE }}"
-          distribution_key: ${{ steps.build_info.outputs.deploy_dist_key }}
-
-      # -------- Create GitHub Release (Only for Tag pushes triggered run) --------
-      - name: Create GitHub Release
-        if: steps.build_info.outputs.is_release_build == 'true'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref_name }}
-          body: |
-            Official Release for ${{ github.ref_name }}
-            Commit: ${{ github.sha }}
-
-            **Artifacts:**
-            - Android: ${{ steps.android_artifact.outputs.name }}
-
-            Uploaded to DeployGate (Release Distribution).
-          draft: false
-          prerelease: false
-          files: |
-            ${{ steps.android_artifact.outputs.path }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "Cleaning up sensitive files..."
+          # Remove both the generated properties file and the decoded keystore
+          rm -f android/key.properties android/keystore.jks
+          echo "Cleanup complete."
