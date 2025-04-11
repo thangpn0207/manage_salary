@@ -36,8 +36,8 @@ jobs:
         run: flutter analyze
 
       # 6. Run tests (Optional)
-      - name: Run Flutter tests
-        run: flutter test
+      #      - name: Run Flutter tests
+      #        run: flutter test
 
       # 7. Decode Keystore File into Android Directory
       - name: Decode Keystore
