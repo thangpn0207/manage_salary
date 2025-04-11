@@ -1,7 +1,10 @@
+import 'package:manage_salary/core/util/date_util.dart'; // For date comparison
+
 import '../../../core/constants/enums.dart';
 import '../../../models/activity_data.dart';
+import '../../../models/recurring_activity.dart';
 
-// --- Calculation & Pruning Utility Functions ---
+// --- Calculation, Generation & Pruning Utility Functions ---
 class ActivityUtil {
   List<ActivityData> pruneActivities(List<ActivityData> activities) {
     // Keep activities within the last 3 months (approx 90 days)
@@ -24,14 +27,15 @@ class ActivityUtil {
         .fold(0.0, (sum, a) => sum + a.amount);
   }
 
-  Map<ActivityPaying, double> calculateExpensesByType(
+  // Updated to use ActivityType
+  Map<ActivityType, double> calculateExpensesByType(
       List<ActivityData> activities) {
-    final Map<ActivityPaying, double> spending = {};
+    final Map<ActivityType, double> spending = {};
     activities
         .where((a) => a.nature == ActivityNature.expense)
         .forEach((activity) {
       spending.update(
-        activity.activityType ?? ActivityPaying.other,
+        activity.type,
         (value) => value + activity.amount,
         ifAbsent: () => activity.amount,
       );
@@ -39,14 +43,14 @@ class ActivityUtil {
     return spending;
   }
 
-  Map<ActivityPaying, double> calculateIncomeByType(
-      List<ActivityData> activities) {
-    final Map<ActivityPaying, double> incomeMap = {};
+  // Updated to use ActivityType
+  Map<ActivityType, double> calculateIncomeByType(List<ActivityData> activities) {
+    final Map<ActivityType, double> incomeMap = {};
     activities
         .where((a) => a.nature == ActivityNature.income)
         .forEach((activity) {
       incomeMap.update(
-        activity.activityType ?? ActivityPaying.other,
+        activity.type,
         (value) => value + activity.amount,
         ifAbsent: () => activity.amount,
       );
@@ -54,28 +58,27 @@ class ActivityUtil {
     return incomeMap;
   }
 
+  // --- Date Range Helpers ---
+
   ({DateTime start, DateTime end}) getTodayRange() {
     final now = DateTime.now();
-    final start = DateTime(now.year, now.month, now.day);
-    final end = DateTime(now.year, now.month, now.day + 1);
+    final start = DateUtil.startOfDay(now);
+    final end = start.add(const Duration(days: 1));
     return (start: start, end: end);
   }
 
   ({DateTime start, DateTime end}) getThisWeekRange(
       {int startOfWeek = DateTime.monday}) {
     final now = DateTime.now();
-    final daysToSubtract = (now.weekday - startOfWeek + 7) % 7;
-    final start = DateTime(now.year, now.month, now.day - daysToSubtract);
+    final start = DateUtil.startOfWeek(now, startOfWeek: startOfWeek);
     final end = start.add(const Duration(days: 7));
     return (start: start, end: end);
   }
 
   ({DateTime start, DateTime end}) getThisMonthRange() {
     final now = DateTime.now();
-    final start = DateTime(now.year, now.month, 1);
-    final end = (now.month < 12)
-        ? DateTime(now.year, now.month + 1, 1)
-        : DateTime(now.year + 1, 1, 1);
+    final start = DateUtil.startOfMonth(now);
+    final end = DateUtil.startOfNextMonth(now);
     return (start: start, end: end);
   }
 
@@ -96,5 +99,74 @@ class ActivityUtil {
       }
     }
     return (income: income, expense: expense);
+  }
+
+  // --- Recurring Activity Generation ---
+
+  List<ActivityData> generateInstances(
+    RecurringActivity recurring,
+    List<ActivityData> existingActivities,
+    DateTime upToDate,
+  ) {
+    final List<ActivityData> newInstances = [];
+    DateTime nextDate = recurring.startDate;
+
+    // Find the last generated instance for this recurring activity
+    final lastGenerated = existingActivities
+        .where((a) => a.recurringActivityId == recurring.id)
+        .fold<DateTime?>(null, (latest, a) {
+      if (latest == null || a.date.isAfter(latest)) {
+        return a.date;
+      }
+      return latest;
+    });
+
+    // Start generating from the day AFTER the last generated instance, or from the start date
+    if (lastGenerated != null) {
+      nextDate = _calculateNextDate(recurring.frequency, lastGenerated);
+    }
+
+    while (nextDate.isBefore(upToDate) &&
+        (recurring.endDate == null || nextDate.isBefore(recurring.endDate!))) {
+      // Only add if an instance with the same date doesn't already exist
+      // (Handles cases where generation might run multiple times)
+      if (!existingActivities.any((a) =>
+          a.recurringActivityId == recurring.id &&
+          DateUtil.isSameDay(a.date, nextDate))) {
+        newInstances.add(ActivityData(
+          nature: recurring.type == ActivityType.salary ||
+                  recurring.type == ActivityType.freelance ||
+                  recurring.type == ActivityType.investment ||
+                  recurring.type == ActivityType.incomeOther
+              ? ActivityNature.income
+              : ActivityNature.expense,
+          title: recurring.title,
+          amount: recurring.amount,
+          date: nextDate,
+          type: recurring.type,
+          recurringActivityId: recurring.id,
+        ));
+      }
+      nextDate = _calculateNextDate(recurring.frequency, nextDate);
+    }
+
+    return newInstances;
+  }
+
+  DateTime _calculateNextDate(RecurringFrequency frequency, DateTime currentDate) {
+    switch (frequency) {
+      case RecurringFrequency.daily:
+        return currentDate.add(const Duration(days: 1));
+      case RecurringFrequency.weekly:
+        return currentDate.add(const Duration(days: 7));
+      case RecurringFrequency.biWeekly:
+        return currentDate.add(const Duration(days: 14));
+      case RecurringFrequency.monthly:
+        // Basic monthly - add 1 month (can have issues with end-of-month)
+        // Consider using a more robust date package for complex scenarios
+        return DateTime(currentDate.year, currentDate.month + 1, currentDate.day);
+      case RecurringFrequency.yearly:
+        return DateTime(currentDate.year + 1, currentDate.month, currentDate.day);
+    }
   }
 }

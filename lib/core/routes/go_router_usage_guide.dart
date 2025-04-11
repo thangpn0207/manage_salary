@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class GoRouterExamples extends StatelessWidget {
-  const GoRouterExamples({Key? key}) : super(key: key);
+  const GoRouterExamples({super.key});
 
   @override
   Widget build(BuildContext context) {
