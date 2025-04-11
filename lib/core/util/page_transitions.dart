@@ -155,11 +155,11 @@ class PageTransitions {
 /// A widget that implements the fade through transition
 class FadeThroughTransition extends StatelessWidget {
   const FadeThroughTransition({
-    Key? key,
+    super.key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;

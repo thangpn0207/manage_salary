@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../bloc/activity/activity_bloc.dart';
+import '../../../../bloc/activity/activity_event.dart'; // Import the event
 import '../../../../bloc/activity/activity_state.dart';
 import '../../../../core/constants/enums.dart';
-import '../../../../core/locale/generated/l10n.dart';
+import '../../../../core/locale/generated/l10n.dart'; // Import generated localization
 import '../../../../models/activity_data.dart';
 import '../../../components/activity_item.dart';
 
@@ -57,8 +58,8 @@ class _ActivityTabsViewState extends State<ActivityTabsView>
             TabBar(
               controller: _tabController,
               tabs: [
-                Tab(text: S.current.income),
-                Tab(text: S.current.expenses),
+                Tab(text: S.of(context).income), // Use localization
+                Tab(text: S.of(context).expenses), // Use localization
               ],
               // Customize appearance as needed
               labelColor: Theme.of(context).colorScheme.primary,
@@ -73,11 +74,17 @@ class _ActivityTabsViewState extends State<ActivityTabsView>
                 children: [
                   // --- Income Tab Content ---
                   _buildActivityListView(
-                      incomeActivities, 'No income activities recorded yet.'),
+                    context, // Pass context
+                    incomeActivities,
+                    S.of(context).noIncomeActivities, // Use localization
+                  ),
 
                   // --- Expense Tab Content ---
                   _buildActivityListView(
-                      expenseActivities, 'No expense activities recorded yet.'),
+                    context, // Pass context
+                    expenseActivities,
+                    S.of(context).noExpenseActivities, // Use localization
+                  ),
                 ],
               ),
             ),
@@ -89,11 +96,14 @@ class _ActivityTabsViewState extends State<ActivityTabsView>
 
   // --- Helper Widget to build the ListView ---
   Widget _buildActivityListView(
-      List<ActivityData> activities, String emptyListMessage) {
+    BuildContext context, // Need context to access BLoC
+    List<ActivityData> activities,
+    String emptyListMessage,
+  ) {
     if (activities.isEmpty) {
       return Center(
         child: Text(
-          emptyListMessage,
+          emptyListMessage, // Already uses the localized string passed in
           style: Theme.of(context)
               .textTheme
               .bodyMedium
@@ -110,7 +120,23 @@ class _ActivityTabsViewState extends State<ActivityTabsView>
       itemBuilder: (context, index) {
         final activity = activities[index];
         // Use your existing ActivityListItem widget
-        return ActivityListItem(activity: activity);
+        // *** MODIFIED: Added onDismissed callback ***
+        return ActivityListItem(
+          activity: activity,
+          onDismissed: (activityId) {
+            // Dispatch the RemoveActivity event using the BLoC
+            context.read<ActivityBloc>().add(RemoveActivity(activityId));
+            // Optional: Show a snackbar to confirm deletion or offer undo
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                // Use localization for the snackbar message
+                content: Text(S.of(context).activityDeleted(activity.title)),
+                duration: const Duration(seconds: 2),
+                // Optionally add an Undo action
+              ),
+            );
+          },
+        );
       },
     );
   }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // For TextInputFormatters
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/constants/enums.dart';
+import '../../../../core/locale/generated/l10n.dart';
+import '../../../../core/util/localization_utils.dart'; // Import the utils
 import '../../../../models/activity_data.dart';
 
 class AddActivitySheetContent extends StatefulWidget {
@@ -17,16 +19,14 @@ class AddActivitySheetContent extends StatefulWidget {
 
 class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   final _formKey = GlobalKey<FormBuilderState>();
-  DateTime _selectedDate = DateTime.now(); // Default to today
+  DateTime _selectedDate = DateTime.now();
 
-  // Function to show the date picker
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(2000), // Or relevant start date
-      lastDate:
-          DateTime.now().add(const Duration(days: 365)), // Or relevant end date
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -35,7 +35,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
     }
   }
 
-  // Function to handle form submission
   void _submitForm() {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final formData = _formKey.currentState?.value;
@@ -44,23 +43,19 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
         nature: formData?['activityNature'],
         activityType: formData?['activityType'],
         title: formData?['title'],
-        amount: double.tryParse(formData?['amount'] ?? '0') ?? 0,
+        amount: double.tryParse(formData?['amount']?.replaceAll(',', '') ?? '0') ?? 0,
         date: _selectedDate,
       );
 
-      // Pop the bottom sheet and return the data
       Navigator.pop(context, activityData);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all fields correctly.')),
+        SnackBar(content: Text(S.of(context).formValidationError)),
       );
     }
   }
 
-  // Get icon for dropdown item (optional but nice)
   IconData _getIconForActivity(ActivityPaying type) {
-    // Reuse the logic from ActivityListItem or define it here
-    // (Copied from previous example for completeness)
     switch (type) {
       case ActivityPaying.salary:
         return Icons.wallet;
@@ -92,6 +87,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final currentLocale = Localizations.localeOf(context).toString();
 
     return SingleChildScrollView(
       child: Padding(
@@ -108,16 +104,15 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Add New Activity',
+                S.of(context).addNewActivitySheetTitle,
                 style: theme.textTheme.headlineSmall
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              // --- Activity nature Dropdown ---
               FormBuilderDropdown<ActivityNature>(
                 name: 'activityNature',
                 decoration: InputDecoration(
-                  labelText: 'Activity Nature',
+                  labelText: S.of(context).activityNatureLabel,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -131,12 +126,11 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                           value == ActivityNature.income
                               ? Icons.arrow_circle_down_outlined
                               : Icons.arrow_circle_up_outlined,
-                          // Use the helper function to get the icon
                           size: 20,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(value.name),
+                        Text(localizedActivityNature(context, value)), // Use utils
                       ],
                     ),
                   );
@@ -144,11 +138,10 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),
-              // --- Activity Type Dropdown ---
               FormBuilderDropdown<ActivityPaying>(
                 name: 'activityType',
                 decoration: InputDecoration(
-                  labelText: 'Activity Type',
+                  labelText: S.of(context).activityTypeLabel,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -160,12 +153,11 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                       children: [
                         Icon(
                           _getIconForActivity(value),
-                          // Use the helper function to get the icon
                           size: 20,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(value.name),
+                        Text(localizedActivityPaying(context, value)), // Use utils
                       ],
                     ),
                   );
@@ -173,12 +165,10 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),
-
-              // --- Title/Description Field ---
               FormBuilderTextField(
                 name: 'title',
                 decoration: InputDecoration(
-                  labelText: 'Title / Description',
+                  labelText: S.of(context).titleDescriptionLabel,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -187,14 +177,12 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 validator: FormBuilderValidators.required(),
               ),
               const SizedBox(height: 16),
-
-              // --- Amount Field ---
               FormBuilderTextField(
                 name: 'amount',
                 decoration: InputDecoration(
-                  labelText: 'Amount',
+                  labelText: S.of(context).amountLabel,
                   prefixText:
-                      '${NumberFormat.simpleCurrency(locale: 'en_US').currencySymbol} ',
+                      '${NumberFormat.simpleCurrency(locale: currentLocale).currencySymbol} ',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -207,23 +195,21 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                   FormBuilderValidators.numeric(),
-                  FormBuilderValidators.min(0.01),
+                  FormBuilderValidators.min( 0.01),
                 ]),
               ),
               const SizedBox(height: 16),
-
-              // --- Date Picker ---
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      'Date: ${DateFormat.yMd().format(_selectedDate)}',
+                      S.of(context).dateLabelPrefix + DateFormat.yMd(currentLocale).format(_selectedDate),
                       style: theme.textTheme.titleMedium,
                     ),
                   ),
                   TextButton.icon(
                     icon: const Icon(Icons.calendar_month_outlined),
-                    label: const Text('Change'),
+                    label: Text(S.of(context).changeButton),
                     onPressed: () => _pickDate(context),
                     style: TextButton.styleFrom(
                       foregroundColor: theme.colorScheme.primary,
@@ -232,13 +218,11 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 ],
               ),
               const SizedBox(height: 24),
-
-              // --- Submit Button ---
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.add_task_outlined),
-                  label: const Text('Add Activity'),
+                  label: Text(S.of(context).addActivityButton),
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),

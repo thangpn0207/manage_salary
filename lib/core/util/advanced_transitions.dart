@@ -91,12 +91,12 @@ class AdvancedTransitions {
 /// Implementation of SharedAxisTransition
 class SharedAxisTransition extends StatelessWidget {
   const SharedAxisTransition({
-    Key? key,
+    super.key,
     required this.animation,
     required this.secondaryAnimation,
     required this.transitionType,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;
@@ -137,11 +137,10 @@ enum SharedAxisTransitionType {
 
 class _SharedAxisHorizontal extends StatelessWidget {
   const _SharedAxisHorizontal({
-    Key? key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;
@@ -194,11 +193,10 @@ class _SharedAxisHorizontal extends StatelessWidget {
 
 class _SharedAxisVertical extends StatelessWidget {
   const _SharedAxisVertical({
-    Key? key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;
@@ -251,11 +249,10 @@ class _SharedAxisVertical extends StatelessWidget {
 
 class _SharedAxisScaled extends StatelessWidget {
   const _SharedAxisScaled({
-    Key? key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Animation<double> animation;
   final Animation<double> secondaryAnimation;
