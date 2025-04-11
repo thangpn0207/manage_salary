@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:manage_salary/bloc/activity/util/activity_util.dart';
 
@@ -119,15 +118,15 @@ class ActivityState extends Equatable {
       return {
         'allActivities':
             allActivities.map((activity) => activity.toJson()).toList(),
-        'budgets': budgets.map((budget) => budget.toJson()).toList(), // Serialize budgets
-        'recurringActivities': recurringActivities
-            .map((rec) => rec.toJson())
-            .toList(), // Serialize recurring activities
+        'budgets': budgets.map((budget) => budget.toJson()).toList(),
+        // Serialize budgets
+        'recurringActivities':
+            recurringActivities.map((rec) => rec.toJson()).toList(),
+        // Serialize recurring activities
       };
     } catch (e, stackTrace) {
-       print("Error serializing ActivityState: $e
-$stackTrace");
-       return {'allActivities': []}; // Fallback to minimal JSON
+      print("Error serializing ActivityState: $e $stackTrace");
+      return {'allActivities': []}; // Fallback to minimal JSON
     }
   }
 
@@ -142,7 +141,8 @@ $stackTrace");
           .toList();
 
       // Deserialize Budgets
-      final List<dynamic> budgetListJson = json['budgets'] as List<dynamic>? ?? [];
+      final List<dynamic> budgetListJson =
+          json['budgets'] as List<dynamic>? ?? [];
       final List<Budget> budgets = budgetListJson
           .map((bJson) => Budget.fromJson(bJson as Map<String, dynamic>))
           .toList();
@@ -164,8 +164,10 @@ $stackTrace");
 
       return ActivityState(
         allActivities: prunedActivities,
-        budgets: budgets, // Use deserialized list
-        recurringActivities: recurringActivities, // Use deserialized list
+        budgets: budgets,
+        // Use deserialized list
+        recurringActivities: recurringActivities,
+        // Use deserialized list
         totalIncome: analytics.totalIncome,
         totalExpenses: analytics.totalExpenses,
         netBalance: analytics.netBalance,
@@ -179,9 +181,7 @@ $stackTrace");
         thisMonthExpenses: analytics.thisMonthExpenses,
       );
     } catch (e, stackTrace) {
-      print("Error deserializing ActivityState: $e
-$stackTrace
-Data: $json");
+      print("Error deserializing ActivityState: $e $stackTrace Data: $json");
       return ActivityState.initial(); // Fallback
     }
   }

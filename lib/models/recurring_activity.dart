@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:uuid/uuid.dart'; // For default ID generation
@@ -62,10 +61,13 @@ class RecurringActivity extends Equatable {
       'id': id,
       'title': title,
       'amount': amount,
-      'type': type.name, // Store enum name
-      'frequency': frequency.name, // Store enum name
+      'type': type.name,
+      // Store enum name
+      'frequency': frequency.name,
+      // Store enum name
       'startDate': startDate.toIso8601String(),
-      'endDate': endDate?.toIso8601String(), // Store optional date as ISO string or null
+      'endDate': endDate?.toIso8601String(),
+      // Store optional date as ISO string or null
     };
   }
 
@@ -73,18 +75,22 @@ class RecurringActivity extends Equatable {
     try {
       final endDateString = json['endDate'] as String?;
       return RecurringActivity(
-        id: json['id'] as String? ?? const Uuid().v4(), // Generate ID if missing
+        id: json['id'] as String? ?? const Uuid().v4(),
+        // Generate ID if missing
         title: json['title'] as String? ?? 'Recurring Entry',
         amount: (json['amount'] as num? ?? 0.0).toDouble(),
-        type: ActivityType.values.byName(json['type'] as String? ?? ActivityType.expenseOther.name),
-        frequency: RecurringFrequency.values.byName(json['frequency'] as String? ?? RecurringFrequency.monthly.name),
-        startDate: DateTime.tryParse(json['startDate'] as String? ?? '') ?? DateTime.now(),
-        endDate: endDateString == null ? null : DateTime.tryParse(endDateString),
+        type: ActivityType.values
+            .byName(json['type'] as String? ?? ActivityType.expenseOther.name),
+        frequency: RecurringFrequency.values.byName(
+            json['frequency'] as String? ?? RecurringFrequency.monthly.name),
+        startDate: DateTime.tryParse(json['startDate'] as String? ?? '') ??
+            DateTime.now(),
+        endDate:
+            endDateString == null ? null : DateTime.tryParse(endDateString),
       );
     } catch (e, stackTrace) {
-      print("Error deserializing RecurringActivity: $e
-$stackTrace
-Data: $json");
+      print(
+          "Error deserializing RecurringActivity: $e $stackTrace Data: $json");
       // Provide a fallback recurring activity
       return RecurringActivity(
         id: const Uuid().v4(),

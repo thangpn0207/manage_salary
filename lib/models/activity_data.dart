@@ -71,7 +71,8 @@ class ActivityData extends Equatable {
           ? defaultType
           : ActivityType.values.firstWhere(
               (e) => e.name == typeName,
-              orElse: () => defaultType, // Default category if name doesn't match
+              orElse: () =>
+                  defaultType, // Default category if name doesn't match
             );
 
       // Parse amount, ensure it's positive
@@ -95,9 +96,7 @@ class ActivityData extends Equatable {
         recurringActivityId: json['recurringActivityId'] as String?,
       );
     } catch (e, stackTrace) {
-      print("Error deserializing ActivityData: $e
-$stackTrace
-Data: $json");
+      print("Error deserializing ActivityData: $e $stackTrace Data: $json");
       // Return a default/error placeholder object
       return ActivityData(
         id: "${DateTime.now().millisecondsSinceEpoch}error",

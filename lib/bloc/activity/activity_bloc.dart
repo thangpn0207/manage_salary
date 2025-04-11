@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 // Import events, state, models, enums
 import '../../core/constants/enums.dart';
 import '../../models/activity_data.dart';
-import '../../models/budget.dart';             // Import model
+import '../../models/budget.dart'; // Import model
 import '../../models/recurring_activity.dart'; // Import model
 import 'activity_event.dart';
 import 'activity_state.dart';
@@ -124,12 +124,13 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   void _onAddRecurringActivity(
       AddRecurringActivity event, Emitter<ActivityState> emit) {
     final recurringWithId = event.recurringActivity.copyWith(id: _uuid.v4());
-    final updatedRecurring = List<RecurringActivity>.from(state.recurringActivities)
-      ..add(recurringWithId);
+    final updatedRecurring =
+        List<RecurringActivity>.from(state.recurringActivities)
+          ..add(recurringWithId);
     emit(state.copyWith(recurringActivities: updatedRecurring));
     // Optionally trigger instance generation immediately
     add(GenerateRecurringInstances(untilDate: DateTime.now()));
-     // TODO: Add UI for managing recurring activities
+    // TODO: Add UI for managing recurring activities
   }
 
   void _onUpdateRecurringActivity(
@@ -146,20 +147,23 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
   void _onRemoveRecurringActivity(
       RemoveRecurringActivity event, Emitter<ActivityState> emit) {
-    final updatedRecurring = List<RecurringActivity>.from(state.recurringActivities)
-      ..removeWhere((rec) => rec.id == event.recurringActivityId);
+    final updatedRecurring =
+        List<RecurringActivity>.from(state.recurringActivities)
+          ..removeWhere((rec) => rec.id == event.recurringActivityId);
 
     // Also remove generated activities linked to this recurring one
     final updatedActivities = List<ActivityData>.from(state.allActivities)
-        ..removeWhere((act) => act.recurringActivityId == event.recurringActivityId);
-    updatedActivities.sort((a,b) => b.date.compareTo(a.date)); // Re-sort
+      ..removeWhere(
+          (act) => act.recurringActivityId == event.recurringActivityId);
+    updatedActivities.sort((a, b) => b.date.compareTo(a.date)); // Re-sort
 
     // Recalculate analytics after removing linked activities
     final analytics = calculateAnalytics(updatedActivities);
 
     emit(state.copyWith(
       recurringActivities: updatedRecurring,
-      allActivities: updatedActivities, // Emit updated activities list
+      allActivities: updatedActivities,
+      // Emit updated activities list
       // Emit recalculated analytics
       totalIncome: analytics.totalIncome,
       totalExpenses: analytics.totalExpenses,
@@ -177,7 +181,6 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
   void _onGenerateRecurringInstances(
       GenerateRecurringInstances event, Emitter<ActivityState> emit) {
-
     // Simple generation logic - needs refinement for different frequencies
     // This is a basic example for MONTHLY recurrence. Needs expansion.
     List<ActivityData> newlyGenerated = [];
@@ -186,31 +189,36 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     for (final recurring in state.recurringActivities) {
       DateTime nextDueDate = recurring.startDate;
 
-       // Make sure start date is not in the future for generation loop
+      // Make sure start date is not in the future for generation loop
       if (nextDueDate.isAfter(now)) continue;
 
       while (nextDueDate.isBefore(now) || nextDueDate.isAtSameMomentAs(now)) {
-         // Check if end date is reached
-        if (recurring.endDate != null && nextDueDate.isAfter(recurring.endDate!)) {
+        // Check if end date is reached
+        if (recurring.endDate != null &&
+            nextDueDate.isAfter(recurring.endDate!)) {
           break; // Stop generating for this item if end date passed
         }
 
         // Check if an instance for this recurring item on this date already exists
         bool alreadyExists = state.allActivities.any((activity) =>
-            activity.recurringActivityId == recurring.id &&
-            activity.date.year == nextDueDate.year &&
-            activity.date.month == nextDueDate.month &&
-            activity.date.day == nextDueDate.day // Check day specifically
-        );
+                activity.recurringActivityId == recurring.id &&
+                activity.date.year == nextDueDate.year &&
+                activity.date.month == nextDueDate.month &&
+                activity.date.day == nextDueDate.day // Check day specifically
+            );
 
         if (!alreadyExists) {
-           // Create instance ONLY if it doesn't exist and is within end date
+          // Create instance ONLY if it doesn't exist and is within end date
           newlyGenerated.add(ActivityData(
             // Generate new ID for the instance
             id: _uuid.v4(),
-            nature: recurring.type.name.toLowerCase().contains('income') || recurring.type == ActivityType.salary || recurring.type == ActivityType.freelance || recurring.type == ActivityType.investment
+            nature: recurring.type.name.toLowerCase().contains('income') ||
+                    recurring.type == ActivityType.salary ||
+                    recurring.type == ActivityType.freelance ||
+                    recurring.type == ActivityType.investment
                 ? ActivityNature.income
-                : ActivityNature.expense, // Determine nature from type
+                : ActivityNature.expense,
+            // Determine nature from type
             title: recurring.title,
             amount: recurring.amount,
             date: nextDueDate,
@@ -219,7 +227,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
           ));
         }
 
-         // Calculate the *next* potential due date based on frequency
+        // Calculate the *next* potential due date based on frequency
         try {
           switch (recurring.frequency) {
             case RecurringFrequency.daily:
@@ -229,8 +237,8 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
               nextDueDate = nextDueDate.add(const Duration(days: 7));
               break;
             case RecurringFrequency.biWeekly:
-               nextDueDate = nextDueDate.add(const Duration(days: 14));
-               break;
+              nextDueDate = nextDueDate.add(const Duration(days: 14));
+              break;
             case RecurringFrequency.monthly:
               // Attempting smarter month increment (handles month length)
               var newMonth = nextDueDate.month + 1;
@@ -241,38 +249,46 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
               }
               // Check if the original day exists in the new month
               var daysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
-              var newDay = nextDueDate.day > daysInNewMonth ? daysInNewMonth : nextDueDate.day;
+              var newDay = nextDueDate.day > daysInNewMonth
+                  ? daysInNewMonth
+                  : nextDueDate.day;
               nextDueDate = DateTime(newYear, newMonth, newDay);
               break;
             case RecurringFrequency.yearly:
               // Handle leap years for Feb 29
               var newDay = nextDueDate.day;
               if (nextDueDate.month == 2 && nextDueDate.day == 29) {
-                  // If next year is not a leap year, use Feb 28
-                  if (!DateTime(nextDueDate.year + 1, 1, 1).isUtc) { // Quick leap year check approximation
-                     if (((nextDueDate.year + 1) % 4 == 0) && (((nextDueDate.year + 1) % 100 != 0) || ((nextDueDate.year + 1) % 400 == 0))) {
-                       // It is a leap year
-                     } else {
-                       newDay = 28;
-                     }
+                // If next year is not a leap year, use Feb 28
+                if (!DateTime(nextDueDate.year + 1, 1, 1).isUtc) {
+                  // Quick leap year check approximation
+                  if (((nextDueDate.year + 1) % 4 == 0) &&
+                      (((nextDueDate.year + 1) % 100 != 0) ||
+                          ((nextDueDate.year + 1) % 400 == 0))) {
+                    // It is a leap year
+                  } else {
+                    newDay = 28;
                   }
+                }
               }
-              nextDueDate = DateTime(nextDueDate.year + 1, nextDueDate.month, newDay);
+              nextDueDate =
+                  DateTime(nextDueDate.year + 1, nextDueDate.month, newDay);
               break;
           }
         } catch (e) {
-           print("Error calculating next due date: $e");
-           break; // Exit loop for this item if date calculation fails
+          print("Error calculating next due date: $e");
+          break; // Exit loop for this item if date calculation fails
         }
 
-         // Safety break for potential infinite loops if logic is flawed
-         if (nextDueDate.year > now.year + 10) break; // Limit generation horizon further
-         if (newlyGenerated.length > 1000) break; // Limit batch size
+        // Safety break for potential infinite loops if logic is flawed
+        if (nextDueDate.year > now.year + 10)
+          break; // Limit generation horizon further
+        if (newlyGenerated.length > 1000) break; // Limit batch size
       }
     }
 
     if (newlyGenerated.isNotEmpty) {
-      final updatedList = List<ActivityData>.from(state.allActivities)..addAll(newlyGenerated);
+      final updatedList = List<ActivityData>.from(state.allActivities)
+        ..addAll(newlyGenerated);
       // No need to prune generated activities unless specific rules apply
       updatedList.sort((a, b) => b.date.compareTo(a.date)); // Re-sort
 
@@ -296,21 +312,19 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     // No change emission if nothing was generated
   }
 
-
   // --- HydratedBloc Overrides ---
 
   @override
   ActivityState? fromJson(Map<String, dynamic> json) {
     try {
-       // We need ActivityState.fromJson to handle the new lists
-       // We will update that next after adding toJson/fromJson to models
+      // We need ActivityState.fromJson to handle the new lists
+      // We will update that next after adding toJson/fromJson to models
       final state = ActivityState.fromJson(json);
       // Trigger generation after loading state
       add(GenerateRecurringInstances(untilDate: DateTime.now()));
       return state;
     } catch (e, stackTrace) {
-      print("Error hydrating ActivityBloc state: $e
-$stackTrace");
+      print("Error hydrating ActivityBloc state: $e $stackTrace");
       // Fallback to initial state on error
       return ActivityState.initial();
     }
@@ -320,11 +334,10 @@ $stackTrace");
   Map<String, dynamic>? toJson(ActivityState state) {
     // We need state.toJson to include the new lists
     // We will update that next after adding toJson/fromJson to models
-     try {
+    try {
       return state.toJson();
     } catch (e, stackTrace) {
-      print("Error serializing ActivityBloc state: $e
-$stackTrace");
+      print("Error serializing ActivityBloc state: $e $stackTrace");
       return null;
     }
   }
