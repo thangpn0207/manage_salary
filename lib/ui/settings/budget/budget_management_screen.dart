@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manage_salary/core/constants/enums.dart';
+import 'package:manage_salary/core/extensions/context.dart';
 import 'package:manage_salary/core/util/money_util.dart';
-import 'package:manage_salary/ui/components/base_button.dart';
 import 'package:manage_salary/ui/settings/budget/widgets/add_edit_budget_dialog.dart';
 
-import '../../../../bloc/activity/activity_bloc.dart';
-import '../../../../bloc/activity/activity_event.dart';
-import '../../../../bloc/activity/activity_state.dart';
+import '../../../../bloc/activity/activity_bloc.dart'; // Corrected path
+import '../../../../bloc/activity/activity_event.dart'; // Corrected path
+import '../../../../bloc/activity/activity_state.dart'; // Corrected path
+import '../../../../models/budget_category.dart';// Corrected path
 import '../../../../models/budget.dart';
 
 // Import the Add/Edit Dialog (will create next)
@@ -70,13 +71,26 @@ class BudgetManagementScreen extends StatelessWidget {
       body: BlocBuilder<ActivityBloc, ActivityState>(
         builder: (context, state) {
           if (state.budgets.isEmpty) {
-            return Center(
-              child: BaseButton(
-                  text: "Add",
+            return Center(child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('No budgets set yet.'),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
                   onPressed: () {
-                    _showAddEditBudgetDialog(context);
-                  }),
+                    _showAddEditBudgetBottomSheet(context);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Budget'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
             );
+
           }
 
           return ListView.builder(
@@ -109,7 +123,7 @@ class BudgetManagementScreen extends StatelessWidget {
                   subtitle: Text('Period: \${_formatEnumName(budget.period)}'),
                   trailing: Text(MoneyUtil.formatDefault(budget.amount)),
                   onTap: () {
-                    _showAddEditBudgetDialog(context, budgetToEdit: budget);
+                    _showAddEditBudgetBottomSheet(context, budgetToEdit: budget);
                   },
                 ),
               );
@@ -119,29 +133,26 @@ class BudgetManagementScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddEditBudgetDialog(context);
+          _showAddEditBudgetBottomSheet(context);
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  // Function to show the Add/Edit Budget Dialog (placeholder)
-  void _showAddEditBudgetDialog(BuildContext context, {Budget? budgetToEdit}) {
-    showDialog(
-      context: context,
-      builder: (_) => AddEditBudgetDialog(
-        budget: budgetToEdit,
-        onSave: (Budget newOrUpdatedBudget) {
-          if (budgetToEdit == null) {
-            context.read<ActivityBloc>().add(AddBudget(newOrUpdatedBudget));
-          } else {
-            context.read<ActivityBloc>().add(UpdateBudget(newOrUpdatedBudget));
-          }
+  void _showAddEditBudgetBottomSheet(BuildContext context,
+      {Budget? budgetToEdit}) {
+    AddEditBudgetDialog.show(context,
+        budget: budgetToEdit, onSave: (Budget newOrUpdatedBudget) {
+      if (budgetToEdit == null) {
+        context.read<ActivityBloc>().add(AddBudget(newOrUpdatedBudget));
+      } else {
+        context.read<ActivityBloc>().add(UpdateBudget(newOrUpdatedBudget));
+      }
         },
-      ),
-    );
+    );  
   }
+  
 
   ActivityType _convertBudgetCategoryToActivityType(
       BudgetCategory budgetCategory) {

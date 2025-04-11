@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // Import for Flutter widgets
+import 'package:manage_salary/core/extensions/context.dart'; // Import for context extension
+import 'package:manage_salary/core/extensions/string_extension.dart'; // Import for string extension
 
-import '../../../../models/budget.dart';
+import '../../../../models/budget.dart'; // Import for Budget model
 
+// Enumeration for budget categories
 enum BudgetCategory {
   foodAndDrinks,
   transportation,
@@ -10,6 +13,7 @@ enum BudgetCategory {
   expenseOther,
 }
 
+// Enumeration for budget periods
 enum BudgetPeriod {
   daily,
   weekly,
@@ -17,6 +21,7 @@ enum BudgetPeriod {
   yearly,
 }
 
+// Stateful widget for adding or editing a budget
 class AddEditBudgetDialog extends StatefulWidget {
   final Budget? budget;
   final Function(Budget) onSave;
@@ -31,6 +36,7 @@ class AddEditBudgetDialog extends StatefulWidget {
   _AddEditBudgetDialogState createState() => _AddEditBudgetDialogState();
 }
 
+// State class for AddEditBudgetDialog
 class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
   late BudgetCategory _selectedCategory;
   late BudgetPeriod _selectedPeriod;
@@ -54,13 +60,11 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
     super.dispose();
   }
 
-  String _formatEnumBudgetCategoryName(BudgetCategory enumValue) {
+  // Helper function to format enum names
+  String _formatEnumName(dynamic enumValue) {
     if (enumValue == null) return '';
     String name = enumValue.name;
-    // Split by uppercase letters and join with space
-    name = name.replaceAllMapped(
-        RegExp(r'([A-Z])'), (match) => ' \${match.group(1)}');
-    // Capitalize first letter (using extension or basic)
+
     try {
       name = name[0].toUpperCase() + name.substring(1).trim();
     } catch (_) {
@@ -72,38 +76,59 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
     return name.trim();
   }
 
-  String _formatEnumBudgetPeriodName(BudgetPeriod enumValue) {
-    if (enumValue == null) return '';
-    String name = enumValue.name;
-    // Split by uppercase letters and join with space
-    name = name.replaceAllMapped(
-        RegExp(r'([A-Z])'), (match) => ' \${match.group(1)}');
-    // Capitalize first letter (using extension or basic)
-    try {
-      name = name[0].toUpperCase() + name.substring(1).trim();
-    } catch (_) {
-      if (name.isNotEmpty) {
-        name = name[0].toUpperCase() + name.substring(1);
-      }
-    }
-    name = name.replaceFirst('And', '&');
-    return name.trim();
+  // Static method to show the bottom sheet
+  static Future<void> show(BuildContext context,
+      {Budget? budget, required Function(Budget) onSave}) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext bc) {
+        return Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: AddEditBudgetDialog(budget: budget, onSave: onSave),
+        );
+      },
+    );
+  }
+  
+   PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: Text(widget.budget == null ? 'Add Budget' : 'Edit Budget'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            double amount = double.tryParse(_amountController.text) ?? 0.0;
+            final budget = Budget(
+                id: widget.budget?.id ?? DateTime.now().toString(),
+                category: _selectedCategory,
+                period: _selectedPeriod,
+                amount: amount);
+            widget.onSave(budget);
+            Navigator.of(context).pop();
+          },
+          child: const Text('Save'),
+        ),
+      ],
+    );
   }
 
   @override
+  // Build method for the widget
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.budget == null ? 'Add Budget' : 'Edit Budget'),
-      content: SingleChildScrollView(
-        child: Column(
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
             DropdownButtonFormField<BudgetCategory>(
               value: _selectedCategory,
               items: _categories.map((BudgetCategory category) {
-                return DropdownMenuItem<BudgetCategory>(
-                  value: category,
-                  child: Text(_formatEnumBudgetCategoryName(category)),
+                return DropdownMenuItem(value: category,child: Text(_formatEnumName(category)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -117,9 +142,8 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
             DropdownButtonFormField<BudgetPeriod>(
               value: _selectedPeriod,
               items: _periods.map((BudgetPeriod period) {
-                return DropdownMenuItem<BudgetPeriod>(
-                  value: period,
-                  child: Text(_formatEnumBudgetPeriodName(period)),
+                return DropdownMenuItem(value: period,
+                  child: Text(_formatEnumName(period)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -138,28 +162,7 @@ class _AddEditBudgetDialogState extends State<AddEditBudgetDialog> {
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            double amount = double.tryParse(_amountController.text) ?? 0.0;
-            final budget = Budget(
-                id: widget.budget?.id ?? DateTime.now().toString(),
-                category: _selectedCategory,
-                period: _selectedPeriod,
-                amount: amount);
-
-            widget.onSave(budget);
-            Navigator.of(context).pop();
-          },
-          child: const Text('Save'),
-        ),
-      ],
+      ),
     );
   }
 }
