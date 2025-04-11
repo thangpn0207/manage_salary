@@ -40,6 +40,10 @@
   "activityTypeTravel": "Du lịch",
   "activityTypeSavings": "Tiết kiệm",
   "activityTypeOther": "Khác",
+  "activityTypeExpenseOther": "Chi tieu khác",
+  "activityTypeFreelance": "Freelance",
+  "activityTypeInvestment": "Đầu tư",
+  "activityTypeIncomeOther": "Thu nhập khác",
   "otherCategory": "Khác",
   "noChartData": "Không có dữ liệu chi phí nào trong khoảng thời gian này để hiển thị biểu đồ."
 }

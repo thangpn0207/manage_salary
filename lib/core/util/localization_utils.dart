@@ -14,30 +14,45 @@ String localizedActivityNature(BuildContext context, ActivityNature nature) {
 
 // Helper function to get localized string for ActivityPaying
 String localizedActivityPaying(BuildContext context, ActivityType type) {
+  final s = S.of(context);
+
   switch (type) {
-    case ActivityType.salary:
-      return S.of(context).activityTypeSalary;
+// === Expense Types ===
     case ActivityType.shopping:
-      return S.of(context).activityTypeShopping;
+      return s.activityTypeShopping;
     case ActivityType.foodAndDrinks:
-      return S.of(context).activityTypeFoodAndDrinks;
-    case ActivityType.utilities:
-      return S.of(context).activityTypeUtilities;
+      return s.activityTypeFoodAndDrinks;
     case ActivityType.rent:
-      return S.of(context).activityTypeRent;
+      return s.activityTypeRent;
+    case ActivityType.utilities:
+      return s.activityTypeUtilities;
     case ActivityType.groceries:
-      return S.of(context).activityTypeGroceries;
+      return s.activityTypeGroceries;
     case ActivityType.entertainment:
-      return S.of(context).activityTypeEntertainment;
+      return s.activityTypeEntertainment;
     case ActivityType.education:
-      return S.of(context).activityTypeEducation;
+      return s.activityTypeEducation;
     case ActivityType.healthcare:
-      return S.of(context).activityTypeHealthcare;
+      return s.activityTypeHealthcare;
     case ActivityType.travel:
-      return S.of(context).activityTypeTravel;
-    case ActivityType.savings:
-      return S.of(context).activityTypeSavings;
-    case ActivityType.other:
-      return S.of(context).activityTypeOther;
+      return s.activityTypeTravel;
+    case ActivityType.expenseOther:
+      // Use the specific key for "Other Expense" if available
+      return s.activityTypeExpenseOther;
+
+// === Income Types ===
+    case ActivityType.salary:
+      return s.activityTypeSalary;
+    case ActivityType.freelance:
+      // Assuming key exists: activityTypeFreelance
+      return s.activityTypeFreelance;
+    case ActivityType.investment:
+      // Assuming key exists: activityTypeInvestment
+      return s.activityTypeInvestment;
+    case ActivityType.incomeOther:
+      // Assuming key exists: activityTypeIncomeOther
+      return s.activityTypeIncomeOther;
+
+// Assuming a generic 'Other' key exists
   }
 }

@@ -34,12 +34,22 @@ class MessageLookup extends MessageLookupByLibrary {
     "activityTypeEntertainment": MessageLookupByLibrary.simpleMessage(
       "Entertainment",
     ),
+    "activityTypeExpenseOther": MessageLookupByLibrary.simpleMessage(
+      "Other Expense",
+    ),
     "activityTypeFoodAndDrinks": MessageLookupByLibrary.simpleMessage(
       "Food & Drinks",
     ),
+    "activityTypeFreelance": MessageLookupByLibrary.simpleMessage("Freelance"),
     "activityTypeGroceries": MessageLookupByLibrary.simpleMessage("Groceries"),
     "activityTypeHealthcare": MessageLookupByLibrary.simpleMessage(
       "Healthcare",
+    ),
+    "activityTypeIncomeOther": MessageLookupByLibrary.simpleMessage(
+      "Other Income",
+    ),
+    "activityTypeInvestment": MessageLookupByLibrary.simpleMessage(
+      "Investment",
     ),
     "activityTypeLabel": MessageLookupByLibrary.simpleMessage("Activity Type"),
     "activityTypeOther": MessageLookupByLibrary.simpleMessage("Other"),

@@ -40,6 +40,10 @@
   "activityTypeTravel": "Travel",
   "activityTypeSavings": "Savings",
   "activityTypeOther": "Other",
+  "activityTypeExpenseOther": "Other Expense",
+  "activityTypeFreelance": "Freelance",
+  "activityTypeInvestment": "Investment",
+  "activityTypeIncomeOther": "Other Income",
   "otherCategory": "Other",
   "noChartData": "No expense data for this period to display chart."
 }

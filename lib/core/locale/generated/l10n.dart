@@ -395,6 +395,46 @@ class S {
     return Intl.message('Other', name: 'activityTypeOther', desc: '', args: []);
   }
 
+  /// `Other Expense`
+  String get activityTypeExpenseOther {
+    return Intl.message(
+      'Other Expense',
+      name: 'activityTypeExpenseOther',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Freelance`
+  String get activityTypeFreelance {
+    return Intl.message(
+      'Freelance',
+      name: 'activityTypeFreelance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Investment`
+  String get activityTypeInvestment {
+    return Intl.message(
+      'Investment',
+      name: 'activityTypeInvestment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other Income`
+  String get activityTypeIncomeOther {
+    return Intl.message(
+      'Other Income',
+      name: 'activityTypeIncomeOther',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Other`
   String get otherCategory {
     return Intl.message('Other', name: 'otherCategory', desc: '', args: []);

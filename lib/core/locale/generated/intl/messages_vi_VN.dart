@@ -34,15 +34,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "activityTypeEntertainment": MessageLookupByLibrary.simpleMessage(
       "Giải trí",
     ),
+    "activityTypeExpenseOther": MessageLookupByLibrary.simpleMessage(
+      "Chi tieu khác",
+    ),
     "activityTypeFoodAndDrinks": MessageLookupByLibrary.simpleMessage(
       "Ăn uống",
     ),
+    "activityTypeFreelance": MessageLookupByLibrary.simpleMessage("Freelance"),
     "activityTypeGroceries": MessageLookupByLibrary.simpleMessage(
       "Hàng tạp hóa",
     ),
     "activityTypeHealthcare": MessageLookupByLibrary.simpleMessage(
       "Chăm sóc sức khỏe",
     ),
+    "activityTypeIncomeOther": MessageLookupByLibrary.simpleMessage(
+      "Thu nhập khác",
+    ),
+    "activityTypeInvestment": MessageLookupByLibrary.simpleMessage("Đầu tư"),
     "activityTypeLabel": MessageLookupByLibrary.simpleMessage("Loại hoạt động"),
     "activityTypeOther": MessageLookupByLibrary.simpleMessage("Khác"),
     "activityTypeRent": MessageLookupByLibrary.simpleMessage("Thuê nhà"),
