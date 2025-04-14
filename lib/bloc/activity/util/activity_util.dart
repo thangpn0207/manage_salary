@@ -2,7 +2,6 @@ import 'package:manage_salary/core/util/date_util.dart'; // For date comparison
 
 import '../../../core/constants/enums.dart';
 import '../../../models/activity_data.dart';
-import '../../../models/recurring_activity.dart';
 
 // --- Calculation, Generation & Pruning Utility Functions ---
 class ActivityUtil {

@@ -22,6 +22,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(title) => "${title} đã bị xóa";
 
+  static String m1(category) => "Đã xóa ngân sách ${category}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "activityDeleted": m0,
@@ -59,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "activityTypeShopping": MessageLookupByLibrary.simpleMessage("Mua sắm"),
     "activityTypeTravel": MessageLookupByLibrary.simpleMessage("Du lịch"),
     "activityTypeUtilities": MessageLookupByLibrary.simpleMessage("Tiện ích"),
+    "add": MessageLookupByLibrary.simpleMessage("Thêm"),
     "addActivity": MessageLookupByLibrary.simpleMessage("Thêm hoạt động"),
     "addActivityButton": MessageLookupByLibrary.simpleMessage("Thêm hoạt động"),
     "addBudget": MessageLookupByLibrary.simpleMessage("Thêm ngân sách"),
@@ -69,10 +72,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "amountMustBePositive": MessageLookupByLibrary.simpleMessage(
       "Số tiền phải lớn hơn 0",
     ),
+    "budget": MessageLookupByLibrary.simpleMessage("Ngân sách"),
     "budgetAmount": MessageLookupByLibrary.simpleMessage("Số tiền ngân sách"),
+    "budgetDetails": MessageLookupByLibrary.simpleMessage("Chi tiết ngân sách"),
     "budgetPeriodMonthly": MessageLookupByLibrary.simpleMessage("Hàng tháng"),
     "budgetPeriodWeekly": MessageLookupByLibrary.simpleMessage("Hàng tuần"),
     "budgetPeriodYearly": MessageLookupByLibrary.simpleMessage("Hàng năm"),
+    "budgetRemoved": m1,
+    "budgetSummary": MessageLookupByLibrary.simpleMessage(
+      "Tổng quan ngân sách",
+    ),
     "cacheClearError": MessageLookupByLibrary.simpleMessage(
       "Lỗi khi xóa bộ nhớ đệm.",
     ),
@@ -90,6 +99,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmClearCacheTitle": MessageLookupByLibrary.simpleMessage(
       "Xác nhận xóa bộ nhớ đệm",
     ),
+    "confirmDeletion": MessageLookupByLibrary.simpleMessage("Xác nhận xóa"),
     "currentSpending": MessageLookupByLibrary.simpleMessage(
       "Chi tiêu hiện tại",
     ),
@@ -109,6 +119,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "income": MessageLookupByLibrary.simpleMessage("Thu nhập"),
     "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
+    "manageBudgets": MessageLookupByLibrary.simpleMessage("Quản lý ngân sách"),
+    "noBudgetsSet": MessageLookupByLibrary.simpleMessage(
+      "Chưa có ngân sách nào",
+    ),
     "noChartData": MessageLookupByLibrary.simpleMessage(
       "Không có dữ liệu chi phí nào trong khoảng thời gian này để hiển thị biểu đồ.",
     ),
@@ -123,8 +137,14 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "otherCategory": MessageLookupByLibrary.simpleMessage("Khác"),
     "period": MessageLookupByLibrary.simpleMessage("Kỳ hạn"),
+    "remaining": MessageLookupByLibrary.simpleMessage("Còn lại"),
+    "remove": MessageLookupByLibrary.simpleMessage("Xóa"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("Lưu thay đổi"),
     "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
+    "spent": MessageLookupByLibrary.simpleMessage("Đã chi"),
+    "tapToAddBudget": MessageLookupByLibrary.simpleMessage(
+      "Nhấn nút + ở trên để thêm ngân sách đầu tiên của bạn",
+    ),
     "titleDescriptionLabel": MessageLookupByLibrary.simpleMessage(
       "Tiêu đề / Mô tả",
     ),

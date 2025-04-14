@@ -50,7 +50,7 @@ class ActivityListItem extends StatelessWidget {
       case ActivityType.travel:
         return Icons.flight_takeoff_outlined; // Updated icon
       case ActivityType.expenseOther:
-      default: // Fallback icon for expenseOther or any unexpected value
+      // Fallback icon for expenseOther or any unexpected value
         return Icons.receipt_long_outlined;
     }
   }

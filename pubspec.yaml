@@ -5,7 +5,7 @@ description: "A new Flutter manager salary application."
 publish_to: 'none'
 
 # Application version and build number
-version: 1.0.0+2
+version: 1.0.0+3
 
 # Dart SDK version constraints
 environment:

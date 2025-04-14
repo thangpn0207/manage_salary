@@ -137,7 +137,6 @@ enum SharedAxisTransitionType {
 
 class _SharedAxisHorizontal extends StatelessWidget {
   const _SharedAxisHorizontal({
-    super.key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
@@ -194,7 +193,6 @@ class _SharedAxisHorizontal extends StatelessWidget {
 
 class _SharedAxisVertical extends StatelessWidget {
   const _SharedAxisVertical({
-    super.key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
@@ -251,7 +249,6 @@ class _SharedAxisVertical extends StatelessWidget {
 
 class _SharedAxisScaled extends StatelessWidget {
   const _SharedAxisScaled({
-    super.key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
