@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import '../core/constants/enums.dart';
 
 /// Represents a budget set for a specific category over a period.
+// ignore: must_be_immutable
 class Budget extends Equatable {
   final String id;
   final BudgetCategory category;
