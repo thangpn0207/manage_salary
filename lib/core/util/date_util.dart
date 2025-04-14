@@ -135,6 +135,39 @@ class DateUtil {
       return false;
     }
   }
+
+  // --- New Date Helper Methods ---
+
+  /// Returns a DateTime representing the start of the day (00:00:00).
+  static DateTime startOfDay(DateTime dateTime) {
+    return DateTime(dateTime.year, dateTime.month, dateTime.day);
+  }
+
+  /// Checks if two DateTime objects fall on the same calendar day.
+  static bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  /// Returns the start of the week for the given date.
+  static DateTime startOfWeek(DateTime date, {int startOfWeek = DateTime.monday}) {
+    final currentWeekday = date.weekday;
+    final daysToSubtract = (currentWeekday - startOfWeek + 7) % 7;
+    return startOfDay(date.subtract(Duration(days: daysToSubtract)));
+  }
+
+  /// Returns the start of the month for the given date.
+  static DateTime startOfMonth(DateTime date) {
+    return DateTime(date.year, date.month, 1);
+  }
+
+  /// Returns the start of the next month for the given date.
+  static DateTime startOfNextMonth(DateTime date) {
+     return (date.month < 12)
+        ? DateTime(date.year, date.month + 1, 1)
+        : DateTime(date.year + 1, 1, 1);
+  }
 }
 
 List<int> _leapYearMonths = const <int>[1, 3, 5, 7, 8, 10, 12];

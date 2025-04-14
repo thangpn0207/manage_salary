@@ -34,7 +34,7 @@ class DashboardCard extends StatelessWidget {
   List<ChartDisplayData> _prepareChartData(
       BuildContext context,
       // Need context for localization
-      Map<ActivityPaying, double> expensesByType,
+      Map<ActivityType, double> expensesByType,
       double totalExpenses) {
     if (totalExpenses <= 0 || expensesByType.isEmpty) {
       return [];
@@ -46,7 +46,7 @@ class DashboardCard extends StatelessWidget {
     final List<ChartDisplayData> displayData = [];
     int colorIndex = 0;
     double otherTotal = 0.0;
-    const int maxIndividualCategories = 4; // Show top 4
+    const int maxIndividualCategories = 5; // Show top 5 potentially
 
     // Process top categories
     for (int i = 0;
@@ -150,7 +150,6 @@ class DashboardCard extends StatelessWidget {
                 ),
               ],
             ),
-            // --- Main Card Content ---
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
@@ -183,8 +182,8 @@ class DashboardCard extends StatelessWidget {
 
   Widget _buildTotalBalance(BuildContext context, double balance) {
     final theme = Theme.of(context);
-    final balanceColor =
-        balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
+    // Determine color based on balance
+    final balanceColor = balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
@@ -201,7 +200,7 @@ class DashboardCard extends StatelessWidget {
             MoneyUtil.formatDefault(balance),
             style: theme.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: balanceColor,
+                color: balanceColor, // Apply determined color
                 shadows: [
                   Shadow(
                     blurRadius: 1.0,

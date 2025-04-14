@@ -9,7 +9,7 @@ class MoneyUtil {
   }
 
   static String formatDefault(num number) {
-    final oCcy = NumberFormat.simpleCurrency(locale: "vi_VN");
+    final oCcy = NumberFormat.simpleCurrency( locale: "vi_VN");
     return oCcy.format(number);
   }
 }

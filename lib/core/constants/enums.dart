@@ -4,19 +4,63 @@ enum AuthStatus {
   unknown,
 }
 
-enum ActivityPaying {
+// Renamed ActivityPaying to ActivityType for clarity
+enum ActivityType {
+  // Expense types
   shopping,
-  salary, // Income from salary or wages
-  foodAndDrinks, // Eating out or ordering food
-  rent, // Paying for housing or accommodation
-  utilities, // Paying for electricity, water, and other utilities
-  groceries, // Paying for food and daily essentials
-  entertainment, // Paying for movies, concerts, or hobbies
-  education, // Paying for school, courses, or training
-  healthcare, // Paying for medical expenses or insurance
-  travel, // Paying for transportation or vacations
-  savings, // Allocating money for savings or investments
-  other, // Miscellaneous or unspecified activities
+  foodAndDrinks,
+  rent,
+  utilities,
+  groceries,
+  entertainment,
+  education,
+  healthcare,
+  travel,
+  expenseOther, // Specific 'other' for expenses
+
+  // Income types
+  salary,
+  freelance,
+  investment,
+  incomeOther, // Specific 'other' for income
+
+  // General/Neutral (can be used if needed, or map specific income/expense)
+  // Maybe remove 'savings' as it's more a transfer/goal than income/expense?
+  // Consider if 'savings' needs special handling
 }
 
-enum ActivityNature { income, expense }
+enum ActivityNature {
+  income,
+  expense,
+  // Potentially 'transfer' if moving money between accounts
+}
+
+// Enum for Budgeting Periods
+enum BudgetPeriod {
+  weekly,
+  monthly,
+  yearly,
+}
+
+// Enum for Recurring Frequencies
+enum RecurringFrequency {
+  daily,
+  weekly,
+  biWeekly, // Every two weeks
+  monthly,
+  yearly,
+}
+
+// Budget Categories aligned with ActivityType for better tracking
+enum BudgetCategory {
+  shopping,
+  foodAndDrinks,
+  rent,
+  utilities,
+  groceries,
+  entertainment,
+  education,
+  healthcare,
+  travel,
+  expenseOther,
+}

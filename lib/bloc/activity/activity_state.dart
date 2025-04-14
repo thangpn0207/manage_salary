@@ -1,22 +1,23 @@
-// activity_state.dart
-
 import 'package:equatable/equatable.dart';
 import 'package:manage_salary/bloc/activity/util/activity_util.dart';
 
 import '../../core/constants/enums.dart';
 import '../../core/util/log_util.dart';
 import '../../models/activity_data.dart';
-// No need to import calculation helpers here anymore
+import '../../models/budget.dart';
+import '../../models/recurring_activity.dart';
 
 class ActivityState extends Equatable {
-  final List<ActivityData> allActivities; // Source of truth
+  final List<ActivityData> allActivities;
+  final List<Budget> budgets;
+  final List<RecurringActivity> recurringActivities;
 
-  // Analytics Data - now populated externally via Bloc
+  // Analytics data
   final double totalIncome;
   final double totalExpenses;
   final double netBalance;
-  final Map<ActivityPaying, double> expensesByType;
-  final Map<ActivityPaying, double> incomeByType;
+  final Map<ActivityType, double> expensesByType;
+  final Map<ActivityType, double> incomeByType;
   final double todayIncome;
   final double todayExpenses;
   final double thisWeekIncome;
@@ -26,7 +27,8 @@ class ActivityState extends Equatable {
 
   const ActivityState({
     required this.allActivities,
-    // Required calculated fields
+    required this.budgets,
+    required this.recurringActivities,
     required this.totalIncome,
     required this.totalExpenses,
     required this.netBalance,
@@ -41,9 +43,10 @@ class ActivityState extends Equatable {
   });
 
   factory ActivityState.initial() {
-    // Still useful for the starting point
     return const ActivityState(
       allActivities: [],
+      budgets: [],
+      recurringActivities: [],
       totalIncome: 0.0,
       totalExpenses: 0.0,
       netBalance: 0.0,
@@ -58,14 +61,15 @@ class ActivityState extends Equatable {
     );
   }
 
-  // copyWith now ACCEPTS calculated values
   ActivityState copyWith({
     List<ActivityData>? allActivities,
+    List<Budget>? budgets,
+    List<RecurringActivity>? recurringActivities,
     double? totalIncome,
     double? totalExpenses,
     double? netBalance,
-    Map<ActivityPaying, double>? expensesByType,
-    Map<ActivityPaying, double>? incomeByType,
+    Map<ActivityType, double>? expensesByType,
+    Map<ActivityType, double>? incomeByType,
     double? todayIncome,
     double? todayExpenses,
     double? thisWeekIncome,
@@ -75,6 +79,8 @@ class ActivityState extends Equatable {
   }) {
     return ActivityState(
       allActivities: allActivities ?? this.allActivities,
+      budgets: budgets ?? this.budgets,
+      recurringActivities: recurringActivities ?? this.recurringActivities,
       totalIncome: totalIncome ?? this.totalIncome,
       totalExpenses: totalExpenses ?? this.totalExpenses,
       netBalance: netBalance ?? this.netBalance,
@@ -90,62 +96,90 @@ class ActivityState extends Equatable {
   }
 
   @override
-  List<Object> get props => [
-        // Keep props for state comparison
+  List<Object?> get props => [
         allActivities,
-        totalIncome, totalExpenses, netBalance,
-        expensesByType, incomeByType,
-        todayIncome, todayExpenses,
-        thisWeekIncome, thisWeekExpenses,
-        thisMonthIncome, thisMonthExpenses,
+        budgets,
+        recurringActivities,
+        totalIncome,
+        totalExpenses,
+        netBalance,
+        expensesByType,
+        incomeByType,
+        todayIncome,
+        todayExpenses,
+        thisWeekIncome,
+        thisWeekExpenses,
+        thisMonthIncome,
+        thisMonthExpenses,
       ];
 
   // --- HydratedBloc Serialization ---
   Map<String, dynamic> toJson() {
-    // Still only need to store the source list
-    return {
-      'allActivities':
-          allActivities.map((activity) => activity.toJson()).toList(),
-    };
+    try {
+      return {
+        'allActivities':
+            allActivities.map((activity) => activity.toJson()).toList(),
+        'budgets': budgets.map((budget) => budget.toJson()).toList(),
+        // Serialize budgets
+        'recurringActivities':
+            recurringActivities.map((rec) => rec.toJson()).toList(),
+        // Serialize recurring activities
+      };
+    } catch (e, stackTrace) {
+      print("Error serializing ActivityState: $e $stackTrace");
+      return {'allActivities': []}; // Fallback to minimal JSON
+    }
   }
 
-  // fromJson - Loads the list, then relies on external calculation
-  // Note: This means the Bloc's fromJson needs to trigger calculations
   factory ActivityState.fromJson(Map<String, dynamic> json) {
     try {
+      // Deserialize Activities
       final List<dynamic> activityListJson =
           json['allActivities'] as List<dynamic>? ?? [];
-      // Load the core list ONLY
       final List<ActivityData> activities = activityListJson
           .map((activityJson) =>
               ActivityData.fromJson(activityJson as Map<String, dynamic>))
           .toList();
 
-      // Pruning and sorting can happen here or in the Bloc's fromJson
-      final pruned =
-          ActivityUtil().pruneActivities(activities); // Use external helper
-      pruned.sort((a, b) => b.date.compareTo(a.date));
+      // Deserialize Budgets
+      final List<dynamic> budgetListJson =
+          json['budgets'] as List<dynamic>? ?? [];
+      final List<Budget> budgets = budgetListJson
+          .map((bJson) => Budget.fromJson(bJson as Map<String, dynamic>))
+          .toList();
 
-      // Return a state with JUST the loaded list.
-      // The Bloc's fromJson override will need to calculate analytics.
-      // Or, we calculate here and return a fully populated state:
-      final calculatedState =
-          calculateAnalytics(pruned); // Call central calc function
+      // Deserialize Recurring Activities
+      final List<dynamic> recurringListJson =
+          json['recurringActivities'] as List<dynamic>? ?? [];
+      final List<RecurringActivity> recurringActivities = recurringListJson
+          .map((rJson) =>
+              RecurringActivity.fromJson(rJson as Map<String, dynamic>))
+          .toList();
+
+      // Pruning and sorting activities
+      final prunedActivities = ActivityUtil().pruneActivities(activities);
+      prunedActivities.sort((a, b) => b.date.compareTo(a.date));
+
+      // Calculate analytics based on the loaded (and pruned) activities
+      final analytics = calculateAnalytics(prunedActivities);
 
       return ActivityState(
-        // Construct fully calculated state
-        allActivities: pruned,
-        totalIncome: calculatedState.totalIncome,
-        totalExpenses: calculatedState.totalExpenses,
-        netBalance: calculatedState.netBalance,
-        expensesByType: calculatedState.expensesByType,
-        incomeByType: calculatedState.incomeByType,
-        todayIncome: calculatedState.todayIncome,
-        todayExpenses: calculatedState.todayExpenses,
-        thisWeekIncome: calculatedState.thisWeekIncome,
-        thisWeekExpenses: calculatedState.thisWeekExpenses,
-        thisMonthIncome: calculatedState.thisMonthIncome,
-        thisMonthExpenses: calculatedState.thisMonthExpenses,
+        allActivities: prunedActivities,
+        budgets: budgets,
+        // Use deserialized list
+        recurringActivities: recurringActivities,
+        // Use deserialized list
+        totalIncome: analytics.totalIncome,
+        totalExpenses: analytics.totalExpenses,
+        netBalance: analytics.netBalance,
+        expensesByType: analytics.expensesByType,
+        incomeByType: analytics.incomeByType,
+        todayIncome: analytics.todayIncome,
+        todayExpenses: analytics.todayExpenses,
+        thisWeekIncome: analytics.thisWeekIncome,
+        thisWeekExpenses: analytics.thisWeekExpenses,
+        thisMonthIncome: analytics.thisMonthIncome,
+        thisMonthExpenses: analytics.thisMonthExpenses,
       );
     } catch (e, stackTrace) {
       LogUtil.e(
@@ -155,14 +189,13 @@ class ActivityState extends Equatable {
   }
 }
 
-// Central calculation function (can live in bloc file or utils)
-// Takes the list and returns ALL calculated analytics values
+// Central calculation function (Signature updated to use ActivityType)
 ({
   double totalIncome,
   double totalExpenses,
   double netBalance,
-  Map<ActivityPaying, double> expensesByType,
-  Map<ActivityPaying, double> incomeByType,
+  Map<ActivityType, double> expensesByType,
+  Map<ActivityType, double> incomeByType,
   double todayIncome,
   double todayExpenses,
   double thisWeekIncome,
@@ -173,6 +206,7 @@ class ActivityState extends Equatable {
   final totalIncome = ActivityUtil().calculateTotalIncome(activities);
   final totalExpenses = ActivityUtil().calculateTotalExpenses(activities);
   final netBalance = totalIncome - totalExpenses;
+  // Ensure these utility methods now use ActivityType correctly internally
   final expensesByType = ActivityUtil().calculateExpensesByType(activities);
   final incomeByType = ActivityUtil().calculateIncomeByType(activities);
 

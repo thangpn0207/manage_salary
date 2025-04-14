@@ -13,31 +13,46 @@ String localizedActivityNature(BuildContext context, ActivityNature nature) {
 }
 
 // Helper function to get localized string for ActivityPaying
-String localizedActivityPaying(BuildContext context, ActivityPaying type) {
+String localizedActivityPaying(BuildContext context, ActivityType type) {
+  final s = S.of(context);
+
   switch (type) {
-    case ActivityPaying.salary:
-      return S.of(context).activityTypeSalary;
-    case ActivityPaying.shopping:
-      return S.of(context).activityTypeShopping;
-    case ActivityPaying.foodAndDrinks:
-      return S.of(context).activityTypeFoodAndDrinks;
-    case ActivityPaying.utilities:
-      return S.of(context).activityTypeUtilities;
-    case ActivityPaying.rent:
-      return S.of(context).activityTypeRent;
-    case ActivityPaying.groceries:
-      return S.of(context).activityTypeGroceries;
-    case ActivityPaying.entertainment:
-      return S.of(context).activityTypeEntertainment;
-    case ActivityPaying.education:
-      return S.of(context).activityTypeEducation;
-    case ActivityPaying.healthcare:
-      return S.of(context).activityTypeHealthcare;
-    case ActivityPaying.travel:
-      return S.of(context).activityTypeTravel;
-    case ActivityPaying.savings:
-      return S.of(context).activityTypeSavings;
-    case ActivityPaying.other:
-      return S.of(context).activityTypeOther;
+// === Expense Types ===
+    case ActivityType.shopping:
+      return s.activityTypeShopping;
+    case ActivityType.foodAndDrinks:
+      return s.activityTypeFoodAndDrinks;
+    case ActivityType.rent:
+      return s.activityTypeRent;
+    case ActivityType.utilities:
+      return s.activityTypeUtilities;
+    case ActivityType.groceries:
+      return s.activityTypeGroceries;
+    case ActivityType.entertainment:
+      return s.activityTypeEntertainment;
+    case ActivityType.education:
+      return s.activityTypeEducation;
+    case ActivityType.healthcare:
+      return s.activityTypeHealthcare;
+    case ActivityType.travel:
+      return s.activityTypeTravel;
+    case ActivityType.expenseOther:
+      // Use the specific key for "Other Expense" if available
+      return s.activityTypeExpenseOther;
+
+// === Income Types ===
+    case ActivityType.salary:
+      return s.activityTypeSalary;
+    case ActivityType.freelance:
+      // Assuming key exists: activityTypeFreelance
+      return s.activityTypeFreelance;
+    case ActivityType.investment:
+      // Assuming key exists: activityTypeInvestment
+      return s.activityTypeInvestment;
+    case ActivityType.incomeOther:
+      // Assuming key exists: activityTypeIncomeOther
+      return s.activityTypeIncomeOther;
+
+// Assuming a generic 'Other' key exists
   }
 }

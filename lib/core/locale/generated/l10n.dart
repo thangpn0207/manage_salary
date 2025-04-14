@@ -395,6 +395,46 @@ class S {
     return Intl.message('Other', name: 'activityTypeOther', desc: '', args: []);
   }
 
+  /// `Other Expense`
+  String get activityTypeExpenseOther {
+    return Intl.message(
+      'Other Expense',
+      name: 'activityTypeExpenseOther',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Freelance`
+  String get activityTypeFreelance {
+    return Intl.message(
+      'Freelance',
+      name: 'activityTypeFreelance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Investment`
+  String get activityTypeInvestment {
+    return Intl.message(
+      'Investment',
+      name: 'activityTypeInvestment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other Income`
+  String get activityTypeIncomeOther {
+    return Intl.message(
+      'Other Income',
+      name: 'activityTypeIncomeOther',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Other`
   String get otherCategory {
     return Intl.message('Other', name: 'otherCategory', desc: '', args: []);
@@ -405,6 +445,126 @@ class S {
     return Intl.message(
       'No expense data for this period to display chart.',
       name: 'noChartData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Budget`
+  String get addBudget {
+    return Intl.message('Add Budget', name: 'addBudget', desc: '', args: []);
+  }
+
+  /// `Edit Budget`
+  String get editBudget {
+    return Intl.message('Edit Budget', name: 'editBudget', desc: '', args: []);
+  }
+
+  /// `Category`
+  String get category {
+    return Intl.message('Category', name: 'category', desc: '', args: []);
+  }
+
+  /// `Period`
+  String get period {
+    return Intl.message('Period', name: 'period', desc: '', args: []);
+  }
+
+  /// `Budget Amount`
+  String get budgetAmount {
+    return Intl.message(
+      'Budget Amount',
+      name: 'budgetAmount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This field is required`
+  String get fieldRequired {
+    return Intl.message(
+      'This field is required',
+      name: 'fieldRequired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter a valid number`
+  String get enterValidNumber {
+    return Intl.message(
+      'Please enter a valid number',
+      name: 'enterValidNumber',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Amount must be greater than 0`
+  String get amountMustBePositive {
+    return Intl.message(
+      'Amount must be greater than 0',
+      name: 'amountMustBePositive',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Current Spending`
+  String get currentSpending {
+    return Intl.message(
+      'Current Spending',
+      name: 'currentSpending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `of budget used`
+  String get ofBudgetUsed {
+    return Intl.message(
+      'of budget used',
+      name: 'ofBudgetUsed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save Changes`
+  String get saveChanges {
+    return Intl.message(
+      'Save Changes',
+      name: 'saveChanges',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Weekly`
+  String get budgetPeriodWeekly {
+    return Intl.message(
+      'Weekly',
+      name: 'budgetPeriodWeekly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Monthly`
+  String get budgetPeriodMonthly {
+    return Intl.message(
+      'Monthly',
+      name: 'budgetPeriodMonthly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Yearly`
+  String get budgetPeriodYearly {
+    return Intl.message(
+      'Yearly',
+      name: 'budgetPeriodYearly',
       desc: '',
       args: [],
     );

@@ -69,7 +69,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 500.h, child: ActivityTabsView())
+            SizedBox(height: 500.h, child: ActivityTabsView()),
+            SizedBox(
+              height: 50.h,
+            ),
           ],
         ),
       ),
