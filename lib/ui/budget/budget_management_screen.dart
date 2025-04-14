@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:manage_salary/core/constants/enums.dart'; // Assuming ActivityType, BudgetCategory, BudgetPeriod are here
-import 'package:manage_salary/core/util/money_util.dart'; // Assuming for currency formatting
-import 'package:manage_salary/models/budget.dart'; // Import budget model
-import 'package:manage_salary/ui/budget/widgets/add_edit_budget_sheet.dart'; // Import sheet function
+import 'package:manage_salary/core/constants/enums.dart';
+import 'package:manage_salary/core/util/convert_enum.dart';
+import 'package:manage_salary/core/util/money_util.dart';
+import 'package:manage_salary/models/budget.dart';
+import 'package:manage_salary/ui/budget/widgets/add_edit_budget_sheet.dart';
+import 'package:manage_salary/core/locale/generated/l10n.dart';
+import 'package:manage_salary/core/util/localization_utils.dart';
 
 import '../../../bloc/activity/activity_bloc.dart';
 import '../../../bloc/activity/activity_event.dart';
@@ -12,19 +15,6 @@ import '../../../bloc/activity/activity_state.dart';
 class BudgetManagementScreen extends StatelessWidget {
   const BudgetManagementScreen({super.key});
 
-  // Helper to format enum names (same as before)
-  String _formatEnumName(dynamic enumValue) {
-    if (enumValue == null) return '';
-    String name = enumValue.toString().split('.').last;
-    name = name
-        .replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(1)}')
-        .trim();
-    name = name[0].toUpperCase() + name.substring(1);
-    name = name.replaceFirst('And', '&');
-    return name;
-  }
-
-  // Helper to get icon (same as before)
   IconData _getIconForCategory(ActivityType type) {
     switch (type) {
       case ActivityType.shopping:
@@ -51,33 +41,8 @@ class BudgetManagementScreen extends StatelessWidget {
     }
   }
 
-  // Helper to convert BudgetCategory to ActivityType
-  ActivityType _convertBudgetCategoryToActivityType(BudgetCategory budgetCategory) {
-    switch (budgetCategory) {
-      case BudgetCategory.shopping:
-        return ActivityType.shopping;
-      case BudgetCategory.foodAndDrinks:
-        return ActivityType.foodAndDrinks;
-      case BudgetCategory.rent:
-        return ActivityType.rent;
-      case BudgetCategory.utilities:
-        return ActivityType.utilities;
-      case BudgetCategory.groceries:
-        return ActivityType.groceries;
-      case BudgetCategory.entertainment:
-        return ActivityType.entertainment;
-      case BudgetCategory.education:
-        return ActivityType.education;
-      case BudgetCategory.healthcare:
-        return ActivityType.healthcare;
-      case BudgetCategory.travel:
-        return ActivityType.travel;
-      case BudgetCategory.expenseOther:
-        return ActivityType.expenseOther;
-    }
-  }
 
-  // --- Function to trigger Add/Edit Sheet and dispatch events (same as before) ---
+
   void _showAddEditBudgetDialog(BuildContext context, {Budget? budget}) async {
     final resultBudget = await showAddEditBudgetSheet(context, budget: budget);
     if (resultBudget != null && context.mounted) {
@@ -86,45 +51,43 @@ class BudgetManagementScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  '${_formatEnumName(resultBudget.category)} budget added.')),
+                  '${localizedActivityPaying(context, convertBudgetCategoryToActivityType(resultBudget.category))} ${S.of(context).addBudget.toLowerCase()}')),
         );
       } else {
         context.read<ActivityBloc>().add(UpdateBudget(resultBudget));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  '${_formatEnumName(resultBudget.category)} budget updated.')),
+                  '${localizedActivityPaying(context, convertBudgetCategoryToActivityType(resultBudget.category))} ${S.of(context).editBudget.toLowerCase()}')),
         );
       }
     }
   }
 
-// --- Function to confirm and dispatch RemoveBudget event ---
   void _confirmAndRemoveBudget(
       BuildContext context, String budgetId, String categoryName) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
+        final s = S.of(context);
         return AlertDialog(
-          title: const Text('Confirm Deletion'),
+          title: Text(s.confirmDeletion),
           content: Text(
               'Are you sure you want to remove the "$categoryName" budget?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: Text(s.cancelButton),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('Remove'),
+              child: Text(s.remove),
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Close dialog
-                context
-                    .read<ActivityBloc>()
-                    .add(RemoveBudget(budgetId)); // Dispatch remove
+                Navigator.of(dialogContext).pop();
+                context.read<ActivityBloc>().add(RemoveBudget(budgetId));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text('"$categoryName" budget removed'),
+                      content: Text(s.budgetRemoved(categoryName)),
                       duration: const Duration(seconds: 2)),
                 );
               },
@@ -138,25 +101,24 @@ class BudgetManagementScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final s = S.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Budgets'),
+        title: Text(s.manageBudgets),
       ),
       body: BlocBuilder<ActivityBloc, ActivityState>(
         builder: (context, state) {
-          // --- Calculate summary data (assuming monthly for simplicity) ---
           Map<ActivityType, double> monthlySpendingByType = {};
           final monthRange = _getThisMonthRange();
           state.allActivities
               .where((a) =>
                   a.nature == ActivityNature.expense &&
                   !a.date.isBefore(monthRange.start) &&
-                  a.date.isBefore(monthRange.end) &&
-                  a.type != null) // Ensure activityType is not null
+                  a.date.isBefore(monthRange.end))
               .forEach((activity) {
             monthlySpendingByType.update(
-                activity.type!, // Safe due to null check above
+                activity.type,
                 (value) => value + activity.amount,
                 ifAbsent: () => activity.amount);
           });
@@ -170,36 +132,28 @@ class BudgetManagementScreen extends StatelessWidget {
 
           return ListView(
             padding: const EdgeInsets.only(bottom: 80),
-            // Padding for potential FAB if kept
             children: [
-              // --- Updated Summary Card ---
               _buildSummaryCardWithAddButton(
-                // Use the new summary card widget
                 context: context,
-                period: "This Month",
+                period: s.budgetPeriodMonthly,
                 totalBudget: totalMonthlyBudget,
                 totalSpending: actualMonthlySpending,
                 remaining: remainingMonthly,
-                onAddBudget: () =>
-                    _showAddEditBudgetDialog(context), // Pass the add function
+                onAddBudget: () => _showAddEditBudgetDialog(context),
               ),
 
-              // --- Title for Budget List ---
-              if (state
-                  .budgets.isNotEmpty) // Only show title if there are budgets
+              if (state.budgets.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 8.0),
-                  // Adjusted padding
                   child: Text(
-                    "Budget Details",
+                    s.budgetDetails,
                     style: theme.textTheme.titleLarge
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
 
-              // --- Budget List or Empty State Placeholder ---
               if (state.budgets.isEmpty)
-                _buildEmptyState(context) // Keep the empty state
+                _buildEmptyState(context)
               else
                 ListView.separated(
                   shrinkWrap: true,
@@ -208,27 +162,24 @@ class BudgetManagementScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final budget = state.budgets[index];
                     final activityType =
-                        _convertBudgetCategoryToActivityType(budget.category);
+                        convertBudgetCategoryToActivityType(budget.category);
 
-                    // Get spending specific to this budget's category and period
-                    // Still simplified for monthly here
                     double spendingForBudget = 0;
                     if (budget.period == BudgetPeriod.monthly) {
                       spendingForBudget =
                           monthlySpendingByType[activityType] ?? 0.0;
-                    } else {
-                      // TODO: Calculate spending for non-monthly periods
                     }
 
                     return _buildBudgetListItem(
-                      // Use the same list item
                       context: context,
                       budget: budget,
                       actualSpending: spendingForBudget,
                       onTap: () =>
                           _showAddEditBudgetDialog(context, budget: budget),
                       onDismissed: (id) => _confirmAndRemoveBudget(
-                          context, id, _formatEnumName(budget.category)),
+                          context,
+                          id,
+                          localizedActivityPaying(context, activityType)),
                     );
                   },
                   separatorBuilder: (context, index) => Divider(
@@ -243,14 +194,9 @@ class BudgetManagementScreen extends StatelessWidget {
           );
         },
       ),
-      // FloatingActionButton is removed as Add button is now in the summary card
-      // floatingActionButton: FloatingActionButton( ... ),
     );
   }
 
-  // --- UI Helper Widgets ---
-
-  // NEW Summary Card Widget with Add Button
   Widget _buildSummaryCardWithAddButton({
     required BuildContext context,
     required String period,
@@ -260,9 +206,10 @@ class BudgetManagementScreen extends StatelessWidget {
     required VoidCallback onAddBudget,
   }) {
     final theme = Theme.of(context);
+    final s = S.of(context);
     final remainingColor =
         remaining >= 0 ? Colors.green.shade700 : theme.colorScheme.error;
-    final hasBudgets = totalBudget > 0; // Check if any budget is set
+    final hasBudgets = totalBudget > 0;
 
     return Card(
       margin: const EdgeInsets.all(16.0),
@@ -276,29 +223,26 @@ class BudgetManagementScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("$period Budget Summary",
+                Text('$period ${s.budgetSummary}',
                     style: theme.textTheme.titleMedium),
-                // Add Budget Button (replaces FAB)
                 TextButton.icon(
                   onPressed: onAddBudget,
                   icon: const Icon(Icons.add_circle_outline, size: 20),
-                  label: const Text("Add"),
+                  label: Text(s.add),
                   style: TextButton.styleFrom(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    // visualDensity: VisualDensity.compact, // Make slightly smaller
                   ),
                 )
               ],
             ),
             const SizedBox(height: 12),
 
-            // Only show details if budgets exist
             if (hasBudgets) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Budget:", style: theme.textTheme.bodyMedium),
+                  Text('${s.budget}:', style: theme.textTheme.bodyMedium),
                   Text(MoneyUtil.formatDefault(totalBudget),
                       style: theme.textTheme.bodyMedium
                           ?.copyWith(fontWeight: FontWeight.bold)),
@@ -308,7 +252,7 @@ class BudgetManagementScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Spent:", style: theme.textTheme.bodyMedium),
+                  Text('${s.spent}:', style: theme.textTheme.bodyMedium),
                   Text(MoneyUtil.formatDefault(totalSpending),
                       style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
@@ -319,7 +263,7 @@ class BudgetManagementScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Remaining:",
+                  Text('${s.remaining}:',
                       style: theme.textTheme.bodyMedium
                           ?.copyWith(fontWeight: FontWeight.bold)),
                   Text(
@@ -330,11 +274,10 @@ class BudgetManagementScreen extends StatelessWidget {
                 ],
               ),
             ] else ...[
-              // Message when no budgets are set yet inside the card
               const SizedBox(height: 10),
               Center(
                 child: Text(
-                  "No monthly budgets set yet. Tap 'Add' to create one.",
+                  s.noBudgetsSet,
                   style: theme.textTheme.bodyMedium
                       ?.copyWith(color: theme.hintColor),
                   textAlign: TextAlign.center,
@@ -348,7 +291,6 @@ class BudgetManagementScreen extends StatelessWidget {
     );
   }
 
-  // Budget List Item remains the same
   Widget _buildBudgetListItem({
     required BuildContext context,
     required Budget budget,
@@ -357,6 +299,7 @@ class BudgetManagementScreen extends StatelessWidget {
     required Function(String) onDismissed,
   }) {
     final theme = Theme.of(context);
+    final s = S.of(context);
     double progress = 0.0;
     if (budget.amount > 0) {
       progress = (actualSpending / budget.amount).clamp(0.0, 1.0);
@@ -367,7 +310,7 @@ class BudgetManagementScreen extends StatelessWidget {
     else if (progress > 0.7) progressColor = Colors.orange.shade600;
 
     final budgetActivityType =
-        _convertBudgetCategoryToActivityType(budget.category);
+        convertBudgetCategoryToActivityType(budget.category);
 
     return Dismissible(
       key: Key(budget.id),
@@ -382,28 +325,26 @@ class BudgetManagementScreen extends StatelessWidget {
       child: ListTile(
         leading: Icon(_getIconForCategory(budgetActivityType),
             color: theme.colorScheme.primary),
-        title: Text(_formatEnumName(budget.category),
+        title: Text(localizedActivityPaying(context, budgetActivityType),
             style: const TextStyle(fontWeight: FontWeight.w500)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-                'Budget: ${MoneyUtil.formatDefault(budget.amount)} / ${_formatEnumName(budget.period)}'),
+                '${s.budget}: ${MoneyUtil.formatDefault(budget.amount)} / ${localizedActivityPaying(context, budgetActivityType)}'),
             const SizedBox(height: 4),
-            // Conditionally show progress based on period (simplified to monthly)
             if (budget.period == BudgetPeriod.monthly) ...[
               Row(
                 children: [
                   Expanded(
                     child: ClipRRect(
-                      // Add rounded corners to progress bar
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
                         value: progress,
                         backgroundColor: theme.dividerColor.withOpacity(0.3),
                         valueColor:
                             AlwaysStoppedAnimation<Color>(progressColor),
-                        minHeight: 8, // Slightly thicker
+                        minHeight: 8,
                       ),
                     ),
                   ),
@@ -416,7 +357,7 @@ class BudgetManagementScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 4.0),
                 child: Text(
-                  'Spent: ${MoneyUtil.formatDefault(actualSpending)}',
+                  '${s.spent}: ${MoneyUtil.formatDefault(actualSpending)}',
                   style: theme.textTheme.bodySmall
                       ?.copyWith(color: theme.hintColor),
                 ),
@@ -426,13 +367,13 @@ class BudgetManagementScreen extends StatelessWidget {
         ),
         trailing:
             Icon(Icons.edit_note_outlined, size: 22, color: theme.hintColor),
-        // Edit icon
         onTap: onTap,
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final s = S.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 16.0),
       child: Center(
@@ -442,10 +383,10 @@ class BudgetManagementScreen extends StatelessWidget {
             Icon(Icons.account_balance_wallet_outlined,
                 size: 60, color: Theme.of(context).hintColor),
             const SizedBox(height: 16),
-            const Text('No budgets set yet.', style: TextStyle(fontSize: 16)),
+            Text(s.noBudgetsSet, style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 8),
             Text(
-              'Tap the + button to add your first budget.',
+              s.tapToAddBudget,
               style: TextStyle(color: Theme.of(context).hintColor),
               textAlign: TextAlign.center,
             ),
@@ -455,7 +396,6 @@ class BudgetManagementScreen extends StatelessWidget {
     );
   }
 
-  // Helper to get date range (same as before)
   ({DateTime start, DateTime end}) _getThisMonthRange() {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, 1);

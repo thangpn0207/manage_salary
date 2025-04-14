@@ -59,5 +59,17 @@
   "saveChanges": "Save Changes",
   "budgetPeriodWeekly": "Weekly",
   "budgetPeriodMonthly": "Monthly", 
-  "budgetPeriodYearly": "Yearly"
+  "budgetPeriodYearly": "Yearly",
+  "manageBudgets": "Manage Budgets",
+  "budgetSummary": "Budget Summary",
+  "budgetDetails": "Budget Details",
+  "add": "Add",
+  "budget": "Budget",
+  "spent": "Spent",
+  "remaining": "Remaining",
+  "noBudgetsSet": "No budgets set",
+  "tapToAddBudget": "Tap the + button above to add your first budget",
+  "confirmDeletion": "Confirm Deletion",
+  "remove": "Remove",
+  "budgetRemoved": "{category} budget removed"
 }

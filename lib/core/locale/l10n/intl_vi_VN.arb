@@ -59,5 +59,17 @@
   "saveChanges": "Lưu thay đổi",
   "budgetPeriodWeekly": "Hàng tuần",
   "budgetPeriodMonthly": "Hàng tháng",
-  "budgetPeriodYearly": "Hàng năm"
+  "budgetPeriodYearly": "Hàng năm",
+  "manageBudgets": "Quản lý ngân sách",
+  "budgetSummary": "Tổng quan ngân sách",
+  "budgetDetails": "Chi tiết ngân sách",
+  "add": "Thêm",
+  "budget": "Ngân sách",
+  "spent": "Đã chi",
+  "remaining": "Còn lại",
+  "noBudgetsSet": "Chưa có ngân sách nào",
+  "tapToAddBudget": "Nhấn nút + ở trên để thêm ngân sách đầu tiên của bạn",
+  "confirmDeletion": "Xác nhận xóa",
+  "remove": "Xóa",
+  "budgetRemoved": "Đã xóa ngân sách {category}"
 }
