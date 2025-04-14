@@ -11,6 +11,18 @@ String localizedActivityNature(BuildContext context, ActivityNature nature) {
       return S.of(context).activityNatureExpense;
   }
 }
+// Helper function to get localized string for BudgetPeriod
+String localizedBudgetPeriod(BuildContext context, BudgetPeriod period) {
+  switch (period) {
+    case BudgetPeriod.weekly:
+      return S.of(context).budgetPeriodWeekly;
+    case BudgetPeriod.monthly:
+      return S.of(context).budgetPeriodMonthly;
+    case BudgetPeriod.yearly:
+      return S.of(context).budgetPeriodYearly;
+  }
+}
+
 
 // Helper function to get localized string for ActivityPaying
 String localizedActivityPaying(BuildContext context, ActivityType type) {

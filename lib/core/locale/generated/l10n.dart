@@ -569,6 +569,101 @@ class S {
       args: [],
     );
   }
+
+  /// `Manage Budgets`
+  String get manageBudgets {
+    return Intl.message(
+      'Manage Budgets',
+      name: 'manageBudgets',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Budget Summary`
+  String get budgetSummary {
+    return Intl.message(
+      'Budget Summary',
+      name: 'budgetSummary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Budget Details`
+  String get budgetDetails {
+    return Intl.message(
+      'Budget Details',
+      name: 'budgetDetails',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add`
+  String get add {
+    return Intl.message('Add', name: 'add', desc: '', args: []);
+  }
+
+  /// `Budget`
+  String get budget {
+    return Intl.message('Budget', name: 'budget', desc: '', args: []);
+  }
+
+  /// `Spent`
+  String get spent {
+    return Intl.message('Spent', name: 'spent', desc: '', args: []);
+  }
+
+  /// `Remaining`
+  String get remaining {
+    return Intl.message('Remaining', name: 'remaining', desc: '', args: []);
+  }
+
+  /// `No budgets set`
+  String get noBudgetsSet {
+    return Intl.message(
+      'No budgets set',
+      name: 'noBudgetsSet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap the + button above to add your first budget`
+  String get tapToAddBudget {
+    return Intl.message(
+      'Tap the + button above to add your first budget',
+      name: 'tapToAddBudget',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirm Deletion`
+  String get confirmDeletion {
+    return Intl.message(
+      'Confirm Deletion',
+      name: 'confirmDeletion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove`
+  String get remove {
+    return Intl.message('Remove', name: 'remove', desc: '', args: []);
+  }
+
+  /// `{category} budget removed`
+  String budgetRemoved(Object category) {
+    return Intl.message(
+      '$category budget removed',
+      name: 'budgetRemoved',
+      desc: '',
+      args: [category],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

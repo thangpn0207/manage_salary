@@ -22,6 +22,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(title) => "${title} deleted";
 
+  static String m1(category) => "${category} budget removed";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "activityDeleted": m0,
@@ -59,6 +61,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "activityTypeShopping": MessageLookupByLibrary.simpleMessage("Shopping"),
     "activityTypeTravel": MessageLookupByLibrary.simpleMessage("Travel"),
     "activityTypeUtilities": MessageLookupByLibrary.simpleMessage("Utilities"),
+    "add": MessageLookupByLibrary.simpleMessage("Add"),
     "addActivity": MessageLookupByLibrary.simpleMessage("Add Activity"),
     "addActivityButton": MessageLookupByLibrary.simpleMessage("Add Activity"),
     "addBudget": MessageLookupByLibrary.simpleMessage("Add Budget"),
@@ -69,10 +72,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "amountMustBePositive": MessageLookupByLibrary.simpleMessage(
       "Amount must be greater than 0",
     ),
+    "budget": MessageLookupByLibrary.simpleMessage("Budget"),
     "budgetAmount": MessageLookupByLibrary.simpleMessage("Budget Amount"),
+    "budgetDetails": MessageLookupByLibrary.simpleMessage("Budget Details"),
     "budgetPeriodMonthly": MessageLookupByLibrary.simpleMessage("Monthly"),
     "budgetPeriodWeekly": MessageLookupByLibrary.simpleMessage("Weekly"),
     "budgetPeriodYearly": MessageLookupByLibrary.simpleMessage("Yearly"),
+    "budgetRemoved": m1,
+    "budgetSummary": MessageLookupByLibrary.simpleMessage("Budget Summary"),
     "cacheClearError": MessageLookupByLibrary.simpleMessage(
       "Error clearing cache.",
     ),
@@ -90,6 +97,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmClearCacheTitle": MessageLookupByLibrary.simpleMessage(
       "Confirm Clear Cache",
     ),
+    "confirmDeletion": MessageLookupByLibrary.simpleMessage("Confirm Deletion"),
     "currentSpending": MessageLookupByLibrary.simpleMessage("Current Spending"),
     "darkMode": MessageLookupByLibrary.simpleMessage("Dark mode"),
     "dashboard": MessageLookupByLibrary.simpleMessage("DashBoard"),
@@ -107,6 +115,8 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "income": MessageLookupByLibrary.simpleMessage("Income"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
+    "manageBudgets": MessageLookupByLibrary.simpleMessage("Manage Budgets"),
+    "noBudgetsSet": MessageLookupByLibrary.simpleMessage("No budgets set"),
     "noChartData": MessageLookupByLibrary.simpleMessage(
       "No expense data for this period to display chart.",
     ),
@@ -119,8 +129,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "ofBudgetUsed": MessageLookupByLibrary.simpleMessage("of budget used"),
     "otherCategory": MessageLookupByLibrary.simpleMessage("Other"),
     "period": MessageLookupByLibrary.simpleMessage("Period"),
+    "remaining": MessageLookupByLibrary.simpleMessage("Remaining"),
+    "remove": MessageLookupByLibrary.simpleMessage("Remove"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("Save Changes"),
     "settings": MessageLookupByLibrary.simpleMessage("Settings"),
+    "spent": MessageLookupByLibrary.simpleMessage("Spent"),
+    "tapToAddBudget": MessageLookupByLibrary.simpleMessage(
+      "Tap the + button above to add your first budget",
+    ),
     "titleDescriptionLabel": MessageLookupByLibrary.simpleMessage(
       "Title / Description",
     ),
