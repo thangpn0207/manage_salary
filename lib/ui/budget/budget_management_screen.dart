@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manage_salary/core/constants/enums.dart'; // Assuming ActivityType, BudgetCategory, BudgetPeriod are here
 import 'package:manage_salary/core/util/money_util.dart'; // Assuming for currency formatting
 import 'package:manage_salary/models/budget.dart'; // Import budget model
-import 'package:manage_salary/ui/settings/budget/widgets/add_edit_budget_dialog.dart'; // Import sheet function
+import 'package:manage_salary/ui/budget/widgets/add_edit_budget_sheet.dart'; // Import sheet function
 
-import '../../../../bloc/activity/activity_bloc.dart';
-import '../../../../bloc/activity/activity_event.dart';
-import '../../../../bloc/activity/activity_state.dart';
+import '../../../bloc/activity/activity_bloc.dart';
+import '../../../bloc/activity/activity_event.dart';
+import '../../../bloc/activity/activity_state.dart';
 
 class BudgetManagementScreen extends StatelessWidget {
   const BudgetManagementScreen({super.key});
@@ -51,21 +51,28 @@ class BudgetManagementScreen extends StatelessWidget {
     }
   }
 
-  // Helper to convert BudgetCategory to ActivityType (same as before)
-  ActivityType _convertBudgetCategoryToActivityType(
-      BudgetCategory budgetCategory) {
+  // Helper to convert BudgetCategory to ActivityType
+  ActivityType _convertBudgetCategoryToActivityType(BudgetCategory budgetCategory) {
     switch (budgetCategory) {
+      case BudgetCategory.shopping:
+        return ActivityType.shopping;
       case BudgetCategory.foodAndDrinks:
         return ActivityType.foodAndDrinks;
-      case BudgetCategory.transportation:
-        return ActivityType.travel;
-      case BudgetCategory.entertainment:
-        return ActivityType.entertainment;
+      case BudgetCategory.rent:
+        return ActivityType.rent;
       case BudgetCategory.utilities:
         return ActivityType.utilities;
+      case BudgetCategory.groceries:
+        return ActivityType.groceries;
+      case BudgetCategory.entertainment:
+        return ActivityType.entertainment;
+      case BudgetCategory.education:
+        return ActivityType.education;
+      case BudgetCategory.healthcare:
+        return ActivityType.healthcare;
+      case BudgetCategory.travel:
+        return ActivityType.travel;
       case BudgetCategory.expenseOther:
-        return ActivityType.expenseOther;
-      default:
         return ActivityType.expenseOther;
     }
   }

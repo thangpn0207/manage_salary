@@ -61,10 +61,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "activityTypeUtilities": MessageLookupByLibrary.simpleMessage("Tiện ích"),
     "addActivity": MessageLookupByLibrary.simpleMessage("Thêm hoạt động"),
     "addActivityButton": MessageLookupByLibrary.simpleMessage("Thêm hoạt động"),
+    "addBudget": MessageLookupByLibrary.simpleMessage("Thêm ngân sách"),
     "addNewActivitySheetTitle": MessageLookupByLibrary.simpleMessage(
       "Thêm hoạt động mới",
     ),
     "amountLabel": MessageLookupByLibrary.simpleMessage("Số tiền"),
+    "amountMustBePositive": MessageLookupByLibrary.simpleMessage(
+      "Số tiền phải lớn hơn 0",
+    ),
+    "budgetAmount": MessageLookupByLibrary.simpleMessage("Số tiền ngân sách"),
+    "budgetPeriodMonthly": MessageLookupByLibrary.simpleMessage("Hàng tháng"),
+    "budgetPeriodWeekly": MessageLookupByLibrary.simpleMessage("Hàng tuần"),
+    "budgetPeriodYearly": MessageLookupByLibrary.simpleMessage("Hàng năm"),
     "cacheClearError": MessageLookupByLibrary.simpleMessage(
       "Lỗi khi xóa bộ nhớ đệm.",
     ),
@@ -72,6 +80,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Đã xóa bộ nhớ đệm thành công.",
     ),
     "cancelButton": MessageLookupByLibrary.simpleMessage("Hủy"),
+    "category": MessageLookupByLibrary.simpleMessage("Danh mục"),
     "changeButton": MessageLookupByLibrary.simpleMessage("Thay đổi"),
     "clearButton": MessageLookupByLibrary.simpleMessage("Xóa"),
     "clearCache": MessageLookupByLibrary.simpleMessage("Xóa bộ nhớ đệm"),
@@ -81,10 +90,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmClearCacheTitle": MessageLookupByLibrary.simpleMessage(
       "Xác nhận xóa bộ nhớ đệm",
     ),
+    "currentSpending": MessageLookupByLibrary.simpleMessage(
+      "Chi tiêu hiện tại",
+    ),
     "darkMode": MessageLookupByLibrary.simpleMessage("Chế độ tối"),
     "dashboard": MessageLookupByLibrary.simpleMessage("Tổng quan"),
     "dateLabelPrefix": MessageLookupByLibrary.simpleMessage("Ngày: "),
+    "editBudget": MessageLookupByLibrary.simpleMessage("Sửa ngân sách"),
+    "enterValidNumber": MessageLookupByLibrary.simpleMessage(
+      "Vui lòng nhập một số hợp lệ",
+    ),
     "expenses": MessageLookupByLibrary.simpleMessage("Chi phí"),
+    "fieldRequired": MessageLookupByLibrary.simpleMessage(
+      "Trường này là bắt buộc",
+    ),
     "formValidationError": MessageLookupByLibrary.simpleMessage(
       "Vui lòng điền đầy đủ và chính xác tất cả các trường.",
     ),
@@ -99,7 +118,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "noIncomeActivities": MessageLookupByLibrary.simpleMessage(
       "Chưa có hoạt động thu nhập nào được ghi nhận.",
     ),
+    "ofBudgetUsed": MessageLookupByLibrary.simpleMessage(
+      "ngân sách đã sử dụng",
+    ),
     "otherCategory": MessageLookupByLibrary.simpleMessage("Khác"),
+    "period": MessageLookupByLibrary.simpleMessage("Kỳ hạn"),
+    "saveChanges": MessageLookupByLibrary.simpleMessage("Lưu thay đổi"),
     "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
     "titleDescriptionLabel": MessageLookupByLibrary.simpleMessage(
       "Tiêu đề / Mô tả",

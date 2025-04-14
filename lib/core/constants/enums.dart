@@ -50,3 +50,17 @@ enum RecurringFrequency {
   monthly,
   yearly,
 }
+
+// Budget Categories aligned with ActivityType for better tracking
+enum BudgetCategory {
+  shopping,
+  foodAndDrinks,
+  rent,
+  utilities,
+  groceries,
+  entertainment,
+  education,
+  healthcare,
+  travel,
+  expenseOther,
+}

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For TextInputFormatters
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
-
-// Removed unused import for string_extension.dart
-// import 'package:manage_salary/core/extensions/string_extension.dart';
+import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
+import 'package:manage_salary/core/util/formatter.dart';
+import 'package:manage_salary/core/util/log_util.dart';
+import 'package:manage_salary/core/util/spell_number.dart';
 
 import '../../../../core/constants/enums.dart';
 import '../../../../core/locale/generated/l10n.dart';
-import '../../../../core/util/localization_utils.dart'; // Import the utils
-import '../../../../core/locale/generated/l10n.dart';
+import '../../../../core/util/localization_utils.dart';
 import '../../../../models/activity_data.dart';
 
 class AddActivitySheetContent extends StatefulWidget {
@@ -24,7 +25,7 @@ class AddActivitySheetContent extends StatefulWidget {
 class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   final _formKey = GlobalKey<FormBuilderState>();
   DateTime _selectedDate = DateTime.now(); // Default to today
-
+  String spelledAmount = '';
   // Function to show the date picker
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -131,6 +132,10 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                onChanged: (value) {
+                  // Force rebuild to update activityType dropdown
+                  setState(() {});
+                },
                 items: ActivityNature.values.map((ActivityNature value) {
                   return DropdownMenuItem<ActivityNature>(
                     value: value,
@@ -165,6 +170,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 items: ActivityType.values.where((type) {
                   final selectedNature =
                       _formKey.currentState?.fields['activityNature']?.value;
+                      LogUtil.i( 'Selected Nature: $selectedNature');
                   if (selectedNature == ActivityNature.income) {
                     return [
                       ActivityType.salary,
@@ -218,6 +224,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
               FormBuilderTextField(
                 name: 'amount',
                 decoration: InputDecoration(
+                  helperText: spelledAmount,
                   labelText: S.of(context).amountLabel,
                   prefixText:
                       '${NumberFormat.simpleCurrency(locale: currentLocale).currencySymbol} ',
@@ -227,9 +234,21 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                ],
+                  inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                MoneyInputFormatter(),
+              ],
+                onChanged: (value) => setState(() {
+                if (value?.isEmpty ?? true) {
+                  spelledAmount = '';
+                  return;
+                }
+                final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
+                final amount = double.parse(cleanAmount ?? '0'); // Convert back to actual amount
+                context.read<LocaleCubit>().state.languageCode == 'vi'
+                    ? spelledAmount = SpellNumber().spellMoneyVND(amount)
+                    : spelledAmount = SpellNumber().spellMoney(amount);
+              }),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                   FormBuilderValidators.numeric(),

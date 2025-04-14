@@ -61,10 +61,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "activityTypeUtilities": MessageLookupByLibrary.simpleMessage("Utilities"),
     "addActivity": MessageLookupByLibrary.simpleMessage("Add Activity"),
     "addActivityButton": MessageLookupByLibrary.simpleMessage("Add Activity"),
+    "addBudget": MessageLookupByLibrary.simpleMessage("Add Budget"),
     "addNewActivitySheetTitle": MessageLookupByLibrary.simpleMessage(
       "Add New Activity",
     ),
     "amountLabel": MessageLookupByLibrary.simpleMessage("Amount"),
+    "amountMustBePositive": MessageLookupByLibrary.simpleMessage(
+      "Amount must be greater than 0",
+    ),
+    "budgetAmount": MessageLookupByLibrary.simpleMessage("Budget Amount"),
+    "budgetPeriodMonthly": MessageLookupByLibrary.simpleMessage("Monthly"),
+    "budgetPeriodWeekly": MessageLookupByLibrary.simpleMessage("Weekly"),
+    "budgetPeriodYearly": MessageLookupByLibrary.simpleMessage("Yearly"),
     "cacheClearError": MessageLookupByLibrary.simpleMessage(
       "Error clearing cache.",
     ),
@@ -72,6 +80,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Cache Cleared Successfully.",
     ),
     "cancelButton": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "category": MessageLookupByLibrary.simpleMessage("Category"),
     "changeButton": MessageLookupByLibrary.simpleMessage("Change"),
     "clearButton": MessageLookupByLibrary.simpleMessage("Clear"),
     "clearCache": MessageLookupByLibrary.simpleMessage("Clear Cache"),
@@ -81,10 +90,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmClearCacheTitle": MessageLookupByLibrary.simpleMessage(
       "Confirm Clear Cache",
     ),
+    "currentSpending": MessageLookupByLibrary.simpleMessage("Current Spending"),
     "darkMode": MessageLookupByLibrary.simpleMessage("Dark mode"),
     "dashboard": MessageLookupByLibrary.simpleMessage("DashBoard"),
     "dateLabelPrefix": MessageLookupByLibrary.simpleMessage("Date: "),
+    "editBudget": MessageLookupByLibrary.simpleMessage("Edit Budget"),
+    "enterValidNumber": MessageLookupByLibrary.simpleMessage(
+      "Please enter a valid number",
+    ),
     "expenses": MessageLookupByLibrary.simpleMessage("Expenses"),
+    "fieldRequired": MessageLookupByLibrary.simpleMessage(
+      "This field is required",
+    ),
     "formValidationError": MessageLookupByLibrary.simpleMessage(
       "Please complete all fields correctly.",
     ),
@@ -99,7 +116,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "noIncomeActivities": MessageLookupByLibrary.simpleMessage(
       "No income activities recorded yet.",
     ),
+    "ofBudgetUsed": MessageLookupByLibrary.simpleMessage("of budget used"),
     "otherCategory": MessageLookupByLibrary.simpleMessage("Other"),
+    "period": MessageLookupByLibrary.simpleMessage("Period"),
+    "saveChanges": MessageLookupByLibrary.simpleMessage("Save Changes"),
     "settings": MessageLookupByLibrary.simpleMessage("Settings"),
     "titleDescriptionLabel": MessageLookupByLibrary.simpleMessage(
       "Title / Description",

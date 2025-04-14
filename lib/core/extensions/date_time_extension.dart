@@ -124,4 +124,60 @@ extension DateTimeExtension on DateTime {
   }
 
   DateTime get lastMoment => DateTime(year, month, day, 23, 59, 59);
+
+  int get weekOfYear {
+    // Return the ISO week of year (1-53)
+    final dayOfYear = ordinalDate;
+    // Thursday is used as the reference point as per ISO-8601
+    final woy = ((dayOfYear - weekday + 10) / 7).floor();
+    
+    if (woy < 1) {
+      // If we're in the last week of the previous year
+      return DateTime(year - 1, 12, 28).weekOfYear;
+    } else if (woy > 52) {
+      // If we're in the first week of the next year
+      final lastDayOfYear = DateTime(year, 12, 31);
+      if (lastDayOfYear.weekday < 4) {
+        return 1;
+      }
+    }
+    return woy;
+  }
+
+  int get ordinalDate {
+    const daysInMonth = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    var ordinalDate = daysInMonth[month - 1] + day;
+    if (month > 2 && isLeapYear) ordinalDate++;
+    return ordinalDate;
+  }
+
+  bool get isLeapYear {
+    return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+  }
+
+  DateTime startOfWeek() {
+    // Monday is the first day of the week
+    return subtract(Duration(days: weekday - 1));
+  }
+
+  DateTime endOfWeek() {
+    // Sunday is the last day of the week
+    return add(Duration(days: DateTime.daysPerWeek - weekday));
+  }
+
+  DateTime startOfMonth() {
+    return DateTime(year, month);
+  }
+
+  DateTime endOfMonth() {
+    return DateTime(year, month + 1, 0);
+  }
+
+  DateTime startOfYear() {
+    return DateTime(year);
+  }
+
+  DateTime endOfYear() {
+    return DateTime(year + 1, 1, 0);
+  }
 }

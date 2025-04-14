@@ -45,5 +45,19 @@
   "activityTypeInvestment": "Investment",
   "activityTypeIncomeOther": "Other Income",
   "otherCategory": "Other",
-  "noChartData": "No expense data for this period to display chart."
+  "noChartData": "No expense data for this period to display chart.",
+  "addBudget": "Add Budget",
+  "editBudget": "Edit Budget",
+  "category": "Category",
+  "period": "Period",
+  "budgetAmount": "Budget Amount",
+  "fieldRequired": "This field is required",
+  "enterValidNumber": "Please enter a valid number",
+  "amountMustBePositive": "Amount must be greater than 0",
+  "currentSpending": "Current Spending",
+  "ofBudgetUsed": "of budget used",
+  "saveChanges": "Save Changes",
+  "budgetPeriodWeekly": "Weekly",
+  "budgetPeriodMonthly": "Monthly", 
+  "budgetPeriodYearly": "Yearly"
 }
