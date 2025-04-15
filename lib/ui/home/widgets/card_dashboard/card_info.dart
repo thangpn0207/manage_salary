@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/util/money_util.dart';
@@ -47,7 +46,7 @@ class CardInfo extends StatelessWidget {
                 style: theme.textTheme.titleMedium // Adjusted text style
                     ?.copyWith(fontWeight: FontWeight.w600, color: amountColor),
                 maxLines: 1,
-              ).animate().fadeIn(),
+              ),
             ),
           ],
         ),

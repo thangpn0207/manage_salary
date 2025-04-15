@@ -1,91 +1,123 @@
-name: Deploy Android to DeployGate on Main Merge (key.properties full)
+# This workflow handles building and deploying the Flutter app for different environments
+# It triggers on pushes and PRs to main, develop, and staging branches
+name: Flutter Build & Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop, staging ]
+  pull_request:
+    branches: [ main, develop, staging ]
 
 jobs:
-  build_and_deploy_android:
-    name: Build Signed Android App & Deploy to DeployGate
+  build_and_deploy:
+    name: Build & Deploy Flutter App
     runs-on: ubuntu-latest
-
+    
     steps:
-      # 1. Checkout code
+      # Step 1: Check out the repository code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Java
+      # Step 2: Set up Java environment for Android build
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Setup Flutter
+      # Step 3: Set up Flutter environment
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-      # 4. Get Flutter dependencies
+      # Step 4: Install Flutter dependencies
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      # 5. Analyze code (Optional)
-      - name: Analyze project source
+      # Step 5: Run static code analysis
+      - name: Analyze code
         run: flutter analyze
+        
+      # Step 6: Set environment-specific configuration
+      # This step sets different ads keys based on the branch
+      - name: Set Environment Config
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "Setting production configuration"
+            echo "FLUTTER_ADS_KEY=${{ secrets.PROD_ADS_KEY }}" >> $GITHUB_ENV
+            echo "ENABLE_ADS=true" >> $GITHUB_ENV
+            echo "BUILD_FLAVOR=production" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            echo "Setting staging configuration"
+            echo "FLUTTER_ADS_KEY=${{ secrets.STAGING_ADS_KEY }}" >> $GITHUB_ENV
+            echo "ENABLE_ADS=true" >> $GITHUB_ENV
+            echo "BUILD_FLAVOR=staging" >> $GITHUB_ENV
+          else
+            echo "Setting development configuration"
+            echo "FLUTTER_ADS_KEY=${{ secrets.DEV_ADS_KEY }}" >> $GITHUB_ENV
+            echo "ENABLE_ADS=false" >> $GITHUB_ENV
+            echo "BUILD_FLAVOR=development" >> $GITHUB_ENV
+          fi
 
-      # 6. Run tests (Optional)
-      #      - name: Run Flutter tests
-      #        run: flutter test
-
-      # 7. Decode Keystore File into Android Directory
+      # Step 7: Decode the Android keystore for signing
+      # This converts the base64 encoded keystore back to a binary file
       - name: Decode Keystore
         run: |
           echo "Decoding Keystore into android/keystore.jks..."
-          # Decode the base64 secret directly into the android subdirectory
-          # Ensure this filename matches what you put in .gitignore
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/keystore.jks
           echo "Keystore decoded."
 
-      # 8. Create key.properties File with Keystore Path
+      # Step 8: Create Android signing configuration
+      # This creates the key.properties file needed for signing the APK
       - name: Create key.properties
         run: |
           echo "Creating android/key.properties file..."
-          # Define the relative path to the decoded keystore
-          KEYSTORE_RELATIVE_PATH="../keystore.jks" # Relative to android directory
-
-          # Write secrets and the relative keystore path into the key.properties file
-          echo "storeFile=${KEYSTORE_RELATIVE_PATH}" > android/key.properties # Use > to overwrite/create file
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties # Use >> to append
+          KEYSTORE_RELATIVE_PATH="../keystore.jks"
+          echo "storeFile=${KEYSTORE_RELATIVE_PATH}" > android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
           echo "key.properties file created."
-          # Optional: Display content for verification (mask passwords if needed in logs)
-          # cat android/key.properties
 
-      # 9. Build Signed Release APK (No Env Vars needed for signing)
-      - name: Build Signed Android APK
+      # Step 9: Build the Android APK
+      # Uses the version from pubspec.yaml and build number from GitHub Actions
+      - name: Build Android APK
         run: |
-          echo "Starting build (Gradle will use android/key.properties)..."
-          flutter build apk --release --build-number=${{ github.run_number }}
+          echo "Starting build..."
+          flutter build apk --release \
+            --flavor ${BUILD_FLAVOR} \
+            --build-number=${{ github.run_number }} \
+            --dart-define=FLUTTER_ADS_KEY="${FLUTTER_ADS_KEY}" \
+            --dart-define=ENABLE_ADS="${ENABLE_ADS}"
           echo "Build finished."
 
-      # 10. Deploy to DeployGate
-      - name: Upload to DeployGate
+      # Step 10: Upload the built APK as an artifact
+      # This makes the APK available for download in GitHub Actions
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      # Step 11: Deploy to DeployGate
+      # Only runs on main and staging branches
+      - name: Deploy to DeployGate
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging'
         env:
           DEPLOYGATE_API_KEY: ${{ secrets.DEPLOYGATE_API_KEY }}
           DEPLOYGATE_USER_NAME: ${{ secrets.DEPLOYGATE_USER_NAME }}
-          DEPLOYGATE_DIST_KEY: ${{ secrets.DEPLOYGATE_DISTRIBUTION_KEY || '' }}
+          DEPLOYGATE_DIST_KEY: ${{ secrets.DEPLOYGATE_DISTRIBUTION_KEY }}
         run: |
           APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
-          RELEASE_NOTES="Build ${{ github.run_number }} (props path) deployed via GitHub Actions. Commit: ${{ github.sha }}"
-
+          RELEASE_NOTES="Build ${{ github.run_number }} - Branch: ${GITHUB_REF#refs/heads/} - Commit: ${{ github.sha }}"
+          
           echo "Uploading $APK_PATH to DeployGate..."
           CURL_COMMAND="curl -sfL -F file=@\"$APK_PATH\" \
                       -F token=\"$DEPLOYGATE_API_KEY\" \
                       -F message=\"$RELEASE_NOTES\" "
 
+          # Add distribution key if provided
           if [[ -n "$DEPLOYGATE_DIST_KEY" ]]; then
             CURL_COMMAND+=" -F distribution_key=\"$DEPLOYGATE_DIST_KEY\""
             echo "Deploying to distribution: $DEPLOYGATE_DIST_KEY"
@@ -97,11 +129,11 @@ jobs:
           eval $CURL_COMMAND
           echo "Upload command executed."
 
-      # 11. Cleanup Sensitive Files (Keystore and Properties)
+      # Step 12: Clean up sensitive files
+      # Always runs to ensure security, even if previous steps fail
       - name: Cleanup Sensitive Files
-        if: always() # Ensure this runs even if previous steps fail
+        if: always()
         run: |
           echo "Cleaning up sensitive files..."
-          # Remove both the generated properties file and the decoded keystore
           rm -f android/key.properties android/keystore.jks
           echo "Cleanup complete."

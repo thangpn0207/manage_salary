@@ -2,7 +2,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_tilt/flutter_tilt.dart';
@@ -208,7 +207,7 @@ class DashboardCard extends StatelessWidget {
                     offset: const Offset(1.0, 1.0),
                   ),
                 ]),
-          ).animate().fadeIn(),
+          ),
         ],
       ),
     );
