@@ -1,4 +1,5 @@
 import 'package:manage_salary/core/util/date_util.dart'; // For date comparison
+import 'package:manage_salary/core/util/log_util.dart';
 
 import '../../../core/constants/enums.dart';
 import '../../../models/activity_data.dart';
@@ -136,7 +137,7 @@ class ActivityUtil {
             return DateTime(currentDate.year + 1, currentDate.month, newDay);
       }
     } catch (e) {
-      print("Error calculating next due date in Util: $e");
+      LogUtil.e("Error calculating next due date in Util: $e");
       return null;
     }
   }

@@ -164,7 +164,7 @@ String spellMoneyVND(double amount) {
   String spelledAmount = _spellIntegerVn(integerAmount);
 
   // Combine with currency name
-  String result = spelledAmount + " đồng";
+  String result = "$spelledAmount đồng";
 
   // Capitalize the first letter
   if (result.isNotEmpty) {
@@ -196,10 +196,10 @@ String _spellLessThan1000(int number) {
   if (number == 0) return "";
   if (number < 20) return _units[number];
   if (number < 100) {
-    return _tens[number ~/ 10] + (number % 10 != 0 ? " " + _units[number % 10] : "");
+    return _tens[number ~/ 10] + (number % 10 != 0 ? " ${_units[number % 10]}" : "");
   }
   // Handle hundreds
-  return _units[number ~/ 100] + " hundred" + (number % 100 != 0 ? " " + _spellLessThan1000(number % 100) : "");
+  return "${_units[number ~/ 100]} hundred${number % 100 != 0 ? " ${_spellLessThan1000(number % 100)}" : ""}";
 }
 
 /// Converts a non-negative integer into words.
@@ -215,7 +215,7 @@ String _spellInteger(int number) {
       String thousandSeparator = i > 0 ? _thousands[i] : "";
       // Add space before adding to result if result is not empty
       // Add space between chunk and thousand separator if both exist
-      result = chunk + (thousandSeparator.isNotEmpty ? " " + thousandSeparator : "") + (result.isNotEmpty ? " " + result : "");
+      result = chunk + (thousandSeparator.isNotEmpty ? " $thousandSeparator" : "") + (result.isNotEmpty ? " $result" : "");
     }
     number ~/= 1000; // Move to the next chunk of thousands
     i++;

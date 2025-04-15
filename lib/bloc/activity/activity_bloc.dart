@@ -18,7 +18,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   final ActivityUtil _activityUtil = ActivityUtil();
   
   // Cache for frequent calculations
-  Map<String, double> _cachedCalculations = {};
+  final Map<String, double> cachedCalculations = {};
   DateTime? _lastCacheReset;
 
   ActivityBloc() : super(ActivityState.initial()) {
@@ -47,7 +47,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     final now = DateTime.now();
     if (_lastCacheReset == null || 
         now.difference(_lastCacheReset!).inHours >= 1) {
-      _cachedCalculations.clear();
+      cachedCalculations.clear();
       _lastCacheReset = now;
     }
   }
@@ -79,13 +79,13 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
     // Calculate with caching
     final String totalKey = _getCacheKey('total', null, null);
-    if (!_cachedCalculations.containsKey(totalKey)) {
-      _cachedCalculations['${totalKey}_income'] = _activityUtil.calculateTotalIncome(activities);
-      _cachedCalculations['${totalKey}_expenses'] = _activityUtil.calculateTotalExpenses(activities);
+    if (!cachedCalculations.containsKey(totalKey)) {
+      cachedCalculations['${totalKey}_income'] = _activityUtil.calculateTotalIncome(activities);
+      cachedCalculations['${totalKey}_expenses'] = _activityUtil.calculateTotalExpenses(activities);
     }
 
-    final totalIncome = _cachedCalculations['${totalKey}_income']!;
-    final totalExpenses = _cachedCalculations['${totalKey}_expenses']!;
+    final totalIncome = cachedCalculations['${totalKey}_income']!;
+    final totalExpenses = cachedCalculations['${totalKey}_expenses']!;
     final netBalance = totalIncome - totalExpenses;
 
     // Calculate period totals with caching
@@ -118,14 +118,14 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     String period,
   ) {
     final cacheKey = _getCacheKey(period, range.start, range.end);
-    if (!_cachedCalculations.containsKey('${cacheKey}_income')) {
+    if (!cachedCalculations.containsKey('${cacheKey}_income')) {
       final totals = _activityUtil.calculatePeriodTotals(activities, range);
-      _cachedCalculations['${cacheKey}_income'] = totals.income;
-      _cachedCalculations['${cacheKey}_expense'] = totals.expense;
+      cachedCalculations['${cacheKey}_income'] = totals.income;
+      cachedCalculations['${cacheKey}_expense'] = totals.expense;
     }
     return (
-      income: _cachedCalculations['${cacheKey}_income']!,
-      expense: _cachedCalculations['${cacheKey}_expense']!,
+      income: cachedCalculations['${cacheKey}_income']!,
+      expense: cachedCalculations['${cacheKey}_expense']!,
     );
   }
 
@@ -363,7 +363,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   void _onClearAllActivities(ClearAllActivities event, Emitter<ActivityState> emit) {
     try {
       emit(ActivityState.initial());
-      _cachedCalculations.clear();
+      cachedCalculations.clear();
       _lastCacheReset = DateTime.now();
     } catch (e, stackTrace) {
       LogUtil.e('Error clearing activities: $e\n$stackTrace');

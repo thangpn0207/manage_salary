@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:manage_salary/core/constants/enums.dart';
+import 'package:manage_salary/core/util/log_util.dart';
 import 'package:uuid/uuid.dart'; // For default ID generation
 
 /// Represents an activity that recurs at a set frequency.
@@ -89,7 +90,7 @@ class RecurringActivity extends Equatable {
             endDateString == null ? null : DateTime.tryParse(endDateString),
       );
     } catch (e, stackTrace) {
-      print(
+      LogUtil.e(
           "Error deserializing RecurringActivity: $e $stackTrace Data: $json");
       // Provide a fallback recurring activity
       return RecurringActivity(

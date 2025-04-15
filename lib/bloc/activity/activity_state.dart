@@ -126,7 +126,7 @@ class ActivityState extends Equatable {
         // Serialize recurring activities
       };
     } catch (e, stackTrace) {
-      print("Error serializing ActivityState: $e $stackTrace");
+      LogUtil.e("Error serializing ActivityState: $e $stackTrace");
       return {'allActivities': []}; // Fallback to minimal JSON
     }
   }
