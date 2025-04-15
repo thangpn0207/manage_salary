@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "id.thangpn.manage_salary"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -27,8 +27,42 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+    flavorDimensions += "environment"
+    productFlavors {
+        create("development") {
+            dimension = "environment"
+            applicationId = "id.thangpn.manage_salary.dev"
+            resValue("string", "app_name", "Manage Salary Dev")
+            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary Dev\"")
+            buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
+            buildConfigField("boolean", "DEBUG", "true")
+            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary Dev"
+        }
+        create("staging") {
+            dimension = "environment"
+            applicationId = "id.thangpn.manage_salary"
+            resValue("string", "app_name", "Manage Salary")
+            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary\"")
+            buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
+            buildConfigField("boolean", "DEBUG", "false")
+            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
+        }
+        create("production") {
+            dimension = "environment"
+            applicationId = "id.thangpn.manage_salary"
+            resValue("string", "app_name", "Manage Salary")
+            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary\"")
+            buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
+            buildConfigField("boolean", "DEBUG", "false")
+            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
+        }
+    }
+
     defaultConfig {
-        applicationId = "id.thangpn.manage_salary"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

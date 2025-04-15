@@ -30,6 +30,68 @@ activities, view their total balance, see categorized expenses in a chart, and m
    flutter pub run build_runner build --delete-conflicting-outputs
    ```
 
+## Using Scripts
+
+### Run Script (run.sh)
+The project includes a `run.sh` script to simplify running the application in different environments:
+
+```bash
+# Run in development environment
+./run.sh dev
+
+# Run in staging environment
+./run.sh staging
+
+# Run in production environment
+./run.sh prod
+```
+
+### Build Script (build.sh)
+Use the `build.sh` script to create builds for different environments and build types:
+
+```bash
+# Build APK for different environments
+./build.sh dev apk
+./build.sh staging apk
+./build.sh prod apk
+
+# Build App Bundle
+./build.sh dev appbundle
+./build.sh staging appbundle
+./build.sh prod appbundle
+
+# Build for iOS
+./build.sh dev ios
+./build.sh staging ios
+./build.sh prod ios
+```
+
+Make sure to make the scripts executable:
+```bash
+chmod +x run.sh build.sh
+```
+
+## VS Code Configuration
+
+The project includes VS Code launch configurations for different environments:
+
+1. **Development Environment:**
+   - Name: "Dev"
+   - Features: Debug mode enabled, ads disabled
+   - Launch with: F5 or Debug > Dev
+
+2. **Staging Environment:**
+   - Name: "Staging"
+   - Features: Debug mode disabled, ads enabled
+   - Launch with: F5 or Debug > Staging
+
+3. **Production Environment:**
+   - Name: "Production"
+   - Features: Debug mode disabled, ads enabled
+   - Launch with: F5 or Debug > Production
+
+Profile modes are also available for each environment for performance testing.
+
 ## Building the Project
 
 Flutter combines building and running into a single command for development. However, if you want to create a release

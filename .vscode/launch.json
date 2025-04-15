@@ -20,6 +20,73 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
+        },
+        {
+            "name": "Dev",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor", "development",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=false",
+                "--dart-define=DEBUG=true"
+            ]
+        },
+        {
+            "name": "Staging",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor", "staging",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false"
+            ]
+        },
+        {
+            "name": "Production",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor", "production",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false"
+            ]
+        },
+        {
+            "name": "Dev (Profile Mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor", "development",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=false",
+                "--dart-define=DEBUG=true"
+            ]
+        },
+        {
+            "name": "Staging (Profile Mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor", "staging",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false"
+            ]
+        },
+        {
+            "name": "Production (Profile Mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor", "production",
+                "--dart-define=FLUTTER_ADS_KEY=",
+            ]
         }
     ]
 }
