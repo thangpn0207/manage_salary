@@ -44,12 +44,12 @@ android {
         }
         create("staging") {
             dimension = "environment"
-            applicationId = "id.thangpn.manage_salary.stg"
-            resValue("string", "app_name", "Manage Salary Staging")
-            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary Staging\"")
+            applicationId = "id.thangpn.manage_salary"
+            resValue("string", "app_name", "Manage Salary")
+            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary\"")
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
-            buildConfigField("boolean", "DEBUG", "true")
-            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary Staging"
+            buildConfigField("boolean", "DEBUG", "false")
+            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
         }
         create("production") {
             dimension = "environment"
