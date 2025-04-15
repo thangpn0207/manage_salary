@@ -52,7 +52,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
         type: formData?['activityType'],
         title: formData?['title'],
         amount:
-            double.tryParse(formData?['amount']?.replaceAll(',', '') ?? '0') ??
+            double.tryParse(formData?['amount']?.replaceAll('.', '') ?? '0') ??
                 0,
         date: _selectedDate,
       );
@@ -249,11 +249,17 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                     ? spelledAmount = SpellNumber().spellMoneyVND(amount)
                     : spelledAmount = SpellNumber().spellMoney(amount);
               }),
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(),
-                  FormBuilderValidators.numeric(),
-                  FormBuilderValidators.min(0.01),
-                ]),
+                 validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(errorText: S.of(context).fieldRequired),
+                (value) {
+                  if (value == null || value.isEmpty) return null;
+                  final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+                  if (cleanValue.isEmpty || double.parse(cleanValue) <= 0) {
+                    return S.of(context).amountMustBePositive;
+                  }
+                  return null;
+                },
+              ]),
               ),
               const SizedBox(height: 16),
 

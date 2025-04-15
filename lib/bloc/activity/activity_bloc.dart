@@ -326,6 +326,10 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   // Enhanced Activity Handlers with Error Handling
   void _onAddActivity(AddActivity event, Emitter<ActivityState> emit) {
     try {
+      // Clear cache to ensure fresh calculations
+      cachedCalculations.clear();
+      _lastCacheReset = DateTime.now();
+
       final activityWithId = event.newActivity.copyWith(
         id: _uuid.v4(),
       );
