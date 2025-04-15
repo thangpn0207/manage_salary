@@ -50,8 +50,8 @@ class ActivityState extends Equatable {
       totalIncome: 0.0,
       totalExpenses: 0.0,
       netBalance: 0.0,
-      expensesByType: {},
-      incomeByType: {},
+      expensesByType: const {},
+      incomeByType: const {},
       todayIncome: 0.0,
       todayExpenses: 0.0,
       thisWeekIncome: 0.0,
@@ -59,6 +59,10 @@ class ActivityState extends Equatable {
       thisMonthIncome: 0.0,
       thisMonthExpenses: 0.0,
     );
+  }
+
+  ActivityState reset() {
+    return ActivityState.initial();
   }
 
   ActivityState copyWith({
@@ -116,24 +120,31 @@ class ActivityState extends Equatable {
   // --- HydratedBloc Serialization ---
   Map<String, dynamic> toJson() {
     try {
+      // Only serialize the core data, not the computed analytics
       return {
-        'allActivities':
-            allActivities.map((activity) => activity.toJson()).toList(),
-        'budgets': budgets.map((budget) => budget.toJson()).toList(),
-        // Serialize budgets
-        'recurringActivities':
-            recurringActivities.map((rec) => rec.toJson()).toList(),
-        // Serialize recurring activities
+        'allActivities': [], // Clear activities on serialize
+        'budgets': [], // Clear budgets on serialize
+        'recurringActivities': [], // Clear recurring activities on serialize
+        'isReset': true // Add flag to indicate this is a reset state
       };
     } catch (e, stackTrace) {
       LogUtil.e("Error serializing ActivityState: $e $stackTrace");
-      return {'allActivities': []}; // Fallback to minimal JSON
+      return {
+        'allActivities': [],
+        'isReset': true
+      }; // Fallback to minimal JSON with reset flag
     }
   }
 
   factory ActivityState.fromJson(Map<String, dynamic> json) {
     try {
-      // Deserialize Activities
+      // Check if this is a reset state
+      final bool isReset = json['isReset'] as bool? ?? false;
+      if (isReset) {
+        return ActivityState.initial();
+      }
+
+      // Normal deserialization logic
       final List<dynamic> activityListJson =
           json['allActivities'] as List<dynamic>? ?? [];
       final List<ActivityData> activities = activityListJson
@@ -141,14 +152,12 @@ class ActivityState extends Equatable {
               ActivityData.fromJson(activityJson as Map<String, dynamic>))
           .toList();
 
-      // Deserialize Budgets
       final List<dynamic> budgetListJson =
           json['budgets'] as List<dynamic>? ?? [];
       final List<Budget> budgets = budgetListJson
           .map((bJson) => Budget.fromJson(bJson as Map<String, dynamic>))
           .toList();
 
-      // Deserialize Recurring Activities
       final List<dynamic> recurringListJson =
           json['recurringActivities'] as List<dynamic>? ?? [];
       final List<RecurringActivity> recurringActivities = recurringListJson
@@ -156,19 +165,20 @@ class ActivityState extends Equatable {
               RecurringActivity.fromJson(rJson as Map<String, dynamic>))
           .toList();
 
-      // Pruning and sorting activities
+      // Only calculate analytics if we have activities
+      if (activities.isEmpty) {
+        return ActivityState.initial();
+      }
+
       final prunedActivities = ActivityUtil().pruneActivities(activities);
       prunedActivities.sort((a, b) => b.date.compareTo(a.date));
 
-      // Calculate analytics based on the loaded (and pruned) activities
       final analytics = calculateAnalytics(prunedActivities);
 
       return ActivityState(
         allActivities: prunedActivities,
         budgets: budgets,
-        // Use deserialized list
         recurringActivities: recurringActivities,
-        // Use deserialized list
         totalIncome: analytics.totalIncome,
         totalExpenses: analytics.totalExpenses,
         netBalance: analytics.netBalance,
@@ -184,7 +194,7 @@ class ActivityState extends Equatable {
     } catch (e, stackTrace) {
       LogUtil.e(
           "Error deserializing ActivityState: $e\n$stackTrace\nData: $json");
-      return ActivityState.initial(); // Fallback
+      return ActivityState.initial();
     }
   }
 }
