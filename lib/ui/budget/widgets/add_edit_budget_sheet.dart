@@ -39,7 +39,7 @@ Future<Budget?> showAddEditBudgetSheet(BuildContext context, {Budget? budget}) a
 class _BudgetFormContent extends StatefulWidget {
   final Budget? budget;
 
-  const _BudgetFormContent({Key? key, this.budget}) : super(key: key);
+  const _BudgetFormContent({this.budget});
 
   @override
   _BudgetFormContentState createState() => _BudgetFormContentState();
@@ -310,7 +310,7 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: theme.dividerColor.withOpacity(0.3),
+                    backgroundColor: theme.dividerColor.withValues(alpha:0.3),
                     valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                     minHeight: 8,
                   ),

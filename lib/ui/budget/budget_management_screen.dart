@@ -187,7 +187,7 @@ class BudgetManagementScreen extends StatelessWidget {
                     thickness: 1,
                     indent: 16,
                     endIndent: 16,
-                    color: theme.dividerColor.withOpacity(0.5),
+                    color: theme.dividerColor.withValues(alpha: 0.5),
                   ),
                 ),
             ],
@@ -305,9 +305,11 @@ class BudgetManagementScreen extends StatelessWidget {
       progress = (actualSpending / budget.amount).clamp(0.0, 1.0);
     }
     Color progressColor = Colors.green.shade600;
-    if (progress > 0.9)
+    if (progress > 0.9) {
       progressColor = Colors.red.shade600;
-    else if (progress > 0.7) progressColor = Colors.orange.shade600;
+    } else if (progress > 0.7){
+       progressColor = Colors.orange.shade600;
+    }
 
     final budgetActivityType =
         convertBudgetCategoryToActivityType(budget.category);
@@ -316,7 +318,7 @@ class BudgetManagementScreen extends StatelessWidget {
       key: Key(budget.id),
       direction: DismissDirection.endToStart,
       background: Container(
-        color: Colors.redAccent.withOpacity(0.8),
+        color: Colors.redAccent.withValues(alpha: 0.8),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20.0),
         child: const Icon(Icons.delete_outline, color: Colors.white),
@@ -341,7 +343,7 @@ class BudgetManagementScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
                         value: progress,
-                        backgroundColor: theme.dividerColor.withOpacity(0.3),
+                        backgroundColor: theme.dividerColor.withValues(alpha: 0.3),
                         valueColor:
                             AlwaysStoppedAnimation<Color>(progressColor),
                         minHeight: 8,
