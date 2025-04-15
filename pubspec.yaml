@@ -27,6 +27,7 @@ dependencies:
   flutter_tilt: ^3.2.1
   fl_chart: ^0.70.2
   cupertino_icons: ^1.0.8
+  google_mobile_ads: ^6.0.0
 
   # Navigation & Routing
   go_router: ^12.1.1

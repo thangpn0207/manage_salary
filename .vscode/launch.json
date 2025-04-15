@@ -28,8 +28,9 @@
             "args": [
                 "--flavor", "development",
                 "--dart-define=FLUTTER_ADS_KEY=",
-                "--dart-define=ENABLE_ADS=false",
-                "--dart-define=DEBUG=true"
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=true",
+                "--dart-define=ADMOB_APP_ID=ca-app-pub-2103558986527802~5808548229"
             ]
         },
         {
@@ -40,7 +41,8 @@
                 "--flavor", "staging",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=true",
-                "--dart-define=DEBUG=false"
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -51,7 +53,8 @@
                 "--flavor", "production",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=true",
-                "--dart-define=DEBUG=false"
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -63,7 +66,8 @@
                 "--flavor", "development",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=false",
-                "--dart-define=DEBUG=true"
+                "--dart-define=DEBUG=true",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -75,7 +79,8 @@
                 "--flavor", "staging",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=true",
-                "--dart-define=DEBUG=false"
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -86,6 +91,9 @@
             "args": [
                 "--flavor", "production",
                 "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         }
     ]

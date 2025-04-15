@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:manage_salary/bloc/activity/activity_event.dart';
 import 'package:manage_salary/ui/components/base_button.dart';
+import 'package:manage_salary/ui/components/banner_ad_widget.dart';
 import 'package:manage_salary/ui/home/widgets/activity_list/activity_tabs_view.dart';
 import 'package:manage_salary/ui/home/widgets/bottom_sheet/show_add_activity_sheet.dart';
 import 'package:manage_salary/ui/home/widgets/card_dashboard/card_dashboard.dart';
@@ -70,6 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: 500.h, child: ActivityTabsView()),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: BannerAdWidget(),
+            ),
             SizedBox(
               height: 50.h,
             ),

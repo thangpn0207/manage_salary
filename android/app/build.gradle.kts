@@ -41,6 +41,7 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "true")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary Dev"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: "ca-app-pub-2103558986527802~5808548229"
         }
         create("staging") {
             dimension = "environment"
@@ -50,6 +51,7 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "false")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: ""
         }
         create("production") {
             dimension = "environment"
@@ -59,11 +61,12 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "false")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: "ca-app-pub-2103558986527802~5808548229"
         }
     }
 
-    defaultConfig {
-        minSdk = flutter.minSdkVersion
+    defaultConfig {                                              
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

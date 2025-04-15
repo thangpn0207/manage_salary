@@ -40,22 +40,25 @@ jobs:
         run: flutter analyze
         
       # Step 6: Set environment-specific configuration
-      # This step sets different ads keys based on the branch
+      # This step sets different ads keys and AdMob app IDs based on the branch
       - name: Set Environment Config
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "Setting production configuration"
             echo "FLUTTER_ADS_KEY=${{ secrets.PROD_ADS_KEY }}" >> $GITHUB_ENV
+            echo "ADMOB_APP_ID=${{ secrets.PROD_ADMOB_APP_ID }}" >> $GITHUB_ENV
             echo "ENABLE_ADS=true" >> $GITHUB_ENV
             echo "BUILD_FLAVOR=production" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "Setting staging configuration"
             echo "FLUTTER_ADS_KEY=${{ secrets.STAGING_ADS_KEY }}" >> $GITHUB_ENV
+            echo "ADMOB_APP_ID=${{ secrets.STAGING_ADMOB_APP_ID }}" >> $GITHUB_ENV
             echo "ENABLE_ADS=false" >> $GITHUB_ENV
             echo "BUILD_FLAVOR=staging" >> $GITHUB_ENV
           else
             echo "Setting development configuration"
             echo "FLUTTER_ADS_KEY=${{ secrets.DEV_ADS_KEY }}" >> $GITHUB_ENV
+            echo "ADMOB_APP_ID=${{ secrets.DEV_ADMOB_APP_ID }}" >> $GITHUB_ENV
             echo "ENABLE_ADS=false" >> $GITHUB_ENV
             echo "BUILD_FLAVOR=development" >> $GITHUB_ENV
           fi

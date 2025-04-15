@@ -3,6 +3,10 @@
             android:label="${FLUTTER_APP_NAME}"
             android:name="${applicationName}"
             android:icon="@mipmap/launcher_icon">
+        <!-- AdMob app ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${ADMOB_APP_ID}"/>
         <activity
                 android:name=".MainActivity"
                 android:exported="true"

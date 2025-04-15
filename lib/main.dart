@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/core/debug/debug_config.dart';
@@ -12,6 +13,17 @@ import 'core/dependency/injection.dart' as inject;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Google Mobile Ads SDK
+  if (BuildConfig.enableAds) {
+    await MobileAds.instance.initialize();
+    // Enable debug logging for ads in development
+    if (BuildConfig.debug) {
+      MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(testDeviceIds: ['TEST_DEVICE_ID']),
+      );
+    }
+  }
 
   // Initialize logging with build configuration
   LogUtil.init();

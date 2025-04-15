@@ -1,46 +1,41 @@
 #!/bin/bash
 
+# Get the build flavor from command line argument
 FLAVOR=$1
-BUILD_TYPE=$2
+BUILD_NUMBER=$2
 
+if [ -z "$FLAVOR" ]; then
+    echo "Please provide a build flavor (development/staging/production)"
+    exit 1
+fi
+
+if [ -z "$BUILD_NUMBER" ]; then
+    BUILD_NUMBER=$(date +%s)
+fi
+
+# Set environment-specific variables
 case $FLAVOR in
-  "development")
-    ADS_KEY=""
-    ENABLE_ADS="false"
-    DEBUG="true"
-    ;;
-  "staging")
-    ADS_KEY=""
-    ENABLE_ADS="true"
-    DEBUG="false"
-    ;;
-  "production")
-    ADS_KEY=""
-    ENABLE_ADS="true"
-    DEBUG="false"
-    ;;
-  *)
-    echo "Usage: ./build.sh {development|staging|production} {apk|appbundle|ios}"
-    exit 1
-    ;;
+    "development")
+        ENABLE_ADS=false
+        ;;
+    "staging")
+        ENABLE_ADS=false
+        ;;
+    "production")
+        ENABLE_ADS=true
+        ;;
+    *)
+        echo "Invalid flavor. Use development, staging, or production"
+        exit 1
+        ;;
 esac
 
-DART_DEFINES="--dart-define=FLUTTER_ADS_KEY=$ADS_KEY"
-DART_DEFINES="$DART_DEFINES --dart-define=ENABLE_ADS=$ENABLE_ADS"
-DART_DEFINES="$DART_DEFINES --dart-define=DEBUG=$DEBUG"
+# Build the app with the specified configuration
+flutter build apk --flavor $FLAVOR \
+    --build-number=$BUILD_NUMBER \
+    --dart-define=ENABLE_ADS=$ENABLE_ADS
 
-case $BUILD_TYPE in
-  "apk")
-    flutter build apk --release --flavor $FLAVOR $DART_DEFINES
-    ;;
-  "appbundle")
-    flutter build appbundle --release --flavor $FLAVOR $DART_DEFINES
-    ;;
-  "ios")
-    flutter build ios --release --flavor $FLAVOR $DART_DEFINES
-    ;;
-  *)
-    echo "Usage: ./build.sh {development|staging|production} {apk|appbundle|ios}"
-    exit 1
-    ;;
-esac
+# Make the APK executable
+chmod +x build/app/outputs/flutter-apk/app-$FLAVOR-release.apk
+
+echo "Build completed for $FLAVOR environment"
