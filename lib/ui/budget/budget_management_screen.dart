@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:manage_salary/core/util/convert_enum.dart';
 import 'package:manage_salary/core/util/money_util.dart';
@@ -7,6 +8,7 @@ import 'package:manage_salary/models/budget.dart';
 import 'package:manage_salary/ui/budget/widgets/add_edit_budget_sheet.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/util/localization_utils.dart';
+import 'package:manage_salary/ui/components/banner_ad_widget.dart';
 
 import '../../../bloc/activity/activity_bloc.dart';
 import '../../../bloc/activity/activity_event.dart';
@@ -40,8 +42,6 @@ class BudgetManagementScreen extends StatelessWidget {
         return Icons.receipt_long_outlined;
     }
   }
-
-
 
   void _showAddEditBudgetDialog(BuildContext context, {Budget? budget}) async {
     final resultBudget = await showAddEditBudgetSheet(context, budget: budget);
@@ -118,8 +118,7 @@ class BudgetManagementScreen extends StatelessWidget {
                   a.date.isBefore(monthRange.end))
               .forEach((activity) {
             monthlySpendingByType.update(
-                activity.type,
-                (value) => value + activity.amount,
+                activity.type, (value) => value + activity.amount,
                 ifAbsent: () => activity.amount);
           });
 
@@ -133,6 +132,12 @@ class BudgetManagementScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.only(bottom: 80),
             children: [
+              BuildConfig.enableAds
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: BannerAdWidget(),
+                    )
+                  : SizedBox.shrink(),
               _buildSummaryCardWithAddButton(
                 context: context,
                 period: s.budgetPeriodMonthly,
@@ -141,7 +146,6 @@ class BudgetManagementScreen extends StatelessWidget {
                 remaining: remainingMonthly,
                 onAddBudget: () => _showAddEditBudgetDialog(context),
               ),
-
               if (state.budgets.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 8.0),
@@ -151,7 +155,6 @@ class BudgetManagementScreen extends StatelessWidget {
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
-
               if (state.budgets.isEmpty)
                 _buildEmptyState(context)
               else
@@ -176,9 +179,7 @@ class BudgetManagementScreen extends StatelessWidget {
                       actualSpending: spendingForBudget,
                       onTap: () =>
                           _showAddEditBudgetDialog(context, budget: budget),
-                      onDismissed: (id) => _confirmAndRemoveBudget(
-                          context,
-                          id,
+                      onDismissed: (id) => _confirmAndRemoveBudget(context, id,
                           localizedActivityPaying(context, activityType)),
                     );
                   },
@@ -237,7 +238,6 @@ class BudgetManagementScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-
             if (hasBudgets) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -307,8 +307,8 @@ class BudgetManagementScreen extends StatelessWidget {
     Color progressColor = Colors.green.shade600;
     if (progress > 0.9) {
       progressColor = Colors.red.shade600;
-    } else if (progress > 0.7){
-       progressColor = Colors.orange.shade600;
+    } else if (progress > 0.7) {
+      progressColor = Colors.orange.shade600;
     }
 
     final budgetActivityType =
@@ -343,7 +343,8 @@ class BudgetManagementScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
                         value: progress,
-                        backgroundColor: theme.dividerColor.withValues(alpha: 0.3),
+                        backgroundColor:
+                            theme.dividerColor.withValues(alpha: 0.3),
                         valueColor:
                             AlwaysStoppedAnimation<Color>(progressColor),
                         minHeight: 8,

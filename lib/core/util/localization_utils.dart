@@ -11,6 +11,7 @@ String localizedActivityNature(BuildContext context, ActivityNature nature) {
       return S.of(context).activityNatureExpense;
   }
 }
+
 // Helper function to get localized string for BudgetPeriod
 String localizedBudgetPeriod(BuildContext context, BudgetPeriod period) {
   switch (period) {
@@ -23,13 +24,29 @@ String localizedBudgetPeriod(BuildContext context, BudgetPeriod period) {
   }
 }
 
+// Helper function to get localized string for RecurringFrequency
+String localizedRecurringFrequency(BuildContext context, RecurringFrequency frequency) {
+  final s = S.of(context);
+  switch (frequency) {
+    case RecurringFrequency.daily:
+      return s.frequencyDaily;
+    case RecurringFrequency.weekly:
+      return s.frequencyWeekly;
+    case RecurringFrequency.biWeekly:
+      return s.frequencyBiWeekly;
+    case RecurringFrequency.monthly:
+      return s.frequencyMonthly;
+    case RecurringFrequency.yearly:
+      return s.frequencyYearly;
+  }
+}
 
 // Helper function to get localized string for ActivityPaying
 String localizedActivityPaying(BuildContext context, ActivityType type) {
   final s = S.of(context);
 
   switch (type) {
-// === Expense Types ===
+    // === Expense Types ===
     case ActivityType.shopping:
       return s.activityTypeShopping;
     case ActivityType.foodAndDrinks:
@@ -52,7 +69,7 @@ String localizedActivityPaying(BuildContext context, ActivityType type) {
       // Use the specific key for "Other Expense" if available
       return s.activityTypeExpenseOther;
 
-// === Income Types ===
+    // === Income Types ===
     case ActivityType.salary:
       return s.activityTypeSalary;
     case ActivityType.freelance:
@@ -65,6 +82,6 @@ String localizedActivityPaying(BuildContext context, ActivityType type) {
       // Assuming key exists: activityTypeIncomeOther
       return s.activityTypeIncomeOther;
 
-// Assuming a generic 'Other' key exists
+    // Assuming a generic 'Other' key exists
   }
 }

@@ -20,6 +20,87 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
+        },
+        {
+            "name": "Dev",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "development",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=false",
+                "--dart-define=DEBUG=true",
+                "--dart-define=ADMOB_APP_ID=ca-app-pub-2103558986527802~5808548229"
+            ]
+        },
+        {
+            "name": "Staging",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "staging",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
+            ]
+        },
+        {
+            "name": "Production",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--flavor",
+                "production",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
+            ]
+        },
+        {
+            "name": "Dev (Profile Mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "development",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=false",
+                "--dart-define=DEBUG=true",
+                "--dart-define=ADMOB_APP_ID="
+            ]
+        },
+        {
+            "name": "Staging (Profile Mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "staging",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
+            ]
+        },
+        {
+            "name": "Production (Profile Mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--flavor",
+                "production",
+                "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
+            ]
         }
     ]
 }

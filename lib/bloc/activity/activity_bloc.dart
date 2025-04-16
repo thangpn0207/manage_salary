@@ -21,6 +21,9 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   final Map<String, double> cachedCalculations = {};
   DateTime? _lastCacheReset;
 
+  // Cache for recurring generation
+  final Map<String, DateTime> _lastGeneratedDates = {};
+
   ActivityBloc() : super(ActivityState.initial()) {
     // Standard Activity handlers
     on<AddActivity>(_onAddActivity);
@@ -54,6 +57,32 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
   String _getCacheKey(String operation, DateTime? start, DateTime? end) {
     return '$operation-${start?.toIso8601String() ?? "all"}-${end?.toIso8601String() ?? "all"}';
+  }
+
+  String _getRecurringCacheKey(RecurringActivity activity) {
+    return '${activity.id}-${activity.frequency}';
+  }
+
+  bool _needsRegeneration(RecurringActivity activity, DateTime untilDate) {
+    final cacheKey = _getRecurringCacheKey(activity);
+    final lastGenerated = _lastGeneratedDates[cacheKey];
+    
+    if (lastGenerated == null) return true;
+    
+    // Regenerate if more than the frequency period has passed
+    switch (activity.frequency) {
+      case RecurringFrequency.daily:
+        return untilDate.difference(lastGenerated).inDays >= 1;
+      case RecurringFrequency.weekly:
+        return untilDate.difference(lastGenerated).inDays >= 7;
+      case RecurringFrequency.biWeekly:
+        return untilDate.difference(lastGenerated).inDays >= 14;
+      case RecurringFrequency.monthly:
+        return untilDate.month != lastGenerated.month || 
+               untilDate.year != lastGenerated.year;
+      case RecurringFrequency.yearly:
+        return untilDate.year != lastGenerated.year;
+    }
   }
 
   // Enhanced analytics calculation with caching
@@ -297,6 +326,10 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   // Enhanced Activity Handlers with Error Handling
   void _onAddActivity(AddActivity event, Emitter<ActivityState> emit) {
     try {
+      // Clear cache to ensure fresh calculations
+      cachedCalculations.clear();
+      _lastCacheReset = DateTime.now();
+
       final activityWithId = event.newActivity.copyWith(
         id: _uuid.v4(),
       );
@@ -362,9 +395,17 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
   void _onClearAllActivities(ClearAllActivities event, Emitter<ActivityState> emit) {
     try {
-      emit(ActivityState.initial());
+      // Clear all caches first
       cachedCalculations.clear();
+      _lastGeneratedDates.clear();
       _lastCacheReset = DateTime.now();
+      
+      // Reset the state to initial
+      emit(state.reset());
+      
+      // Force save the reset state
+      toJson(state);
+      
     } catch (e, stackTrace) {
       LogUtil.e('Error clearing activities: $e\n$stackTrace');
     }
@@ -537,15 +578,27 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
   void _onRemoveRecurringActivity(RemoveRecurringActivity event, Emitter<ActivityState> emit) {
     try {
+      // Remove from recurring activities list
       final updatedRecurring = List<RecurringActivity>.from(state.recurringActivities)
         ..removeWhere((rec) => rec.id == event.recurringActivityId);
       
-      // Also remove generated activities linked to this recurring one
+      // Remove all generated instances
       final updatedActivities = List<ActivityData>.from(state.allActivities)
         ..removeWhere((act) => act.recurringActivityId == event.recurringActivityId);
       updatedActivities.sort((a, b) => b.date.compareTo(a.date));
 
+      // Clear cache for the removed recurring activity
+      _lastGeneratedDates.remove(_getRecurringCacheKey(
+        state.recurringActivities.firstWhere((r) => r.id == event.recurringActivityId)
+      ));
+      
+      // Clear analytics cache to force recalculation
+      cachedCalculations.clear();
+      _lastCacheReset = DateTime.now();
+
+      // Recalculate analytics with updated activities
       final analytics = _calculateAnalyticsWithCache(updatedActivities);
+      
       emit(state.copyWith(
         recurringActivities: updatedRecurring,
         allActivities: updatedActivities,
@@ -561,6 +614,10 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
         thisMonthIncome: analytics.thisMonthIncome,
         thisMonthExpenses: analytics.thisMonthExpenses,
       ));
+
+      // Update budgets after removing recurring activity instances
+      _checkAndResetBudgets(emit);
+      
     } catch (e, stackTrace) {
       LogUtil.e('Error removing recurring activity: $e\n$stackTrace');
     }
@@ -572,33 +629,30 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
       final now = event.untilDate;
 
       for (final recurring in state.recurringActivities) {
+        // Skip regeneration if not needed
+        if (!_needsRegeneration(recurring, now)) continue;
+        
         DateTime nextDueDate = recurring.startDate;
-
         // Skip if start date is in the future
         if (nextDueDate.isAfter(now)) continue;
 
         while (nextDueDate.isBefore(now) || nextDueDate.isAtSameMomentAs(now)) {
-          // Stop if end date is reached
-          if (recurring.endDate != null && nextDueDate.isAfter(recurring.endDate!)) {
-            break;
-          }
+          if (recurring.endDate != null && nextDueDate.isAfter(recurring.endDate!)) break;
 
-          // Check for existing instance
-          bool alreadyExists = state.allActivities.any((activity) =>
-              activity.recurringActivityId == recurring.id &&
-              activity.date.year == nextDueDate.year &&
-              activity.date.month == nextDueDate.month &&
-              activity.date.day == nextDueDate.day);
+          // Check for existing instance using optimized query
+          final ActivityData existingActivity = state.allActivities.firstWhere(
+            (activity) => 
+                activity.recurringActivityId == recurring.id &&
+                activity.date.year == nextDueDate.year &&
+                activity.date.month == nextDueDate.month &&
+                activity.date.day == nextDueDate.day,
+            orElse: () => ActivityData(id: '', nature: ActivityNature.expense, title: '', amount: 0.0, date: DateTime.now(), type: ActivityType.expenseOther, recurringActivityId: null), 
+          );
 
-          if (!alreadyExists) {
+          if (existingActivity.id.isEmpty) {
             newlyGenerated.add(ActivityData(
               id: _uuid.v4(),
-              nature: recurring.type.name.toLowerCase().contains('income') ||
-                      recurring.type == ActivityType.salary ||
-                      recurring.type == ActivityType.freelance ||
-                      recurring.type == ActivityType.investment
-                  ? ActivityNature.income
-                  : ActivityNature.expense,
+              nature: _determineActivityNature(recurring.type),
               title: recurring.title,
               amount: recurring.amount,
               date: nextDueDate,
@@ -607,45 +661,20 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
             ));
           }
 
-          // Calculate next due date
-          switch (recurring.frequency) {
-            case RecurringFrequency.daily:
-              nextDueDate = nextDueDate.add(const Duration(days: 1));
-              break;
-            case RecurringFrequency.weekly:
-              nextDueDate = nextDueDate.add(const Duration(days: 7));
-              break;
-            case RecurringFrequency.biWeekly:
-              nextDueDate = nextDueDate.add(const Duration(days: 14));
-              break;
-            case RecurringFrequency.monthly:
-              var newMonth = nextDueDate.month + 1;
-              var newYear = nextDueDate.year;
-              if (newMonth > 12) {
-                newMonth = 1;
-                newYear++;
-              }
-              var daysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
-              var newDay = nextDueDate.day > daysInNewMonth
-                  ? daysInNewMonth
-                  : nextDueDate.day;
-              nextDueDate = DateTime(newYear, newMonth, newDay);
-              break;
-            case RecurringFrequency.yearly:
-              nextDueDate = DateTime(nextDueDate.year + 1, nextDueDate.month, nextDueDate.day);
-              break;
-          }
-
-          // Safety breaks
-          if (nextDueDate.year > now.year + 10) break;
-          if (newlyGenerated.length > 1000) break;
+          nextDueDate = _calculateNextDueDate(nextDueDate, recurring.frequency);
+          
+          // Safety checks
+          if (nextDueDate.year > now.year + 10 || newlyGenerated.length > 1000) break;
         }
+        
+        // Update generation cache
+        _lastGeneratedDates[_getRecurringCacheKey(recurring)] = now;
       }
 
       if (newlyGenerated.isNotEmpty) {
         final updatedList = List<ActivityData>.from(state.allActivities)
-          ..addAll(newlyGenerated);
-        updatedList.sort((a, b) => b.date.compareTo(a.date));
+          ..addAll(newlyGenerated)
+          ..sort((a, b) => b.date.compareTo(a.date));
 
         final analytics = _calculateAnalyticsWithCache(updatedList);
         emit(state.copyWith(
@@ -663,11 +692,42 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
           thisMonthExpenses: analytics.thisMonthExpenses,
         ));
         
-        // Update budgets after generating recurring activities
         _checkAndResetBudgets(emit);
       }
     } catch (e, stackTrace) {
       LogUtil.e('Error generating recurring instances: $e\n$stackTrace');
+    }
+  }
+
+  ActivityNature _determineActivityNature(ActivityType type) {
+    return type.name.toLowerCase().contains('income') ||
+           type == ActivityType.salary ||
+           type == ActivityType.freelance ||
+           type == ActivityType.investment
+        ? ActivityNature.income
+        : ActivityNature.expense;
+  }
+
+  DateTime _calculateNextDueDate(DateTime current, RecurringFrequency frequency) {
+    switch (frequency) {
+      case RecurringFrequency.daily:
+        return current.add(const Duration(days: 1));
+      case RecurringFrequency.weekly:
+        return current.add(const Duration(days: 7));
+      case RecurringFrequency.biWeekly:
+        return current.add(const Duration(days: 14));
+      case RecurringFrequency.monthly:
+        var newMonth = current.month + 1;
+        var newYear = current.year;
+        if (newMonth > 12) {
+          newMonth = 1;
+          newYear++;
+        }
+        var daysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
+        var newDay = current.day > daysInNewMonth ? daysInNewMonth : current.day;
+        return DateTime(newYear, newMonth, newDay);
+      case RecurringFrequency.yearly:
+        return DateTime(current.year + 1, current.month, current.day);
     }
   }
 

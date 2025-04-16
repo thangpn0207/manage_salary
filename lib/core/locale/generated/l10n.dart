@@ -664,6 +664,146 @@ class S {
       args: [category],
     );
   }
+
+  /// `Manage Recurring`
+  String get manageRecurring {
+    return Intl.message(
+      'Manage Recurring',
+      name: 'manageRecurring',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Recurring`
+  String get addRecurring {
+    return Intl.message(
+      'Add Recurring',
+      name: 'addRecurring',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Recurring`
+  String get editRecurring {
+    return Intl.message(
+      'Edit Recurring',
+      name: 'editRecurring',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title`
+  String get title {
+    return Intl.message('Title', name: 'title', desc: '', args: []);
+  }
+
+  /// `Amount`
+  String get amount {
+    return Intl.message('Amount', name: 'amount', desc: '', args: []);
+  }
+
+  /// `Type`
+  String get type {
+    return Intl.message('Type', name: 'type', desc: '', args: []);
+  }
+
+  /// `Frequency`
+  String get frequency {
+    return Intl.message('Frequency', name: 'frequency', desc: '', args: []);
+  }
+
+  /// `Start Date`
+  String get startDate {
+    return Intl.message('Start Date', name: 'startDate', desc: '', args: []);
+  }
+
+  /// `End Date`
+  String get endDate {
+    return Intl.message('End Date', name: 'endDate', desc: '', args: []);
+  }
+
+  /// `No End Date`
+  String get noEndDate {
+    return Intl.message('No End Date', name: 'noEndDate', desc: '', args: []);
+  }
+
+  /// `Daily`
+  String get frequencyDaily {
+    return Intl.message('Daily', name: 'frequencyDaily', desc: '', args: []);
+  }
+
+  /// `Weekly`
+  String get frequencyWeekly {
+    return Intl.message('Weekly', name: 'frequencyWeekly', desc: '', args: []);
+  }
+
+  /// `Bi-Weekly`
+  String get frequencyBiWeekly {
+    return Intl.message(
+      'Bi-Weekly',
+      name: 'frequencyBiWeekly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Monthly`
+  String get frequencyMonthly {
+    return Intl.message(
+      'Monthly',
+      name: 'frequencyMonthly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Yearly`
+  String get frequencyYearly {
+    return Intl.message('Yearly', name: 'frequencyYearly', desc: '', args: []);
+  }
+
+  /// `No recurring activities`
+  String get noRecurringActivities {
+    return Intl.message(
+      'No recurring activities',
+      name: 'noRecurringActivities',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add recurring activities to automate your regular income and expenses`
+  String get addRecurringDescription {
+    return Intl.message(
+      'Add recurring activities to automate your regular income and expenses',
+      name: 'addRecurringDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `added`
+  String get added {
+    return Intl.message('added', name: 'added', desc: '', args: []);
+  }
+
+  /// `updated`
+  String get updated {
+    return Intl.message('updated', name: 'updated', desc: '', args: []);
+  }
+
+  /// `{name} removed`
+  String activityRemoved(Object name) {
+    return Intl.message(
+      '$name removed',
+      name: 'activityRemoved',
+      desc: '',
+      args: [name],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

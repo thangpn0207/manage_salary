@@ -13,15 +13,16 @@ class RecurringActivity extends Equatable {
   final DateTime startDate; // The date the first instance occurs
   final DateTime? endDate; // Optional: when the recurrence stops
 
-  const RecurringActivity({
-    required this.id,
+   RecurringActivity({
+    String? id, // Make id optional in constructor
     required this.title,
     required this.amount,
     required this.type,
     required this.frequency,
     required this.startDate,
     this.endDate,
-  });
+  }) : assert(amount >= 0, 'Amount must be non-negative'),
+        id = id ?? DateTime.now().millisecondsSinceEpoch.toString(); // Generate ID if not provided
 
   @override
   List<Object?> get props => [
