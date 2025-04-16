@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart'; // For clearing storage
+import 'package:manage_salary/bloc/activity/activity_bloc.dart';
+import 'package:manage_salary/bloc/activity/activity_event.dart';
 import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
 import 'package:manage_salary/bloc/theme/cubit/theme_cubit.dart';
 
@@ -150,6 +152,7 @@ class SettingsScreen extends StatelessWidget {
     if (confirmed == true && context.mounted) {
       // Check context is still valid
       try {
+        context.read<ActivityBloc>().add(ClearAllActivities()); // Reset locale
         await HydratedBloc.storage.clear();
         LogUtil.i("HydratedBloc storage cleared.");
 

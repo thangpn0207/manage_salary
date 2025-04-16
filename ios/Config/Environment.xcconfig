@@ -1,0 +1,19 @@
+#include "../Flutter/Generated.xcconfig"
+
+// Development Environment
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
+PRODUCT_BUNDLE_IDENTIFIER = id.thangpn.manage_salary.dev
+FLUTTER_APP_NAME = Manage Salary Dev
+ADMOB_APP_ID = $(ADMOB_APP_ID)
+
+// Staging Environment
+[config=Staging] 
+PRODUCT_BUNDLE_IDENTIFIER = id.thangpn.manage_salary
+FLUTTER_APP_NAME = Manage Salary Staging
+ADMOB_APP_ID = $(ADMOB_APP_ID)
+
+// Production Environment
+[config=Release]
+PRODUCT_BUNDLE_IDENTIFIER = id.thangpn.manage_salary
+FLUTTER_APP_NAME = Manage Salary
+ADMOB_APP_ID = $(ADMOB_APP_ID)

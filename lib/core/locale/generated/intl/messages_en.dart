@@ -22,7 +22,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(title) => "${title} deleted";
 
-  static String m1(category) => "${category} budget removed";
+  static String m1(name) => "${name} removed";
+
+  static String m2(category) => "${category} budget removed";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -32,6 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "activityNatureLabel": MessageLookupByLibrary.simpleMessage(
       "Activity Nature",
     ),
+    "activityRemoved": m1,
     "activityTypeEducation": MessageLookupByLibrary.simpleMessage("Education"),
     "activityTypeEntertainment": MessageLookupByLibrary.simpleMessage(
       "Entertainment",
@@ -68,6 +71,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "addNewActivitySheetTitle": MessageLookupByLibrary.simpleMessage(
       "Add New Activity",
     ),
+    "addRecurring": MessageLookupByLibrary.simpleMessage("Add Recurring"),
+    "addRecurringDescription": MessageLookupByLibrary.simpleMessage(
+      "Add recurring activities to automate your regular income and expenses",
+    ),
+    "added": MessageLookupByLibrary.simpleMessage("added"),
+    "amount": MessageLookupByLibrary.simpleMessage("Amount"),
     "amountLabel": MessageLookupByLibrary.simpleMessage("Amount"),
     "amountMustBePositive": MessageLookupByLibrary.simpleMessage(
       "Amount must be greater than 0",
@@ -78,7 +87,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "budgetPeriodMonthly": MessageLookupByLibrary.simpleMessage("Monthly"),
     "budgetPeriodWeekly": MessageLookupByLibrary.simpleMessage("Weekly"),
     "budgetPeriodYearly": MessageLookupByLibrary.simpleMessage("Yearly"),
-    "budgetRemoved": m1,
+    "budgetRemoved": m2,
     "budgetSummary": MessageLookupByLibrary.simpleMessage("Budget Summary"),
     "cacheClearError": MessageLookupByLibrary.simpleMessage(
       "Error clearing cache.",
@@ -103,6 +112,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "dashboard": MessageLookupByLibrary.simpleMessage("DashBoard"),
     "dateLabelPrefix": MessageLookupByLibrary.simpleMessage("Date: "),
     "editBudget": MessageLookupByLibrary.simpleMessage("Edit Budget"),
+    "editRecurring": MessageLookupByLibrary.simpleMessage("Edit Recurring"),
+    "endDate": MessageLookupByLibrary.simpleMessage("End Date"),
     "enterValidNumber": MessageLookupByLibrary.simpleMessage(
       "Please enter a valid number",
     ),
@@ -113,18 +124,29 @@ class MessageLookup extends MessageLookupByLibrary {
     "formValidationError": MessageLookupByLibrary.simpleMessage(
       "Please complete all fields correctly.",
     ),
+    "frequency": MessageLookupByLibrary.simpleMessage("Frequency"),
+    "frequencyBiWeekly": MessageLookupByLibrary.simpleMessage("Bi-Weekly"),
+    "frequencyDaily": MessageLookupByLibrary.simpleMessage("Daily"),
+    "frequencyMonthly": MessageLookupByLibrary.simpleMessage("Monthly"),
+    "frequencyWeekly": MessageLookupByLibrary.simpleMessage("Weekly"),
+    "frequencyYearly": MessageLookupByLibrary.simpleMessage("Yearly"),
     "income": MessageLookupByLibrary.simpleMessage("Income"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "manageBudgets": MessageLookupByLibrary.simpleMessage("Manage Budgets"),
+    "manageRecurring": MessageLookupByLibrary.simpleMessage("Manage Recurring"),
     "noBudgetsSet": MessageLookupByLibrary.simpleMessage("No budgets set"),
     "noChartData": MessageLookupByLibrary.simpleMessage(
       "No expense data for this period to display chart.",
     ),
+    "noEndDate": MessageLookupByLibrary.simpleMessage("No End Date"),
     "noExpenseActivities": MessageLookupByLibrary.simpleMessage(
       "No expense activities recorded yet.",
     ),
     "noIncomeActivities": MessageLookupByLibrary.simpleMessage(
       "No income activities recorded yet.",
+    ),
+    "noRecurringActivities": MessageLookupByLibrary.simpleMessage(
+      "No recurring activities",
     ),
     "ofBudgetUsed": MessageLookupByLibrary.simpleMessage("of budget used"),
     "otherCategory": MessageLookupByLibrary.simpleMessage("Other"),
@@ -134,12 +156,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveChanges": MessageLookupByLibrary.simpleMessage("Save Changes"),
     "settings": MessageLookupByLibrary.simpleMessage("Settings"),
     "spent": MessageLookupByLibrary.simpleMessage("Spent"),
+    "startDate": MessageLookupByLibrary.simpleMessage("Start Date"),
     "tapToAddBudget": MessageLookupByLibrary.simpleMessage(
       "Tap the + button above to add your first budget",
     ),
+    "title": MessageLookupByLibrary.simpleMessage("Title"),
     "titleDescriptionLabel": MessageLookupByLibrary.simpleMessage(
       "Title / Description",
     ),
     "totalBalance": MessageLookupByLibrary.simpleMessage("Total Balance"),
+    "type": MessageLookupByLibrary.simpleMessage("Type"),
+    "updated": MessageLookupByLibrary.simpleMessage("updated"),
   };
 }
