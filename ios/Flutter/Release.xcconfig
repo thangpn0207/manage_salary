@@ -1,2 +1,6 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"
+
+// AdMob Configuration
+ADMOB_APP_ID=$(ADMOB_APP_ID)
+ENABLE_ADS=YES

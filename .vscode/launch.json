@@ -26,10 +26,12 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--flavor", "development",
+                "--flavor",
+                "development",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=false",
-                "--dart-define=DEBUG=true"
+                "--dart-define=DEBUG=true",
+                "--dart-define=ADMOB_APP_ID=ca-app-pub-2103558986527802~5808548229"
             ]
         },
         {
@@ -37,10 +39,12 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--flavor", "staging",
+                "--flavor",
+                "staging",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=true",
-                "--dart-define=DEBUG=false"
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -48,10 +52,12 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--flavor", "production",
+                "--flavor",
+                "production",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=true",
-                "--dart-define=DEBUG=false"
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -60,10 +66,12 @@
             "type": "dart",
             "flutterMode": "profile",
             "args": [
-                "--flavor", "development",
+                "--flavor",
+                "development",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=false",
-                "--dart-define=DEBUG=true"
+                "--dart-define=DEBUG=true",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -72,10 +80,12 @@
             "type": "dart",
             "flutterMode": "profile",
             "args": [
-                "--flavor", "staging",
+                "--flavor",
+                "staging",
                 "--dart-define=FLUTTER_ADS_KEY=",
                 "--dart-define=ENABLE_ADS=true",
-                "--dart-define=DEBUG=false"
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         },
         {
@@ -84,8 +94,12 @@
             "type": "dart",
             "flutterMode": "profile",
             "args": [
-                "--flavor", "production",
+                "--flavor",
+                "production",
                 "--dart-define=FLUTTER_ADS_KEY=",
+                "--dart-define=ENABLE_ADS=true",
+                "--dart-define=DEBUG=false",
+                "--dart-define=ADMOB_APP_ID="
             ]
         }
     ]

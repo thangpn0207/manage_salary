@@ -4,6 +4,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -15,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "id.thangpn.manage_salary"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -41,6 +42,7 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "true")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary Dev"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: "ca-app-pub-2103558986527802~5808548229"
         }
         create("staging") {
             dimension = "environment"
@@ -50,6 +52,7 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "false")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: ""
         }
         create("production") {
             dimension = "environment"
@@ -59,12 +62,14 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "false")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: "ca-app-pub-2103558986527802~5808548229"
         }
     }
 
-    defaultConfig {
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+    defaultConfig {                                              
+        multiDexEnabled=true
+        minSdk=23
+        targetSdk=34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -100,4 +105,6 @@ flutter {
 
 dependencies {
     implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.gms:play-services-ads:24.2.0")
+    implementation("androidx.multidex:multidex:2.0.1")
 }
