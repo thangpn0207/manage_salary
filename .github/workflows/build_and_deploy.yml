@@ -4,14 +4,19 @@ name: Flutter Build & Deploy
 
 on:
   push:
-    branches: [ main,  staging ]
+    branches: [ main, staging ]
   pull_request:
-    branches: [ main,  staging ]
+    types: [opened, synchronize]
+    branches: [ main, staging ]
 
 jobs:
   build_and_deploy:
     name: Build & Deploy Flutter App
     runs-on: ubuntu-latest
+    
+    # Only run deployment steps on push events (merged PRs) to main or staging
+    env:
+      SHOULD_DEPLOY: ${{ github.event_name == 'push' }}
     
     steps:
       # Step 1: Check out the repository code
@@ -106,9 +111,9 @@ jobs:
           retention-days: 5    # Keep for 5 days
 
       # Step 11: Deploy to DeployGate
-      # Only runs on main and staging branches
+      # Only runs on push events (merged PRs) to staging branch
       - name: Deploy to DeployGate
-        if: github.ref == 'refs/heads/staging'
+        if: env.SHOULD_DEPLOY == 'true' && github.ref == 'refs/heads/staging'
         env:
           DEPLOYGATE_API_KEY: ${{ secrets.DEPLOYGATE_API_KEY }}
           DEPLOYGATE_USER_NAME: ${{ secrets.DEPLOYGATE_USER_NAME }}
