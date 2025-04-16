@@ -54,7 +54,7 @@ jobs:
             echo "ADMOB_APP_ID=${{ secrets.PROD_ADMOB_APP_ID }}" >> $GITHUB_ENV
             echo "ENABLE_ADS=true" >> $GITHUB_ENV
             echo "BUILD_FLAVOR=production" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" || "${{ github.base_ref }}" == "staging" ]]; then
             echo "Setting staging configuration"
             echo "FLUTTER_ADS_KEY=${{ secrets.STAGING_ADS_KEY }}" >> $GITHUB_ENV
             echo "ADMOB_APP_ID=${{ secrets.STAGING_ADMOB_APP_ID }}" >> $GITHUB_ENV
@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-${{ env.BUILD_FLAVOR }}-release.apk
           compression-level: 9 # Maximum compression
           retention-days: 5    # Keep for 5 days
 
@@ -119,7 +119,7 @@ jobs:
           DEPLOYGATE_USER_NAME: ${{ secrets.DEPLOYGATE_USER_NAME }}
           DEPLOYGATE_DIST_KEY: ${{ secrets.DEPLOYGATE_DISTRIBUTION_KEY }}
         run: |
-          APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+          APK_PATH="build/app/outputs/flutter-apk/app-${{ env.BUILD_FLAVOR }}-release.apk"
           RELEASE_NOTES="Build ${{ github.run_number }} - Branch: ${GITHUB_REF#refs/heads/} - Commit: ${{ github.sha }}"
           
           echo "Uploading $APK_PATH to DeployGate..."
