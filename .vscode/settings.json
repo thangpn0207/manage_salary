@@ -2,5 +2,6 @@
   "IDX.aI.enableInlineCompletion": true,
   "IDX.aI.enableCodebaseIndexing": true,
   "dart.flutterSdkPath": ".fvm/versions/3.29.2",
-  "dart.enableSdkFormatter": true
+  "dart.enableSdkFormatter": true,
+  "editor.formatOnSave ":true,
 }

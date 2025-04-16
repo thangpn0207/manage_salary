@@ -4,12 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:manage_salary/bloc/activity/activity_bloc.dart';
 import 'package:manage_salary/bloc/activity/activity_event.dart';
 import 'package:manage_salary/bloc/activity/activity_state.dart';
+import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/util/localization_utils.dart';
 import 'package:manage_salary/core/util/money_util.dart';
 import 'package:manage_salary/core/util/custom_fab_position.dart';
 import 'package:manage_salary/models/recurring_activity.dart';
+import 'package:manage_salary/ui/components/banner_ad_widget.dart';
 import 'package:manage_salary/ui/recurring/widgets/add_edit_recurring_sheet.dart';
 
 class RecurringManagementScreen extends StatelessWidget {
@@ -125,42 +127,52 @@ class RecurringManagementScreen extends StatelessWidget {
         x: screenWidth - 20,
         y: screenHeight - 170, // Position from top
       ),
-      body: BlocBuilder<ActivityBloc, ActivityState>(
-        builder: (context, state) {
-          if (state.recurringActivities.isEmpty) {
-            return _buildEmptyState(context);
-          }
+      body: Column(
+        children: [
+          BuildConfig.enableAds
+              ? Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: BannerAdWidget(),
+                )
+              : SizedBox.shrink(),
+          BlocBuilder<ActivityBloc, ActivityState>(
+            builder: (context, state) {
+              if (state.recurringActivities.isEmpty) {
+                return _buildEmptyState(context);
+              }
 
-          return ListView.separated(
-            padding: const EdgeInsets.only(bottom: 80),
-            itemCount: state.recurringActivities.length,
-            itemBuilder: (context, index) {
-              final recurring = state.recurringActivities[index];
-              return _buildRecurringListItem(
-                context: context,
-                recurring: recurring,
-                onTap: () =>
-                    _showAddEditRecurringDialog(context, activity: recurring),
-                onDismissed: (id) => _confirmAndRemoveRecurring(
-                  context,
-                  id,
-                  recurring.title,
+              return ListView.separated(
+                padding: const EdgeInsets.only(bottom: 80),
+                itemCount: state.recurringActivities.length,
+                itemBuilder: (context, index) {
+                  final recurring = state.recurringActivities[index];
+                  return _buildRecurringListItem(
+                    context: context,
+                    recurring: recurring,
+                    onTap: () => _showAddEditRecurringDialog(context,
+                        activity: recurring),
+                    onDismissed: (id) => _confirmAndRemoveRecurring(
+                      context,
+                      id,
+                      recurring.title,
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) => Divider(
+                  height: 1,
+                  thickness: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: theme.dividerColor.withOpacity(0.5),
                 ),
               );
             },
-            separatorBuilder: (context, index) => Divider(
-              height: 1,
-              thickness: 1,
-              indent: 16,
-              endIndent: 16,
-              color: theme.dividerColor.withOpacity(0.5),
-            ),
-          );
-        },
+          ),
+        ],
       ),
       floatingActionButton: BlocBuilder<ActivityBloc, ActivityState>(
         builder: (context, state) {
-               if (state.recurringActivities.isEmpty) {
+          if (state.recurringActivities.isEmpty) {
             return const SizedBox.shrink();
           }
           return FloatingActionButton.extended(

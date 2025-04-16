@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:manage_salary/bloc/activity/activity_event.dart';
+import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/ui/components/base_button.dart';
 import 'package:manage_salary/ui/components/banner_ad_widget.dart';
 import 'package:manage_salary/ui/home/widgets/activity_list/activity_tabs_view.dart';
@@ -53,6 +54,12 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            BuildConfig.enableAds
+                ? Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: BannerAdWidget(),
+                  )
+                : SizedBox.shrink(),
             SizedBox(height: 500, child: DashboardCard()),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -71,10 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: 500.h, child: ActivityTabsView()),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: BannerAdWidget(),
-            ),
             SizedBox(
               height: 50.h,
             ),
