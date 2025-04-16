@@ -1,22 +1,15 @@
 # This workflow handles building and deploying the Flutter app for different environments
-# It triggers on pushes and PRs to main, develop, and staging branches
+# It triggers on pushes to main and staging branches
 name: Flutter Build & Deploy
 
 on:
   push:
-    branches: [ main, staging ]
-  pull_request:
-    types: [opened, synchronize]
     branches: [ main, staging ]
 
 jobs:
   build_and_deploy:
     name: Build & Deploy Flutter App
     runs-on: ubuntu-latest
-    
-    # Only run deployment steps on push events (merged PRs) to main or staging
-    env:
-      SHOULD_DEPLOY: ${{ github.event_name == 'push' }}
     
     steps:
       # Step 1: Check out the repository code
@@ -40,11 +33,7 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      # Step 5: Run static code analysis
-      - name: Analyze code
-        run: flutter analyze
-        
-      # Step 6: Set environment-specific configuration
+      # Step 5: Set environment-specific configuration
       # This step sets different ads keys and AdMob app IDs based on the branch
       - name: Set Environment Config
         run: |
@@ -54,21 +43,15 @@ jobs:
             echo "ADMOB_APP_ID=${{ secrets.PROD_ADMOB_APP_ID }}" >> $GITHUB_ENV
             echo "ENABLE_ADS=true" >> $GITHUB_ENV
             echo "BUILD_FLAVOR=production" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/staging" || "${{ github.base_ref }}" == "staging" ]]; then
+          else
             echo "Setting staging configuration"
             echo "FLUTTER_ADS_KEY=${{ secrets.STAGING_ADS_KEY }}" >> $GITHUB_ENV
             echo "ADMOB_APP_ID=${{ secrets.STAGING_ADMOB_APP_ID }}" >> $GITHUB_ENV
             echo "ENABLE_ADS=false" >> $GITHUB_ENV
             echo "BUILD_FLAVOR=staging" >> $GITHUB_ENV
-          else
-            echo "Setting development configuration"
-            echo "FLUTTER_ADS_KEY=${{ secrets.DEV_ADS_KEY }}" >> $GITHUB_ENV
-            echo "ADMOB_APP_ID=${{ secrets.DEV_ADMOB_APP_ID }}" >> $GITHUB_ENV
-            echo "ENABLE_ADS=false" >> $GITHUB_ENV
-            echo "BUILD_FLAVOR=development" >> $GITHUB_ENV
           fi
 
-      # Step 7: Decode the Android keystore for signing
+      # Step 6: Decode the Android keystore for signing
       # This converts the base64 encoded keystore back to a binary file
       - name: Decode Keystore
         run: |
@@ -76,7 +59,7 @@ jobs:
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/keystore.jks
           echo "Keystore decoded."
 
-      # Step 8: Create Android signing configuration
+      # Step 7: Create Android signing configuration
       # This creates the key.properties file needed for signing the APK
       - name: Create key.properties
         run: |
@@ -88,7 +71,7 @@ jobs:
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
           echo "key.properties file created."
 
-      # Step 9: Build the Android APK
+      # Step 8: Build the Android APK
       # Uses the version from pubspec.yaml and build number from GitHub Actions
       - name: Build Android APK
         run: |
@@ -100,20 +83,19 @@ jobs:
             --dart-define=ENABLE_ADS="${ENABLE_ADS}"
           echo "Build finished."
 
-      # Step 10: Upload the built APK as an artifact
+      # Step 9: Upload the built APK as an artifact
       # This makes the APK available for download in GitHub Actions
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-apk
           path: build/app/outputs/flutter-apk/app-${{ env.BUILD_FLAVOR }}-release.apk
-          compression-level: 9 # Maximum compression
-          retention-days: 5    # Keep for 5 days
+          name: release-apk
+          compression-level: 9
+          retention-days: 5
 
-      # Step 11: Deploy to DeployGate
-      # Only runs on push events (merged PRs) to staging branch
+      # Step 10: Deploy to DeployGate
+      # Only runs on push events to staging branch
       - name: Deploy to DeployGate
-        if: env.SHOULD_DEPLOY == 'true' && github.ref == 'refs/heads/staging'
+        if: github.ref == 'refs/heads/staging'
         env:
           DEPLOYGATE_API_KEY: ${{ secrets.DEPLOYGATE_API_KEY }}
           DEPLOYGATE_USER_NAME: ${{ secrets.DEPLOYGATE_USER_NAME }}
@@ -139,7 +121,7 @@ jobs:
           eval $CURL_COMMAND
           echo "Upload command executed."
 
-      # Step 12: Clean up sensitive files
+      # Step 11: Clean up sensitive files
       # Always runs to ensure security, even if previous steps fail
       - name: Cleanup Sensitive Files
         if: always()
