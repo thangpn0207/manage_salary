@@ -1,0 +1,36 @@
+name: Pull Request Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, staging]
+
+jobs:
+  analyze:
+    name: Analyze Pull Request
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze
+        
+      - name: Report Analysis Results
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Flutter analysis passed successfully!"
+          else
+            echo "❌ Flutter analysis failed. Please fix the issues above."
+            exit 1
+          fi
