@@ -163,7 +163,7 @@ class RecurringManagementScreen extends StatelessWidget {
                   thickness: 1,
                   indent: 16,
                   endIndent: 16,
-                  color: theme.dividerColor.withOpacity(0.5),
+                  color: theme.dividerColor.withValues(alpha: 0.5),
                 ),
               );
             },
@@ -197,7 +197,7 @@ class RecurringManagementScreen extends StatelessWidget {
       key: Key(recurring.id),
       direction: DismissDirection.endToStart,
       background: Container(
-        color: Colors.redAccent.withOpacity(0.8),
+        color: Colors.redAccent.withValues(alpha: 0.8),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20.0),
         child: const Icon(Icons.delete_outline, color: Colors.white),
