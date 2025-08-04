@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/core/constants/enums.dart';
+import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/util/convert_enum.dart';
+import 'package:manage_salary/core/util/localization_utils.dart';
 import 'package:manage_salary/core/util/money_util.dart';
 import 'package:manage_salary/models/budget.dart';
 import 'package:manage_salary/ui/budget/widgets/add_edit_budget_sheet.dart';
-import 'package:manage_salary/core/locale/generated/l10n.dart';
-import 'package:manage_salary/core/util/localization_utils.dart';
 import 'package:manage_salary/ui/components/banner_ad_widget.dart';
 
 import '../../../bloc/activity/activity_bloc.dart';
@@ -72,8 +72,7 @@ class BudgetManagementScreen extends StatelessWidget {
         final s = S.of(context);
         return AlertDialog(
           title: Text(s.confirmDeletion),
-          content: Text(
-              'Are you sure you want to remove the "$categoryName" budget?'),
+          content: Text(S.current.confirmBudgetDeletion(categoryName)),
           actions: <Widget>[
             TextButton(
               child: Text(s.cancelButton),

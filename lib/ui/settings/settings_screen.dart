@@ -5,8 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart'; // For clearing storage
 import 'package:manage_salary/bloc/activity/activity_bloc.dart';
 import 'package:manage_salary/bloc/activity/activity_event.dart';
-import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
-import 'package:manage_salary/bloc/theme/cubit/theme_cubit.dart';
+import 'package:manage_salary/bloc/concurrent/concurrent_cubit.dart';
+import 'package:manage_salary/bloc/locale/locale_cubit.dart';
+import 'package:manage_salary/bloc/theme/theme_cubit.dart';
 
 import '../../core/constants/colors.dart';
 import '../../core/locale/generated/l10n.dart';
@@ -19,7 +20,11 @@ class SettingsScreen extends StatelessWidget {
   // Language map (can be moved to a constants file)
   static const Map<String, String> _supportedLanguages = {
     'en': 'English',
-    'vi': 'Vietnamese', // TODO: Consider localizing language names themselves?
+    'vi': 'Vietnamese',
+  };
+  static const Map<String, String> _supportedCurrencies = {
+    'en': 'VNĐ',
+    'vi': 'USD',
   };
 
   @override
@@ -40,6 +45,7 @@ class SettingsScreen extends StatelessWidget {
     // Get current state from Blocs using context.watch
     final currentThemeMode = context.watch<ThemeCubit>().state;
     final currentLocale = context.watch<LocaleCubit>().state;
+    final currentCurrency = context.watch<CurrencyCubit>().state;
 
     final isDarkModeOn = currentThemeMode == ThemeMode.dark;
 
@@ -104,6 +110,38 @@ class SettingsScreen extends StatelessWidget {
                         newLanguageCode != currentLocale.languageCode) {
                       context
                           .read<LocaleCubit>()
+                          .setLocale(Locale(newLanguageCode));
+                    }
+                  },
+                ),
+              ),
+
+              _buildDivider(),
+
+              // --- Concurrent Setting ---
+              _buildSettingsTile(
+                context: context,
+                title: S.of(context).currency, // Use localization
+                textColor: itemTextColor,
+                trailing: DropdownButton<String>(
+                  value: currentCurrency.languageCode,
+                  underline: Container(height: 0),
+                  icon: Icon(Icons.keyboard_arrow_down, color: arrowColor),
+                  isDense: true,
+                  items: _supportedCurrencies.entries.map((entry) {
+                    return DropdownMenuItem<String>(
+                      value: entry.key,
+                      child: Text(
+                        entry.value, // Language names are still hardcoded
+                        style: TextStyle(color: itemTextColor, fontSize: 16),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newLanguageCode) {
+                    if (newLanguageCode != null &&
+                        newLanguageCode != currentCurrency.languageCode) {
+                      context
+                          .read<CurrencyCubit>()
                           .setLocale(Locale(newLanguageCode));
                     }
                   },

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For TextInputFormatters
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
+import 'package:manage_salary/bloc/concurrent/concurrent_cubit.dart';
 import 'package:manage_salary/core/util/formatter.dart';
 import 'package:manage_salary/core/util/log_util.dart';
 import 'package:manage_salary/core/util/spell_number.dart';
@@ -245,10 +247,9 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                   final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
                   final amount = double.parse(
                       cleanAmount ?? '0'); // Convert back to actual amount
-                  // context.read<LocaleCubit>().state.languageCode == 'vi'
-                  //     ?
-                  spelledAmount = SpellNumber().spellMoneyVND(amount);
-                  // : spelledAmount = SpellNumber().spellMoney(amount);
+                  context.read<CurrencyCubit>().state.languageCode == 'vi'
+                      ? spelledAmount = SpellNumber().spellMoneyVND(amount)
+                      : spelledAmount = SpellNumber().spellMoney(amount);
                 }),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(
