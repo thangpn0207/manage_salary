@@ -24,7 +24,12 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m1(name) => "${name} removed";
 
-  static String m2(category) => "${category} budget removed";
+  static String m2(name) => "${name} added successfully.";
+
+  static String m3(category) => "${category} budget removed";
+
+  static String m4(name) =>
+      "Are you sure you want to remove the ${name} budget?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -67,6 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "add": MessageLookupByLibrary.simpleMessage("Add"),
     "addActivity": MessageLookupByLibrary.simpleMessage("Add Activity"),
     "addActivityButton": MessageLookupByLibrary.simpleMessage("Add Activity"),
+    "addActivitySuccess": m2,
     "addBudget": MessageLookupByLibrary.simpleMessage("Add Budget"),
     "addNewActivitySheetTitle": MessageLookupByLibrary.simpleMessage(
       "Add New Activity",
@@ -87,7 +93,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "budgetPeriodMonthly": MessageLookupByLibrary.simpleMessage("Monthly"),
     "budgetPeriodWeekly": MessageLookupByLibrary.simpleMessage("Weekly"),
     "budgetPeriodYearly": MessageLookupByLibrary.simpleMessage("Yearly"),
-    "budgetRemoved": m2,
+    "budgetRemoved": m3,
     "budgetSummary": MessageLookupByLibrary.simpleMessage("Budget Summary"),
     "cacheClearError": MessageLookupByLibrary.simpleMessage(
       "Error clearing cache.",
@@ -100,6 +106,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeButton": MessageLookupByLibrary.simpleMessage("Change"),
     "clearButton": MessageLookupByLibrary.simpleMessage("Clear"),
     "clearCache": MessageLookupByLibrary.simpleMessage("Clear Cache"),
+    "confirmBudgetDeletion": m4,
     "confirmClearCacheContent": MessageLookupByLibrary.simpleMessage(
       "Are you sure? This will remove all stored activity data and might reset preferences.",
     ),
@@ -107,6 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Confirm Clear Cache",
     ),
     "confirmDeletion": MessageLookupByLibrary.simpleMessage("Confirm Deletion"),
+    "currency": MessageLookupByLibrary.simpleMessage("Currency"),
     "currentSpending": MessageLookupByLibrary.simpleMessage("Current Spending"),
     "darkMode": MessageLookupByLibrary.simpleMessage("Dark mode"),
     "dashboard": MessageLookupByLibrary.simpleMessage("DashBoard"),

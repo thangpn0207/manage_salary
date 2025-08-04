@@ -7,8 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:manage_salary/bloc/activity/activity_bloc.dart';
-import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
-import 'package:manage_salary/bloc/theme/cubit/theme_cubit.dart';
+import 'package:manage_salary/bloc/concurrent/concurrent_cubit.dart';
+import 'package:manage_salary/bloc/locale/locale_cubit.dart';
+import 'package:manage_salary/bloc/theme/theme_cubit.dart';
 import 'package:manage_salary/core/dependency/injection.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/routes/app_router.dart';
@@ -103,6 +104,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => getIt<ThemeCubit>()),
+        BlocProvider(create: (context) => getIt<CurrencyCubit>()),
         BlocProvider(create: (context) => getIt<LocaleCubit>()),
         BlocProvider(create: (context) => getIt<ActivityBloc>()),
       ],
@@ -110,28 +112,32 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         builder: (context, themeMode) {
           return BlocBuilder<LocaleCubit, Locale>(
             builder: (context, locale) {
-              return ScreenUtilInit(
-                designSize: const Size(360, 690),
-                minTextAdapt: true,
-                splitScreenMode: true,
-                builder: (context, child) {
-                  return MaterialApp.router(
-                    routerConfig: AppRouter.router,
-                    debugShowCheckedModeBanner: false,
-                    title: 'Lotus CEX',
-                    theme: AppTheme.lightTheme,
-                    darkTheme: AppTheme.darkTheme,
-                    themeMode: themeMode,
-                    locale: locale,
-                    supportedLocales: S.delegate.supportedLocales,
-                    localizationsDelegates: const [
-                      S.delegate,
-                      GlobalMaterialLocalizations.delegate,
-                      GlobalWidgetsLocalizations.delegate,
-                      GlobalCupertinoLocalizations.delegate,
-                    ],
+              return BlocBuilder<CurrencyCubit, Locale>(
+                builder: (context, state) {
+                  return ScreenUtilInit(
+                    designSize: const Size(360, 690),
+                    minTextAdapt: true,
+                    splitScreenMode: true,
                     builder: (context, child) {
-                      return child ?? const SizedBox.shrink();
+                      return MaterialApp.router(
+                        routerConfig: AppRouter.router,
+                        debugShowCheckedModeBanner: false,
+                        title: 'Manage Salary',
+                        theme: AppTheme.lightTheme,
+                        darkTheme: AppTheme.darkTheme,
+                        themeMode: themeMode,
+                        locale: locale,
+                        supportedLocales: S.delegate.supportedLocales,
+                        localizationsDelegates: const [
+                          S.delegate,
+                          GlobalMaterialLocalizations.delegate,
+                          GlobalWidgetsLocalizations.delegate,
+                          GlobalCupertinoLocalizations.delegate,
+                        ],
+                        builder: (context, child) {
+                          return child ?? const SizedBox.shrink();
+                        },
+                      );
                     },
                   );
                 },

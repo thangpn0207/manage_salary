@@ -776,9 +776,6 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   ActivityState? fromJson(Map<String, dynamic> json) {
     try {
       final state = ActivityState.fromJson(json);
-      // The GenerateRecurringInstances event is dispatched in the constructor
-      // after the BLoC is fully initialized. Adding events here is unsafe as
-      // handlers might not be registered yet during the hydration process.
       return state;
     } catch (e, stackTrace) {
       LogUtil.e('Error hydrating ActivityBloc state: $e\n$stackTrace');

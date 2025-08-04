@@ -117,23 +117,24 @@ class ActivityState extends Equatable {
         thisMonthExpenses,
       ];
 
-  // --- HydratedBloc Serialization ---
   Map<String, dynamic> toJson() {
-    try {
-      // Only serialize the core data, not the computed analytics
-      return {
-        'allActivities': [], // Clear activities on serialize
-        'budgets': [], // Clear budgets on serialize
-        'recurringActivities': [], // Clear recurring activities on serialize
-        'isReset': true // Add flag to indicate this is a reset state
-      };
-    } catch (e, stackTrace) {
-      LogUtil.e("Error serializing ActivityState: $e $stackTrace");
-      return {
-        'allActivities': [],
-        'isReset': true
-      }; // Fallback to minimal JSON with reset flag
-    }
+    return {
+      'allActivities': allActivities.map((a) => a.toJson()).toList(),
+      'budgets': budgets.map((b) => b.toJson()).toList(),
+      'recurringActivities':
+          recurringActivities.map((r) => r.toJson()).toList(),
+      'totalIncome': totalIncome,
+      'totalExpenses': totalExpenses,
+      'netBalance': netBalance,
+      'expensesByType': expensesByType,
+      'incomeByType': incomeByType,
+      'todayIncome': todayIncome,
+      'todayExpenses': todayExpenses,
+      'thisWeekIncome': thisWeekIncome,
+      'thisWeekExpenses': thisWeekExpenses,
+      'thisMonthIncome': thisMonthIncome,
+      'thisMonthExpenses': thisMonthExpenses,
+    };
   }
 
   factory ActivityState.fromJson(Map<String, dynamic> json) {

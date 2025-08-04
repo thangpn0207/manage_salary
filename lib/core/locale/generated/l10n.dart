@@ -804,6 +804,31 @@ class S {
       args: [name],
     );
   }
+
+  /// `Are you sure you want to remove the {name} budget?`
+  String confirmBudgetDeletion(Object name) {
+    return Intl.message(
+      'Are you sure you want to remove the $name budget?',
+      name: 'confirmBudgetDeletion',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Currency`
+  String get currency {
+    return Intl.message('Currency', name: 'currency', desc: '', args: []);
+  }
+
+  /// `{name} added successfully.`
+  String addActivitySuccess(Object name) {
+    return Intl.message(
+      '$name added successfully.',
+      name: 'addActivitySuccess',
+      desc: '',
+      args: [name],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
