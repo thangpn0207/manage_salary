@@ -182,7 +182,8 @@ class DashboardCard extends StatelessWidget {
   Widget _buildTotalBalance(BuildContext context, double balance) {
     final theme = Theme.of(context);
     // Determine color based on balance
-    final balanceColor = balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
+    final balanceColor =
+        balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
