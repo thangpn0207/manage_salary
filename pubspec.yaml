@@ -1,7 +1,7 @@
 name: manage_salary
 description: A new Flutter manager salary application.
 publish_to: 'none'
-version: 1.0.0+4
+version: 1.0.0+6
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -15,7 +15,7 @@ dependencies:
   # State Management
   bloc: ^9.0.0 
   flutter_bloc: ^9.1.0
-  hydrated_bloc: ^10.0.0
+  hydrated_bloc: ^10.1.1
   equatable: ^2.0.5
 
   # UI Components
@@ -33,7 +33,7 @@ dependencies:
   go_router: ^12.1.1
 
   # Utilities & Services
-  intl: ^0.19.0
+  intl: ^0.20.2
   intl_utils: ^2.8.10
   path_provider: ^2.1.5
   logger: ^2.0.2+1
@@ -50,6 +50,7 @@ dependencies:
   # Dependency Injection
   get_it: ^7.6.4
   injectable: ^2.3.2
+  liquid_glass_renderer: ^0.1.1-dev.10
 
 dev_dependencies:
   flutter_test:

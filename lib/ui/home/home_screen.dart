@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:manage_salary/bloc/activity/activity_event.dart';
 import 'package:manage_salary/core/config/build_config.dart';
-import 'package:manage_salary/ui/components/base_button.dart';
 import 'package:manage_salary/ui/components/banner_ad_widget.dart';
+import 'package:manage_salary/ui/components/base_button.dart';
 import 'package:manage_salary/ui/home/widgets/activity_list/activity_tabs_view.dart';
 import 'package:manage_salary/ui/home/widgets/bottom_sheet/show_add_activity_sheet.dart';
 import 'package:manage_salary/ui/home/widgets/card_dashboard/card_dashboard.dart';
@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${newActivity.title} added successfully!'),
+            content: Text(S.current.addActivitySuccess(newActivity.title)),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),

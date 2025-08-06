@@ -1,9 +1,9 @@
 // activity_bloc.dart
+import 'package:flutter/foundation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:manage_salary/bloc/activity/util/activity_util.dart';
 import 'package:manage_salary/core/extensions/date_time_extension.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../core/constants/enums.dart';
 import '../../core/util/log_util.dart';
@@ -16,7 +16,7 @@ import 'activity_state.dart';
 class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   final Uuid _uuid = const Uuid();
   final ActivityUtil _activityUtil = ActivityUtil();
-  
+
   // Cache for frequent calculations
   final Map<String, double> cachedCalculations = {};
   DateTime? _lastCacheReset;
@@ -48,7 +48,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   // Cache management
   void _resetCacheIfNeeded() {
     final now = DateTime.now();
-    if (_lastCacheReset == null || 
+    if (_lastCacheReset == null ||
         now.difference(_lastCacheReset!).inHours >= 1) {
       cachedCalculations.clear();
       _lastCacheReset = now;
@@ -66,9 +66,9 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   bool _needsRegeneration(RecurringActivity activity, DateTime untilDate) {
     final cacheKey = _getRecurringCacheKey(activity);
     final lastGenerated = _lastGeneratedDates[cacheKey];
-    
+
     if (lastGenerated == null) return true;
-    
+
     // Regenerate if more than the frequency period has passed
     switch (activity.frequency) {
       case RecurringFrequency.daily:
@@ -78,8 +78,8 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
       case RecurringFrequency.biWeekly:
         return untilDate.difference(lastGenerated).inDays >= 14;
       case RecurringFrequency.monthly:
-        return untilDate.month != lastGenerated.month || 
-               untilDate.year != lastGenerated.year;
+        return untilDate.month != lastGenerated.month ||
+            untilDate.year != lastGenerated.year;
       case RecurringFrequency.yearly:
         return untilDate.year != lastGenerated.year;
     }
@@ -109,8 +109,10 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     // Calculate with caching
     final String totalKey = _getCacheKey('total', null, null);
     if (!cachedCalculations.containsKey(totalKey)) {
-      cachedCalculations['${totalKey}_income'] = _activityUtil.calculateTotalIncome(activities);
-      cachedCalculations['${totalKey}_expenses'] = _activityUtil.calculateTotalExpenses(activities);
+      cachedCalculations['${totalKey}_income'] =
+          _activityUtil.calculateTotalIncome(activities);
+      cachedCalculations['${totalKey}_expenses'] =
+          _activityUtil.calculateTotalExpenses(activities);
     }
 
     final totalIncome = cachedCalculations['${totalKey}_income']!;
@@ -118,9 +120,12 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     final netBalance = totalIncome - totalExpenses;
 
     // Calculate period totals with caching
-    final todayTotals = _calculatePeriodTotalsWithCache(activities, todayRange, 'today');
-    final weekTotals = _calculatePeriodTotalsWithCache(activities, weekRange, 'week');
-    final monthTotals = _calculatePeriodTotalsWithCache(activities, monthRange, 'month');
+    final todayTotals =
+        _calculatePeriodTotalsWithCache(activities, todayRange, 'today');
+    final weekTotals =
+        _calculatePeriodTotalsWithCache(activities, weekRange, 'week');
+    final monthTotals =
+        _calculatePeriodTotalsWithCache(activities, monthRange, 'month');
 
     // Calculate type breakdowns
     final expensesByType = _activityUtil.calculateExpensesByType(activities);
@@ -159,25 +164,28 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   }
 
   // Budget Analytics Methods
-  Map<BudgetCategory, ({
-    double allocated,
-    double spent,
-    double remaining,
-    double progress,
-    bool isOverBudget,
-  })> getBudgetAnalytics() {
-    Map<BudgetCategory, ({
-      double allocated,
-      double spent,
-      double remaining,
-      double progress,
-      bool isOverBudget,
-    })> analytics = {};
+  Map<
+      BudgetCategory,
+      ({
+        double allocated,
+        double spent,
+        double remaining,
+        double progress,
+        bool isOverBudget,
+      })> getBudgetAnalytics() {
+    Map<
+        BudgetCategory,
+        ({
+          double allocated,
+          double spent,
+          double remaining,
+          double progress,
+          bool isOverBudget,
+        })> analytics = {};
 
     for (final category in BudgetCategory.values) {
-      final budgetsForCategory = state.budgets
-          .where((b) => b.category == category)
-          .toList();
+      final budgetsForCategory =
+          state.budgets.where((b) => b.category == category).toList();
 
       if (budgetsForCategory.isEmpty) continue;
 
@@ -190,7 +198,9 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
       }
 
       final remaining = totalAllocated - totalSpent;
-      final progress = totalAllocated > 0 ? (totalSpent / totalAllocated).clamp(0.0, 1.0) : 0.0;
+      final progress = totalAllocated > 0
+          ? (totalSpent / totalAllocated).clamp(0.0, 1.0)
+          : 0.0;
 
       analytics[category] = (
         allocated: totalAllocated,
@@ -204,45 +214,46 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     return analytics;
   }
 
-  List<({
-    DateTime date,
-    Map<BudgetCategory, double> spending,
-  })> getDailySpendingTrend({
+  List<
+      ({
+        DateTime date,
+        Map<BudgetCategory, double> spending,
+      })> getDailySpendingTrend({
     required DateTime startDate,
     required DateTime endDate,
   }) {
     List<({DateTime date, Map<BudgetCategory, double> spending})> trend = [];
-    
+
     var currentDate = startDate;
     while (!currentDate.isAfter(endDate)) {
       Map<BudgetCategory, double> daySpending = {};
-      
+
       for (final category in BudgetCategory.values) {
         final activityType = _convertBudgetCategoryToActivityType(category);
         final spending = state.allActivities
-            .where((a) => 
+            .where((a) =>
                 a.nature == ActivityNature.expense &&
                 a.type == activityType &&
                 a.date.year == currentDate.year &&
                 a.date.month == currentDate.month &&
                 a.date.day == currentDate.day)
             .fold(0.0, (sum, activity) => sum + activity.amount);
-            
+
         if (spending > 0) {
           daySpending[category] = spending;
         }
       }
-      
+
       if (daySpending.isNotEmpty) {
         trend.add((
           date: currentDate,
           spending: daySpending,
         ));
       }
-      
+
       currentDate = currentDate.add(const Duration(days: 1));
     }
-    
+
     return trend;
   }
 
@@ -271,7 +282,8 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
         activeBudgets++;
       }
 
-      final progress = budget.amount > 0 ? (budget.currentSpending / budget.amount) : 0.0;
+      final progress =
+          budget.amount > 0 ? (budget.currentSpending / budget.amount) : 0.0;
       if (progress > 1.0) {
         overBudgetBudgets++;
       } else if (progress > 0.8) {
@@ -280,7 +292,9 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     }
 
     final totalRemaining = totalAllocated - totalSpent;
-    final overallProgress = totalAllocated > 0 ? (totalSpent / totalAllocated).clamp(0.0, 1.0) : 0.0;
+    final overallProgress = totalAllocated > 0
+        ? (totalSpent / totalAllocated).clamp(0.0, 1.0)
+        : 0.0;
 
     return (
       totalBudgets: totalBudgets,
@@ -294,20 +308,26 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     );
   }
 
-  Map<BudgetCategory, List<({
-    BudgetPeriod period,
-    double amount,
-    double spent,
-    double remaining,
-    DateTime? lastUpdated,
-  })>> getBudgetsByCategory() {
-    Map<BudgetCategory, List<({
-      BudgetPeriod period,
-      double amount,
-      double spent,
-      double remaining,
-      DateTime? lastUpdated,
-    })>> result = {};
+  Map<
+      BudgetCategory,
+      List<
+          ({
+            BudgetPeriod period,
+            double amount,
+            double spent,
+            double remaining,
+            DateTime? lastUpdated,
+          })>> getBudgetsByCategory() {
+    Map<
+        BudgetCategory,
+        List<
+            ({
+              BudgetPeriod period,
+              double amount,
+              double spent,
+              double remaining,
+              DateTime? lastUpdated,
+            })>> result = {};
 
     for (final budget in state.budgets) {
       result.putIfAbsent(budget.category, () => []);
@@ -354,7 +374,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
         thisMonthIncome: analytics.thisMonthIncome,
         thisMonthExpenses: analytics.thisMonthExpenses,
       ));
-      
+
       // Update budgets after adding activity
       _checkAndResetBudgets(emit);
     } catch (e, stackTrace) {
@@ -385,7 +405,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
         thisMonthIncome: analytics.thisMonthIncome,
         thisMonthExpenses: analytics.thisMonthExpenses,
       ));
-      
+
       // Update budgets after removing activity
       _checkAndResetBudgets(emit);
     } catch (e, stackTrace) {
@@ -393,19 +413,19 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     }
   }
 
-  void _onClearAllActivities(ClearAllActivities event, Emitter<ActivityState> emit) {
+  void _onClearAllActivities(
+      ClearAllActivities event, Emitter<ActivityState> emit) {
     try {
       // Clear all caches first
       cachedCalculations.clear();
       _lastGeneratedDates.clear();
       _lastCacheReset = DateTime.now();
-      
+
       // Reset the state to initial
       emit(state.reset());
-      
+
       // Force save the reset state
       toJson(state);
-      
     } catch (e, stackTrace) {
       LogUtil.e('Error clearing activities: $e\n$stackTrace');
     }
@@ -415,7 +435,8 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   void _onAddBudget(AddBudget event, Emitter<ActivityState> emit) {
     try {
       final budgetWithId = event.budget.copyWith(id: _uuid.v4());
-      final updatedBudgets = List<Budget>.from(state.budgets)..add(budgetWithId);
+      final updatedBudgets = List<Budget>.from(state.budgets)
+        ..add(budgetWithId);
       emit(state.copyWith(budgets: updatedBudgets));
       _checkAndResetBudgets(emit);
     } catch (e, stackTrace) {
@@ -426,7 +447,9 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   void _onUpdateBudget(UpdateBudget event, Emitter<ActivityState> emit) {
     try {
       final updatedBudgets = state.budgets.map((budget) {
-        return budget.id == event.updatedBudget.id ? event.updatedBudget : budget;
+        return budget.id == event.updatedBudget.id
+            ? event.updatedBudget
+            : budget;
       }).toList();
       emit(state.copyWith(budgets: updatedBudgets));
       _checkAndResetBudgets(emit);
@@ -462,8 +485,8 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
             shouldReset = lastWeek != currentWeek;
             break;
           case BudgetPeriod.monthly:
-            shouldReset = budget.lastUpdated!.month != now.month || 
-                       budget.lastUpdated!.year != now.year;
+            shouldReset = budget.lastUpdated!.month != now.month ||
+                budget.lastUpdated!.year != now.year;
             break;
           case BudgetPeriod.yearly:
             shouldReset = budget.lastUpdated!.year != now.year;
@@ -475,17 +498,18 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
       // Update spending for each budget based on activities
       for (var budget in updatedBudgets) {
-        final activityType = _convertBudgetCategoryToActivityType(budget.category);
+        final activityType =
+            _convertBudgetCategoryToActivityType(budget.category);
         final periodRange = _getPeriodDateRange(budget.period);
-        
+
         final spending = state.allActivities
-            .where((a) => 
+            .where((a) =>
                 a.nature == ActivityNature.expense &&
                 a.type == activityType &&
                 !a.date.isBefore(periodRange.start) &&
                 a.date.isBefore(periodRange.end))
             .fold(0.0, (sum, activity) => sum + activity.amount);
-        
+
         final index = updatedBudgets.indexOf(budget);
         updatedBudgets[index] = budget.updateSpending(spending);
       }
@@ -534,13 +558,13 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
           start: DateTime(start.year, start.month, start.day),
           end: DateTime(end.year, end.month, end.day),
         );
-      
+
       case BudgetPeriod.monthly:
         return (
           start: DateTime(now.year, now.month, 1),
           end: DateTime(now.year, now.month + 1, 1),
         );
-      
+
       case BudgetPeriod.yearly:
         return (
           start: DateTime(now.year, 1, 1),
@@ -550,11 +574,13 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   }
 
   // Recurring Activity Handlers
-  void _onAddRecurringActivity(AddRecurringActivity event, Emitter<ActivityState> emit) {
+  void _onAddRecurringActivity(
+      AddRecurringActivity event, Emitter<ActivityState> emit) {
     try {
       final recurringWithId = event.recurringActivity.copyWith(id: _uuid.v4());
-      final updatedRecurring = List<RecurringActivity>.from(state.recurringActivities)
-        ..add(recurringWithId);
+      final updatedRecurring =
+          List<RecurringActivity>.from(state.recurringActivities)
+            ..add(recurringWithId);
       emit(state.copyWith(recurringActivities: updatedRecurring));
       add(GenerateRecurringInstances(untilDate: DateTime.now()));
     } catch (e, stackTrace) {
@@ -562,7 +588,8 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     }
   }
 
-  void _onUpdateRecurringActivity(UpdateRecurringActivity event, Emitter<ActivityState> emit) {
+  void _onUpdateRecurringActivity(
+      UpdateRecurringActivity event, Emitter<ActivityState> emit) {
     try {
       final updatedRecurring = state.recurringActivities.map((rec) {
         return rec.id == event.updatedRecurringActivity.id
@@ -576,29 +603,31 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     }
   }
 
-  void _onRemoveRecurringActivity(RemoveRecurringActivity event, Emitter<ActivityState> emit) {
+  void _onRemoveRecurringActivity(
+      RemoveRecurringActivity event, Emitter<ActivityState> emit) {
     try {
       // Remove from recurring activities list
-      final updatedRecurring = List<RecurringActivity>.from(state.recurringActivities)
-        ..removeWhere((rec) => rec.id == event.recurringActivityId);
-      
+      final updatedRecurring =
+          List<RecurringActivity>.from(state.recurringActivities)
+            ..removeWhere((rec) => rec.id == event.recurringActivityId);
+
       // Remove all generated instances
       final updatedActivities = List<ActivityData>.from(state.allActivities)
-        ..removeWhere((act) => act.recurringActivityId == event.recurringActivityId);
+        ..removeWhere(
+            (act) => act.recurringActivityId == event.recurringActivityId);
       updatedActivities.sort((a, b) => b.date.compareTo(a.date));
 
       // Clear cache for the removed recurring activity
-      _lastGeneratedDates.remove(_getRecurringCacheKey(
-        state.recurringActivities.firstWhere((r) => r.id == event.recurringActivityId)
-      ));
-      
+      _lastGeneratedDates.remove(_getRecurringCacheKey(state.recurringActivities
+          .firstWhere((r) => r.id == event.recurringActivityId)));
+
       // Clear analytics cache to force recalculation
       cachedCalculations.clear();
       _lastCacheReset = DateTime.now();
 
       // Recalculate analytics with updated activities
       final analytics = _calculateAnalyticsWithCache(updatedActivities);
-      
+
       emit(state.copyWith(
         recurringActivities: updatedRecurring,
         allActivities: updatedActivities,
@@ -617,13 +646,13 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
       // Update budgets after removing recurring activity instances
       _checkAndResetBudgets(emit);
-      
     } catch (e, stackTrace) {
       LogUtil.e('Error removing recurring activity: $e\n$stackTrace');
     }
   }
 
-  void _onGenerateRecurringInstances(GenerateRecurringInstances event, Emitter<ActivityState> emit) {
+  void _onGenerateRecurringInstances(
+      GenerateRecurringInstances event, Emitter<ActivityState> emit) {
     try {
       List<ActivityData> newlyGenerated = [];
       final now = event.untilDate;
@@ -631,22 +660,30 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
       for (final recurring in state.recurringActivities) {
         // Skip regeneration if not needed
         if (!_needsRegeneration(recurring, now)) continue;
-        
+
         DateTime nextDueDate = recurring.startDate;
         // Skip if start date is in the future
         if (nextDueDate.isAfter(now)) continue;
 
         while (nextDueDate.isBefore(now) || nextDueDate.isAtSameMomentAs(now)) {
-          if (recurring.endDate != null && nextDueDate.isAfter(recurring.endDate!)) break;
+          if (recurring.endDate != null &&
+              nextDueDate.isAfter(recurring.endDate!)) break;
 
           // Check for existing instance using optimized query
           final ActivityData existingActivity = state.allActivities.firstWhere(
-            (activity) => 
+            (activity) =>
                 activity.recurringActivityId == recurring.id &&
                 activity.date.year == nextDueDate.year &&
                 activity.date.month == nextDueDate.month &&
                 activity.date.day == nextDueDate.day,
-            orElse: () => ActivityData(id: '', nature: ActivityNature.expense, title: '', amount: 0.0, date: DateTime.now(), type: ActivityType.expenseOther, recurringActivityId: null), 
+            orElse: () => ActivityData(
+                id: '',
+                nature: ActivityNature.expense,
+                title: '',
+                amount: 0.0,
+                date: DateTime.now(),
+                type: ActivityType.expenseOther,
+                recurringActivityId: null),
           );
 
           if (existingActivity.id.isEmpty) {
@@ -662,11 +699,12 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
           }
 
           nextDueDate = _calculateNextDueDate(nextDueDate, recurring.frequency);
-          
+
           // Safety checks
-          if (nextDueDate.year > now.year + 10 || newlyGenerated.length > 1000) break;
+          if (nextDueDate.year > now.year + 10 || newlyGenerated.length > 1000)
+            break;
         }
-        
+
         // Update generation cache
         _lastGeneratedDates[_getRecurringCacheKey(recurring)] = now;
       }
@@ -691,7 +729,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
           thisMonthIncome: analytics.thisMonthIncome,
           thisMonthExpenses: analytics.thisMonthExpenses,
         ));
-        
+
         _checkAndResetBudgets(emit);
       }
     } catch (e, stackTrace) {
@@ -701,14 +739,15 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
 
   ActivityNature _determineActivityNature(ActivityType type) {
     return type.name.toLowerCase().contains('income') ||
-           type == ActivityType.salary ||
-           type == ActivityType.freelance ||
-           type == ActivityType.investment
+            type == ActivityType.salary ||
+            type == ActivityType.freelance ||
+            type == ActivityType.investment
         ? ActivityNature.income
         : ActivityNature.expense;
   }
 
-  DateTime _calculateNextDueDate(DateTime current, RecurringFrequency frequency) {
+  DateTime _calculateNextDueDate(
+      DateTime current, RecurringFrequency frequency) {
     switch (frequency) {
       case RecurringFrequency.daily:
         return current.add(const Duration(days: 1));
@@ -724,7 +763,8 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
           newYear++;
         }
         var daysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
-        var newDay = current.day > daysInNewMonth ? daysInNewMonth : current.day;
+        var newDay =
+            current.day > daysInNewMonth ? daysInNewMonth : current.day;
         return DateTime(newYear, newMonth, newDay);
       case RecurringFrequency.yearly:
         return DateTime(current.year + 1, current.month, current.day);
@@ -736,7 +776,6 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
   ActivityState? fromJson(Map<String, dynamic> json) {
     try {
       final state = ActivityState.fromJson(json);
-      add(GenerateRecurringInstances(untilDate: DateTime.now()));
       return state;
     } catch (e, stackTrace) {
       LogUtil.e('Error hydrating ActivityBloc state: $e\n$stackTrace');

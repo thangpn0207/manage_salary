@@ -58,7 +58,7 @@
   "ofBudgetUsed": "of budget used",
   "saveChanges": "Save Changes",
   "budgetPeriodWeekly": "Weekly",
-  "budgetPeriodMonthly": "Monthly", 
+  "budgetPeriodMonthly": "Monthly",
   "budgetPeriodYearly": "Yearly",
   "manageBudgets": "Manage Budgets",
   "budgetSummary": "Budget Summary",
@@ -84,12 +84,15 @@
   "noEndDate": "No End Date",
   "frequencyDaily": "Daily",
   "frequencyWeekly": "Weekly",
-  "frequencyBiWeekly": "Bi-Weekly", 
+  "frequencyBiWeekly": "Bi-Weekly",
   "frequencyMonthly": "Monthly",
   "frequencyYearly": "Yearly",
   "noRecurringActivities": "No recurring activities",
   "addRecurringDescription": "Add recurring activities to automate your regular income and expenses",
   "added": "added",
   "updated": "updated",
-  "activityRemoved": "{name} removed"
+  "activityRemoved": "{name} removed",
+  "confirmBudgetDeletion": "Are you sure you want to remove the {name} budget?",
+  "currency": "Currency",
+  "addActivitySuccess": "{name} added successfully."
 }

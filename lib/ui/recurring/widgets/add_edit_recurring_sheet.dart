@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
+import 'package:manage_salary/bloc/locale/locale_cubit.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/util/formatter.dart';

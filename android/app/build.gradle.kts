@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "id.thangpn.manage_salary"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -38,11 +38,16 @@ android {
             dimension = "environment"
             applicationId = "id.thangpn.manage_salary.dev"
             resValue("string", "app_name", "Manage Salary Dev")
-            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary Dev\"")
+            buildConfigField(
+                "String",
+                "FLUTTER_APP_NAME",
+                "\"Manage Salary Dev\""
+            )
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "true")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary Dev"
-            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: "ca-app-pub-2103558986527802~5808548229"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID")
+                ?: "ca-app-pub-2103558986527802~5808548229"
         }
         create("staging") {
             dimension = "environment"
@@ -52,7 +57,8 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "false")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
-            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: ""
+            manifestPlaceholders["ADMOB_APP_ID"] =
+                System.getenv("ADMOB_APP_ID") ?: ""
         }
         create("production") {
             dimension = "environment"
@@ -62,14 +68,15 @@ android {
             buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
             buildConfigField("boolean", "DEBUG", "false")
             manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
-            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID") ?: "ca-app-pub-2103558986527802~5808548229"
+            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID")
+                ?: "ca-app-pub-2103558986527802~5808548229"
         }
     }
 
-    defaultConfig {                                              
-        multiDexEnabled=true
-        minSdk=23
-        targetSdk=34
+    defaultConfig {
+        multiDexEnabled = true
+        minSdk = 24
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

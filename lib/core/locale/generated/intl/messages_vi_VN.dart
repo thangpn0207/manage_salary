@@ -24,7 +24,12 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m1(name) => "Đã xóa ${name}";
 
-  static String m2(category) => "Đã xóa ngân sách ${category}";
+  static String m2(name) => "${name} thêm thành công.";
+
+  static String m3(category) => "Đã xóa ngân sách ${category}";
+
+  static String m4(name) =>
+      "Bạn có chắc chắn muốn xóa ngân sách ${name} không?";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -67,6 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "add": MessageLookupByLibrary.simpleMessage("Thêm"),
     "addActivity": MessageLookupByLibrary.simpleMessage("Thêm hoạt động"),
     "addActivityButton": MessageLookupByLibrary.simpleMessage("Thêm hoạt động"),
+    "addActivitySuccess": m2,
     "addBudget": MessageLookupByLibrary.simpleMessage("Thêm ngân sách"),
     "addNewActivitySheetTitle": MessageLookupByLibrary.simpleMessage(
       "Thêm hoạt động mới",
@@ -87,7 +93,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "budgetPeriodMonthly": MessageLookupByLibrary.simpleMessage("Hàng tháng"),
     "budgetPeriodWeekly": MessageLookupByLibrary.simpleMessage("Hàng tuần"),
     "budgetPeriodYearly": MessageLookupByLibrary.simpleMessage("Hàng năm"),
-    "budgetRemoved": m2,
+    "budgetRemoved": m3,
     "budgetSummary": MessageLookupByLibrary.simpleMessage(
       "Tổng quan ngân sách",
     ),
@@ -102,6 +108,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeButton": MessageLookupByLibrary.simpleMessage("Thay đổi"),
     "clearButton": MessageLookupByLibrary.simpleMessage("Xóa"),
     "clearCache": MessageLookupByLibrary.simpleMessage("Xóa bộ nhớ đệm"),
+    "confirmBudgetDeletion": m4,
     "confirmClearCacheContent": MessageLookupByLibrary.simpleMessage(
       "Bạn có chắc không? Điều này sẽ xóa tất cả dữ liệu hoạt động đã lưu và có thể đặt lại các tùy chọn.",
     ),
@@ -109,6 +116,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Xác nhận xóa bộ nhớ đệm",
     ),
     "confirmDeletion": MessageLookupByLibrary.simpleMessage("Xác nhận xóa"),
+    "currency": MessageLookupByLibrary.simpleMessage("Tiền tệ"),
     "currentSpending": MessageLookupByLibrary.simpleMessage(
       "Chi tiêu hiện tại",
     ),

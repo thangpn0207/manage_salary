@@ -3,18 +3,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
+import 'package:manage_salary/bloc/concurrent/concurrent_cubit.dart';
 import 'package:manage_salary/core/util/formatter.dart';
 import 'package:manage_salary/core/util/localization_utils.dart';
 import 'package:manage_salary/core/util/spell_number.dart';
 
 import '../../../bloc/activity/activity_bloc.dart';
 import '../../../core/constants/enums.dart';
+import '../../../core/locale/generated/l10n.dart';
 import '../../../core/util/money_util.dart';
 import '../../../models/budget.dart';
-import '../../../core/locale/generated/l10n.dart';
 
-Future<Budget?> showAddEditBudgetSheet(BuildContext context, {Budget? budget}) async {
+Future<Budget?> showAddEditBudgetSheet(BuildContext context,
+    {Budget? budget}) async {
   return await showModalBottomSheet<Budget>(
     context: context,
     isScrollControlled: true,
@@ -34,7 +35,6 @@ Future<Budget?> showAddEditBudgetSheet(BuildContext context, {Budget? budget}) a
     },
   );
 }
-
 
 class _BudgetFormContent extends StatefulWidget {
   final Budget? budget;
@@ -74,17 +74,18 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
 
   void _updateSpendingForCategory() {
     final state = context.read<ActivityBloc>().state;
-    final activityType = _convertBudgetCategoryToActivityType(_selectedCategory);
+    final activityType =
+        _convertBudgetCategoryToActivityType(_selectedCategory);
     final periodRange = _getPeriodDateRange(_selectedPeriod);
-    
+
     _currentSpending = state.allActivities
-        .where((a) => 
+        .where((a) =>
             a.nature == ActivityNature.expense &&
             a.type == activityType &&
             !a.date.isBefore(periodRange.start) &&
             a.date.isBefore(periodRange.end))
         .fold(0.0, (sum, activity) => sum + activity.amount);
-        
+
     setState(() {});
   }
 
@@ -123,13 +124,13 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
           start: DateTime(start.year, start.month, start.day),
           end: DateTime(end.year, end.month, end.day),
         );
-      
+
       case BudgetPeriod.monthly:
         return (
           start: DateTime(now.year, now.month, 1),
           end: DateTime(now.year, now.month + 1, 1),
         );
-      
+
       case BudgetPeriod.yearly:
         return (
           start: DateTime(now.year, 1, 1),
@@ -141,9 +142,10 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
       // Parse the formatted amount by removing currency symbol and thousands separators
-      final cleanAmount = _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
+      final cleanAmount =
+          _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
       final amount = double.parse(cleanAmount); // Convert back to actual amount
-      
+
       final budget = Budget(
         id: widget.budget?.id,
         category: _selectedCategory,
@@ -161,7 +163,8 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
     final theme = Theme.of(context);
     double? currentAmount = double.tryParse(_amountController.text);
     bool hasAmount = currentAmount != null && currentAmount > 0;
-    double progress = hasAmount ? (_currentSpending / currentAmount).clamp(0.0, 1.0) : 0.0;
+    double progress =
+        hasAmount ? (_currentSpending / currentAmount).clamp(0.0, 1.0) : 0.0;
     Color progressColor = Colors.green.shade600;
     if (progress > 0.9) {
       progressColor = Colors.red.shade600;
@@ -177,8 +180,11 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              widget.budget == null ? S.of(context).addBudget : S.of(context).editBudget,
-              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              widget.budget == null
+                  ? S.of(context).addBudget
+                  : S.of(context).editBudget,
+              style: theme.textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -189,11 +195,14 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
               initialValue: _selectedCategory,
               decoration: InputDecoration(
                 labelText: S.of(context).category,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
               items: BudgetCategory.values.map((category) {
-                final activityType = _convertBudgetCategoryToActivityType(category);
+                final activityType =
+                    _convertBudgetCategoryToActivityType(category);
                 return DropdownMenuItem(
                   value: category,
                   child: Row(
@@ -214,7 +223,8 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
                 }
               },
               validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(errorText: S.of(context).fieldRequired),
+                FormBuilderValidators.required(
+                    errorText: S.of(context).fieldRequired),
               ]),
             ),
             const SizedBox(height: 16),
@@ -225,13 +235,15 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
               initialValue: _selectedPeriod,
               decoration: InputDecoration(
                 labelText: S.of(context).period,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
               items: BudgetPeriod.values.map((period) {
                 return DropdownMenuItem(
                   value: period,
-                  child: Text(localizedBudgetPeriod(context,period)),
+                  child: Text(localizedBudgetPeriod(context, period)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -243,7 +255,8 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
                 }
               },
               validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(errorText: S.of(context).fieldRequired),
+                FormBuilderValidators.required(
+                    errorText: S.of(context).fieldRequired),
               ]),
             ),
             const SizedBox(height: 16),
@@ -253,12 +266,13 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
               name: 'amount',
               controller: _amountController,
               keyboardType: TextInputType.number,
-              
               decoration: InputDecoration(
                 helperText: spelledAmount,
                 labelText: S.of(context).budgetAmount,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
@@ -269,14 +283,17 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
                   spelledAmount = '';
                   return;
                 }
-                final cleanAmount = _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
-                final amount = double.parse(cleanAmount); // Convert back to actual amount
-                context.read<LocaleCubit>().state.languageCode == 'vi'
+                final cleanAmount =
+                    _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
+                final amount =
+                    double.parse(cleanAmount); // Convert back to actual amount
+                context.read<CurrencyCubit>().state.languageCode == 'vi'
                     ? spelledAmount = SpellNumber().spellMoneyVND(amount)
                     : spelledAmount = SpellNumber().spellMoney(amount);
               }),
               validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(errorText: S.of(context).fieldRequired),
+                FormBuilderValidators.required(
+                    errorText: S.of(context).fieldRequired),
                 (value) {
                   if (value == null || value.isEmpty) return null;
                   final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
@@ -294,7 +311,8 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(S.of(context).currentSpending, style: theme.textTheme.bodyMedium),
+                  Text(S.of(context).currentSpending,
+                      style: theme.textTheme.bodyMedium),
                   Text(
                     MoneyUtil.formatDefault(_currentSpending),
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -310,7 +328,7 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: theme.dividerColor.withValues(alpha:0.3),
+                    backgroundColor: theme.dividerColor.withValues(alpha: 0.3),
                     valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                     minHeight: 8,
                   ),
@@ -333,9 +351,12 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
               onPressed: _saveForm,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
-              child: Text(widget.budget == null ? S.of(context).addBudget : S.of(context).saveChanges),
+              child: Text(widget.budget == null
+                  ? S.of(context).addBudget
+                  : S.of(context).saveChanges),
             ),
           ],
         ),

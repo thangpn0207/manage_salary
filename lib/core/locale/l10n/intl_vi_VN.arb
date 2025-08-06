@@ -91,5 +91,8 @@
   "addRecurringDescription": "Thêm hoạt động định kỳ để tự động hóa thu nhập và chi tiêu thường xuyên của bạn",
   "added": "đã thêm",
   "updated": "đã cập nhật",
-  "activityRemoved": "Đã xóa {name}"
+  "activityRemoved": "Đã xóa {name}",
+  "confirmBudgetDeletion": "Bạn có chắc chắn muốn xóa ngân sách {name} không?",
+  "currency": "Tiền tệ",
+  "addActivitySuccess": "{name} thêm thành công."
 }

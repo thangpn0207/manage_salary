@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
-import 'package:manage_salary/bloc/locale/cubit/locale_cubit.dart';
+import 'package:manage_salary/bloc/concurrent/concurrent_cubit.dart';
 import 'package:manage_salary/core/util/formatter.dart';
 import 'package:manage_salary/core/util/log_util.dart';
 import 'package:manage_salary/core/util/spell_number.dart';
@@ -26,6 +26,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   final _formKey = GlobalKey<FormBuilderState>();
   DateTime _selectedDate = DateTime.now(); // Default to today
   String spelledAmount = '';
+
   // Function to show the date picker
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -170,7 +171,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                 items: ActivityType.values.where((type) {
                   final selectedNature =
                       _formKey.currentState?.fields['activityNature']?.value;
-                      LogUtil.i( 'Selected Nature: $selectedNature');
+                  LogUtil.i('Selected Nature: $selectedNature');
                   if (selectedNature == ActivityNature.income) {
                     return [
                       ActivityType.salary,
@@ -227,39 +228,41 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                   helperText: spelledAmount,
                   labelText: S.of(context).amountLabel,
                   prefixText:
-                      '${NumberFormat.simpleCurrency(locale: currentLocale).currencySymbol} ',
+                      '${NumberFormat.simpleCurrency(locale: "vi").currencySymbol} ',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                MoneyInputFormatter(),
-              ],
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  MoneyInputFormatter(),
+                ],
                 onChanged: (value) => setState(() {
-                if (value?.isEmpty ?? true) {
-                  spelledAmount = '';
-                  return;
-                }
-                final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
-                final amount = double.parse(cleanAmount ?? '0'); // Convert back to actual amount
-                context.read<LocaleCubit>().state.languageCode == 'vi'
-                    ? spelledAmount = SpellNumber().spellMoneyVND(amount)
-                    : spelledAmount = SpellNumber().spellMoney(amount);
-              }),
-                 validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(errorText: S.of(context).fieldRequired),
-                (value) {
-                  if (value == null || value.isEmpty) return null;
-                  final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
-                  if (cleanValue.isEmpty || double.parse(cleanValue) <= 0) {
-                    return S.of(context).amountMustBePositive;
+                  if (value?.isEmpty ?? true) {
+                    spelledAmount = '';
+                    return;
                   }
-                  return null;
-                },
-              ]),
+                  final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
+                  final amount = double.parse(
+                      cleanAmount ?? '0'); // Convert back to actual amount
+                  context.read<CurrencyCubit>().state.languageCode == 'vi'
+                      ? spelledAmount = SpellNumber().spellMoneyVND(amount)
+                      : spelledAmount = SpellNumber().spellMoney(amount);
+                }),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(
+                      errorText: S.of(context).fieldRequired),
+                  (value) {
+                    if (value == null || value.isEmpty) return null;
+                    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+                    if (cleanValue.isEmpty || double.parse(cleanValue) <= 0) {
+                      return S.of(context).amountMustBePositive;
+                    }
+                    return null;
+                  },
+                ]),
               ),
               const SizedBox(height: 16),
 
