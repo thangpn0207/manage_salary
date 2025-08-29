@@ -23,8 +23,8 @@ class SettingsScreen extends StatelessWidget {
     'vi': 'Vietnamese',
   };
   static const Map<String, String> _supportedCurrencies = {
-    'en': 'VNĐ',
-    'vi': 'USD',
+    'en': 'USD',
+    'vi': 'VND',
   };
 
   @override

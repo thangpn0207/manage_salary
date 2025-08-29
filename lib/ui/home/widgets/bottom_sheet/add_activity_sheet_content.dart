@@ -104,7 +104,6 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentLocale = Localizations.localeOf(context).toString();
-
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.only(
@@ -228,7 +227,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
                   helperText: spelledAmount,
                   labelText: S.of(context).amountLabel,
                   prefixText:
-                      '${NumberFormat.simpleCurrency(locale: "vi").currencySymbol} ',
+                      '${NumberFormat.simpleCurrency(locale: context.read<CurrencyCubit>().state.languageCode).currencySymbol} ',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

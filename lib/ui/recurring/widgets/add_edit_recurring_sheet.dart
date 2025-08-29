@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:manage_salary/bloc/locale/locale_cubit.dart';
+import 'package:intl/intl.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/util/formatter.dart';
@@ -12,10 +12,10 @@ import 'package:manage_salary/core/util/money_util.dart';
 import 'package:manage_salary/core/util/spell_number.dart';
 import 'package:manage_salary/models/recurring_activity.dart';
 
-Future<RecurringActivity?> showAddEditRecurringSheet(
-  BuildContext context, 
-  {RecurringActivity? activity}
-) async {
+import '../../../bloc/concurrent/concurrent_cubit.dart';
+
+Future<RecurringActivity?> showAddEditRecurringSheet(BuildContext context,
+    {RecurringActivity? activity}) async {
   return await showModalBottomSheet<RecurringActivity>(
     context: context,
     isScrollControlled: true,
@@ -59,8 +59,10 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
   void initState() {
     super.initState();
     _selectedType = widget.activity?.type ?? ActivityType.expenseOther;
-    _selectedFrequency = widget.activity?.frequency ?? RecurringFrequency.monthly;
-    _titleController = TextEditingController(text: widget.activity?.title ?? '');
+    _selectedFrequency =
+        widget.activity?.frequency ?? RecurringFrequency.monthly;
+    _titleController =
+        TextEditingController(text: widget.activity?.title ?? '');
     _amountController = TextEditingController(
       text: widget.activity?.amount != null
           ? MoneyUtil.formatDefault(widget.activity!.amount)
@@ -80,7 +82,8 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
   void _saveForm() {
     if (_formKey.currentState!.validate()) {
       // Parse the formatted amount
-      final cleanAmount = _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
+      final cleanAmount =
+          _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
       final amount = double.parse(cleanAmount);
 
       final activity = RecurringActivity(
@@ -111,7 +114,8 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
           children: [
             Text(
               widget.activity == null ? s.addRecurring : s.editRecurring,
-              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -122,8 +126,10 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
               controller: _titleController,
               decoration: InputDecoration(
                 labelText: s.title,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(errorText: s.fieldRequired),
@@ -137,8 +143,10 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
               initialValue: _selectedType,
               decoration: InputDecoration(
                 labelText: s.type,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
               items: ActivityType.values.map((type) {
                 return DropdownMenuItem(
@@ -166,36 +174,41 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
             // Amount TextField
             FormBuilderTextField(
               name: 'amount',
-              controller: _amountController,
-              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 helperText: spelledAmount,
-                labelText: s.amount,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                labelText: S.of(context).amountLabel,
+                prefixText:
+                    '${NumberFormat.simpleCurrency(locale: context.read<CurrencyCubit>().state.languageCode).currencySymbol} ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 MoneyInputFormatter(),
               ],
-              onChanged: (_) => setState(() {
-                if (_amountController.text.isEmpty) {
+              onChanged: (value) => setState(() {
+                if (value?.isEmpty ?? true) {
                   spelledAmount = '';
                   return;
                 }
-                final cleanAmount = _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
-                final amount = double.parse(cleanAmount);
-                context.read<LocaleCubit>().state.languageCode == 'vi'
+                final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
+                final amount = double.parse(
+                    cleanAmount ?? '0'); // Convert back to actual amount
+                context.read<CurrencyCubit>().state.languageCode == 'vi'
                     ? spelledAmount = SpellNumber().spellMoneyVND(amount)
                     : spelledAmount = SpellNumber().spellMoney(amount);
               }),
               validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(errorText: s.fieldRequired),
+                FormBuilderValidators.required(
+                    errorText: S.of(context).fieldRequired),
                 (value) {
                   if (value == null || value.isEmpty) return null;
                   final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
                   if (cleanValue.isEmpty || double.parse(cleanValue) <= 0) {
-                    return s.amountMustBePositive;
+                    return S.of(context).amountMustBePositive;
                   }
                   return null;
                 },
@@ -209,8 +222,10 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
               initialValue: _selectedFrequency,
               decoration: InputDecoration(
                 labelText: s.frequency,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               ),
               items: RecurringFrequency.values.map((frequency) {
                 return DropdownMenuItem(
@@ -267,7 +282,9 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
               subtitle: Text(
                 _endDate?.toString().split(' ')[0] ?? s.noEndDate,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: _endDate != null ? theme.colorScheme.primary : theme.hintColor,
+                  color: _endDate != null
+                      ? theme.colorScheme.primary
+                      : theme.hintColor,
                 ),
               ),
               trailing: Row(
@@ -288,7 +305,8 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
               onTap: () async {
                 final date = await showDatePicker(
                   context: context,
-                  initialDate: _endDate ?? _startDate.add(const Duration(days: 1)),
+                  initialDate:
+                      _endDate ?? _startDate.add(const Duration(days: 1)),
                   firstDate: _startDate.add(const Duration(days: 1)),
                   lastDate: DateTime(2100),
                 );
@@ -304,11 +322,11 @@ class _RecurringFormContentState extends State<_RecurringFormContent> {
               onPressed: _saveForm,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
               child: Text(
-                widget.activity == null ? s.addRecurring : s.saveChanges
-              ),
+                  widget.activity == null ? s.addRecurring : s.saveChanges),
             ),
           ],
         ),

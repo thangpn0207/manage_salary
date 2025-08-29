@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:intl/intl.dart';
 import 'package:manage_salary/bloc/concurrent/concurrent_cubit.dart';
 import 'package:manage_salary/core/util/formatter.dart';
 import 'package:manage_salary/core/util/localization_utils.dart';
@@ -264,29 +265,29 @@ class _BudgetFormContentState extends State<_BudgetFormContent> {
             // Amount Text Field
             FormBuilderTextField(
               name: 'amount',
-              controller: _amountController,
-              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 helperText: spelledAmount,
-                labelText: S.of(context).budgetAmount,
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                labelText: S.of(context).amountLabel,
+                prefixText:
+                    '${NumberFormat.simpleCurrency(locale: context.read<CurrencyCubit>().state.languageCode).currencySymbol} ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 MoneyInputFormatter(),
               ],
-              onChanged: (_) => setState(() {
-                if (_amountController.text.isEmpty) {
+              onChanged: (value) => setState(() {
+                if (value?.isEmpty ?? true) {
                   spelledAmount = '';
                   return;
                 }
-                final cleanAmount =
-                    _amountController.text.replaceAll(RegExp(r'[^\d]'), '');
-                final amount =
-                    double.parse(cleanAmount); // Convert back to actual amount
+                final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
+                final amount = double.parse(
+                    cleanAmount ?? '0'); // Convert back to actual amount
                 context.read<CurrencyCubit>().state.languageCode == 'vi'
                     ? spelledAmount = SpellNumber().spellMoneyVND(amount)
                     : spelledAmount = SpellNumber().spellMoney(amount);
