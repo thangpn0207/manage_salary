@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:manage_salary/bloc/activity/activity_bloc.dart';
 import 'package:manage_salary/bloc/concurrent/concurrent_cubit.dart';
 import 'package:manage_salary/bloc/locale/locale_cubit.dart';
@@ -133,6 +134,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                           GlobalMaterialLocalizations.delegate,
                           GlobalWidgetsLocalizations.delegate,
                           GlobalCupertinoLocalizations.delegate,
+                          FormBuilderLocalizations.delegate,
                         ],
                         builder: (context, child) {
                           return child ?? const SizedBox.shrink();

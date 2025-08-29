@@ -2,7 +2,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../models/activity_data.dart';
-import '../../models/budget.dart';             // Import new model
+import '../../models/budget.dart'; // Import new model
 import '../../models/recurring_activity.dart'; // Import new model
 
 abstract class ActivityEvent extends Equatable {
