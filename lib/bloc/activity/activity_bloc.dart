@@ -1,5 +1,4 @@
 // activity_bloc.dart
-import 'package:flutter/foundation.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:manage_salary/bloc/activity/util/activity_util.dart';
 import 'package:manage_salary/core/extensions/date_time_extension.dart';
@@ -13,157 +12,581 @@ import '../../models/recurring_activity.dart';
 import 'activity_event.dart';
 import 'activity_state.dart';
 
+/// Optimized ActivityBloc with improved performance and cleaner architecture
 class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
+  static const _cacheExpirationHours = 1;
+  static const _maxRecurringInstances = 2000;
+  static const _maxYearsAhead = 10;
+
   final Uuid _uuid = const Uuid();
   final ActivityUtil _activityUtil = ActivityUtil();
 
-  // Cache for frequent calculations
-  final Map<String, double> cachedCalculations = {};
+  // Optimized caching system
+  final _analyticsCache = <String, dynamic>{};
+  final _budgetSpendingCache = <String, double>{};
+  final _recurringGenerationCache = <String, DateTime>{};
   DateTime? _lastCacheReset;
 
-  // Cache for recurring generation
-  final Map<String, DateTime> _lastGeneratedDates = {};
-
   ActivityBloc() : super(ActivityState.initial()) {
-    // Standard Activity handlers
-    on<AddActivity>(_onAddActivity);
-    on<RemoveActivity>(_onRemoveActivity);
-    on<ClearAllActivities>(_onClearAllActivities);
+    _registerEventHandlers();
+    _initializeRecurringActivities();
+  }
 
-    // Budget handlers
-    on<AddBudget>(_onAddBudget);
-    on<UpdateBudget>(_onUpdateBudget);
-    on<RemoveBudget>(_onRemoveBudget);
+  /// Register all event handlers in a centralized manner
+  void _registerEventHandlers() {
+    // Activity events
+    on<AddActivity>(_handleAddActivity);
+    on<RemoveActivity>(_handleRemoveActivity);
+    on<ClearAllActivities>(_handleClearAllActivities);
 
-    // Recurring Activity handlers
-    on<AddRecurringActivity>(_onAddRecurringActivity);
-    on<UpdateRecurringActivity>(_onUpdateRecurringActivity);
-    on<RemoveRecurringActivity>(_onRemoveRecurringActivity);
-    on<GenerateRecurringInstances>(_onGenerateRecurringInstances);
+    // Budget events
+    on<AddBudget>(_handleAddBudget);
+    on<UpdateBudget>(_handleUpdateBudget);
+    on<RemoveBudget>(_handleRemoveBudget);
 
-    // Initialize with recurring activities
+    // Recurring activity events
+    on<AddRecurringActivity>(_handleAddRecurringActivity);
+    on<UpdateRecurringActivity>(_handleUpdateRecurringActivity);
+    on<RemoveRecurringActivity>(_handleRemoveRecurringActivity);
+    on<GenerateRecurringInstances>(_handleGenerateRecurringInstances);
+  }
+
+  void _initializeRecurringActivities() {
     add(GenerateRecurringInstances(untilDate: DateTime.now()));
   }
 
-  // Cache management
-  void _resetCacheIfNeeded() {
+  // ==================== CACHE MANAGEMENT ====================
+
+  void _invalidateCache() {
+    _analyticsCache.clear();
+    _budgetSpendingCache.clear();
+    _lastCacheReset = DateTime.now();
+  }
+
+  void _invalidateCacheIfExpired() {
     final now = DateTime.now();
     if (_lastCacheReset == null ||
-        now.difference(_lastCacheReset!).inHours >= 1) {
-      cachedCalculations.clear();
-      _lastCacheReset = now;
+        now.difference(_lastCacheReset!).inHours >= _cacheExpirationHours) {
+      _invalidateCache();
     }
   }
 
-  String _getCacheKey(String operation, DateTime? start, DateTime? end) {
-    return '$operation-${start?.toIso8601String() ?? "all"}-${end?.toIso8601String() ?? "all"}';
+  String _generateCacheKey(String operation, [DateTime? start, DateTime? end]) {
+    return '$operation-${start?.millisecondsSinceEpoch ?? "all"}-${end?.millisecondsSinceEpoch ?? "all"}';
   }
 
-  String _getRecurringCacheKey(RecurringActivity activity) {
-    return '${activity.id}-${activity.frequency}';
-  }
+  // ==================== ACTIVITY HANDLERS ====================
 
-  bool _needsRegeneration(RecurringActivity activity, DateTime untilDate) {
-    final cacheKey = _getRecurringCacheKey(activity);
-    final lastGenerated = _lastGeneratedDates[cacheKey];
+  Future<void> _handleAddActivity(
+      AddActivity event, Emitter<ActivityState> emit) async {
+    try {
+      final activityWithId = event.newActivity.copyWith(id: _uuid.v4());
+      final updatedActivities = _addAndSortActivities([activityWithId]);
 
-    if (lastGenerated == null) return true;
-
-    // Regenerate if more than the frequency period has passed
-    switch (activity.frequency) {
-      case RecurringFrequency.daily:
-        return untilDate.difference(lastGenerated).inDays >= 1;
-      case RecurringFrequency.weekly:
-        return untilDate.difference(lastGenerated).inDays >= 7;
-      case RecurringFrequency.biWeekly:
-        return untilDate.difference(lastGenerated).inDays >= 14;
-      case RecurringFrequency.monthly:
-        return untilDate.month != lastGenerated.month ||
-            untilDate.year != lastGenerated.year;
-      case RecurringFrequency.yearly:
-        return untilDate.year != lastGenerated.year;
+      await _emitUpdatedState(emit, updatedActivities);
+    } catch (e, stackTrace) {
+      _logError('Error adding activity', e, stackTrace);
     }
   }
 
-  // Enhanced analytics calculation with caching
-  ({
-    double totalIncome,
-    double totalExpenses,
-    double netBalance,
-    Map<ActivityType, double> expensesByType,
-    Map<ActivityType, double> incomeByType,
-    double todayIncome,
-    double todayExpenses,
-    double thisWeekIncome,
-    double thisWeekExpenses,
-    double thisMonthIncome,
-    double thisMonthExpenses,
-  }) _calculateAnalyticsWithCache(List<ActivityData> activities) {
-    _resetCacheIfNeeded();
+  Future<void> _handleRemoveActivity(
+      RemoveActivity event, Emitter<ActivityState> emit) async {
+    try {
+      final updatedActivities = state.allActivities
+          .where((activity) => activity.id != event.activityId)
+          .toList();
 
-    // Get date ranges
+      await _emitUpdatedState(emit, updatedActivities);
+    } catch (e, stackTrace) {
+      _logError('Error removing activity', e, stackTrace);
+    }
+  }
+
+  Future<void> _handleClearAllActivities(
+      ClearAllActivities event, Emitter<ActivityState> emit) async {
+    try {
+      _invalidateCache();
+      _recurringGenerationCache.clear();
+      emit(ActivityState.initial());
+    } catch (e, stackTrace) {
+      _logError('Error clearing activities', e, stackTrace);
+    }
+  }
+
+  // ==================== BUDGET HANDLERS ====================
+
+  Future<void> _handleAddBudget(
+      AddBudget event, Emitter<ActivityState> emit) async {
+    try {
+      final budgetWithId = event.budget.copyWith(id: _uuid.v4());
+      final updatedBudgets = [...state.budgets, budgetWithId];
+
+      final processedBudgets = await _processAndUpdateBudgets(updatedBudgets);
+      emit(state.copyWith(budgets: processedBudgets));
+    } catch (e, stackTrace) {
+      _logError('Error adding budget', e, stackTrace);
+    }
+  }
+
+  Future<void> _handleUpdateBudget(
+      UpdateBudget event, Emitter<ActivityState> emit) async {
+    try {
+      final updatedBudgets = state.budgets
+          .map((budget) => budget.id == event.updatedBudget.id
+              ? event.updatedBudget
+              : budget)
+          .toList();
+
+      final processedBudgets = await _processAndUpdateBudgets(updatedBudgets);
+      emit(state.copyWith(budgets: processedBudgets));
+    } catch (e, stackTrace) {
+      _logError('Error updating budget', e, stackTrace);
+    }
+  }
+
+  Future<void> _handleRemoveBudget(
+      RemoveBudget event, Emitter<ActivityState> emit) async {
+    try {
+      final updatedBudgets =
+          state.budgets.where((budget) => budget.id != event.budgetId).toList();
+
+      emit(state.copyWith(budgets: updatedBudgets));
+    } catch (e, stackTrace) {
+      _logError('Error removing budget', e, stackTrace);
+    }
+  }
+
+  // ==================== RECURRING ACTIVITY HANDLERS ====================
+
+  Future<void> _handleAddRecurringActivity(
+      AddRecurringActivity event, Emitter<ActivityState> emit) async {
+    try {
+      final recurringWithId = event.recurringActivity.copyWith(id: _uuid.v4());
+      final updatedRecurring = [...state.recurringActivities, recurringWithId];
+
+      emit(state.copyWith(recurringActivities: updatedRecurring));
+      add(GenerateRecurringInstances(untilDate: DateTime.now()));
+    } catch (e, stackTrace) {
+      _logError('Error adding recurring activity', e, stackTrace);
+    }
+  }
+
+  Future<void> _handleUpdateRecurringActivity(
+      UpdateRecurringActivity event, Emitter<ActivityState> emit) async {
+    try {
+      final updatedRecurring = state.recurringActivities
+          .map((rec) => rec.id == event.updatedRecurringActivity.id
+              ? event.updatedRecurringActivity
+              : rec)
+          .toList();
+
+      emit(state.copyWith(recurringActivities: updatedRecurring));
+      add(GenerateRecurringInstances(untilDate: DateTime.now()));
+    } catch (e, stackTrace) {
+      _logError('Error updating recurring activity', e, stackTrace);
+    }
+  }
+
+  Future<void> _handleRemoveRecurringActivity(
+      RemoveRecurringActivity event, Emitter<ActivityState> emit) async {
+    try {
+      final updatedRecurring = state.recurringActivities
+          .where((rec) => rec.id != event.recurringActivityId)
+          .toList();
+
+      final updatedActivities = state.allActivities
+          .where((act) => act.recurringActivityId != event.recurringActivityId)
+          .toList();
+
+      _recurringGenerationCache.remove(event.recurringActivityId);
+      _invalidateCache();
+
+      final analytics = await _calculateAnalytics(updatedActivities);
+      final processedBudgets = await _processAndUpdateBudgets(state.budgets);
+
+      emit(state.copyWith(
+        recurringActivities: updatedRecurring,
+        allActivities: updatedActivities,
+        budgets: processedBudgets,
+        totalIncome: analytics['totalIncome'] as double,
+        totalExpenses: analytics['totalExpenses'] as double,
+        netBalance: analytics['netBalance'] as double,
+        expensesByType:
+            analytics['expensesByType'] as Map<ActivityType, double>,
+        incomeByType: analytics['incomeByType'] as Map<ActivityType, double>,
+        todayIncome: analytics['todayIncome'] as double,
+        todayExpenses: analytics['todayExpenses'] as double,
+        thisWeekIncome: analytics['thisWeekIncome'] as double,
+        thisWeekExpenses: analytics['thisWeekExpenses'] as double,
+        thisMonthIncome: analytics['thisMonthIncome'] as double,
+        thisMonthExpenses: analytics['thisMonthExpenses'] as double,
+      ));
+    } catch (e, stackTrace) {
+      _logError('Error removing recurring activity', e, stackTrace);
+    }
+  }
+
+  Future<void> _handleGenerateRecurringInstances(
+      GenerateRecurringInstances event, Emitter<ActivityState> emit) async {
+    try {
+      final newInstances = await _generateRecurringInstances(event.untilDate);
+
+      if (newInstances.isNotEmpty) {
+        final updatedActivities = _addAndSortActivities(newInstances);
+        await _emitUpdatedState(emit, updatedActivities);
+      }
+    } catch (e, stackTrace) {
+      _logError('Error generating recurring instances', e, stackTrace);
+    }
+  }
+
+  // ==================== CORE BUSINESS LOGIC ====================
+
+  List<ActivityData> _addAndSortActivities(List<ActivityData> newActivities) {
+    final allActivities = [...state.allActivities, ...newActivities];
+    final prunedActivities = _activityUtil.pruneActivities(allActivities);
+    prunedActivities.sort((a, b) => b.date.compareTo(a.date));
+    return prunedActivities;
+  }
+
+  Future<void> _emitUpdatedState(
+      Emitter<ActivityState> emit, List<ActivityData> activities) async {
+    _invalidateCache();
+
+    final analytics = await _calculateAnalytics(activities);
+    final processedBudgets = await _processAndUpdateBudgets(state.budgets);
+
+    emit(state.copyWith(
+      allActivities: activities,
+      budgets: processedBudgets,
+      totalIncome: analytics['totalIncome'] as double,
+      totalExpenses: analytics['totalExpenses'] as double,
+      netBalance: analytics['netBalance'] as double,
+      expensesByType: analytics['expensesByType'] as Map<ActivityType, double>,
+      incomeByType: analytics['incomeByType'] as Map<ActivityType, double>,
+      todayIncome: analytics['todayIncome'] as double,
+      todayExpenses: analytics['todayExpenses'] as double,
+      thisWeekIncome: analytics['thisWeekIncome'] as double,
+      thisWeekExpenses: analytics['thisWeekExpenses'] as double,
+      thisMonthIncome: analytics['thisMonthIncome'] as double,
+      thisMonthExpenses: analytics['thisMonthExpenses'] as double,
+    ));
+  }
+
+  Future<Map<String, dynamic>> _calculateAnalytics(
+      List<ActivityData> activities) async {
+    _invalidateCacheIfExpired();
+
+    const cacheKey = 'analytics';
+    if (_analyticsCache.containsKey(cacheKey)) {
+      return _analyticsCache[cacheKey] as Map<String, dynamic>;
+    }
+
+    // Calculate all analytics in one pass for better performance
+    final analytics = await _computeAnalytics(activities);
+    _analyticsCache[cacheKey] = analytics;
+
+    return analytics;
+  }
+
+  Future<Map<String, dynamic>> _computeAnalytics(
+      List<ActivityData> activities) async {
+    final totalIncome = _activityUtil.calculateTotalIncome(activities);
+    final totalExpenses = _activityUtil.calculateTotalExpenses(activities);
+    final netBalance = totalIncome - totalExpenses;
+
+    final expensesByType = _activityUtil.calculateExpensesByType(activities);
+    final incomeByType = _activityUtil.calculateIncomeByType(activities);
+
+    // Calculate period totals efficiently
     final todayRange = _activityUtil.getTodayRange();
     final weekRange = _activityUtil.getThisWeekRange();
     final monthRange = _activityUtil.getThisMonthRange();
 
-    // Calculate with caching
-    final String totalKey = _getCacheKey('total', null, null);
-    if (!cachedCalculations.containsKey(totalKey)) {
-      cachedCalculations['${totalKey}_income'] =
-          _activityUtil.calculateTotalIncome(activities);
-      cachedCalculations['${totalKey}_expenses'] =
-          _activityUtil.calculateTotalExpenses(activities);
-    }
-
-    final totalIncome = cachedCalculations['${totalKey}_income']!;
-    final totalExpenses = cachedCalculations['${totalKey}_expenses']!;
-    final netBalance = totalIncome - totalExpenses;
-
-    // Calculate period totals with caching
     final todayTotals =
-        _calculatePeriodTotalsWithCache(activities, todayRange, 'today');
+        _activityUtil.calculatePeriodTotals(activities, todayRange);
     final weekTotals =
-        _calculatePeriodTotalsWithCache(activities, weekRange, 'week');
+        _activityUtil.calculatePeriodTotals(activities, weekRange);
     final monthTotals =
-        _calculatePeriodTotalsWithCache(activities, monthRange, 'month');
+        _activityUtil.calculatePeriodTotals(activities, monthRange);
 
-    // Calculate type breakdowns
-    final expensesByType = _activityUtil.calculateExpensesByType(activities);
-    final incomeByType = _activityUtil.calculateIncomeByType(activities);
-
-    return (
-      totalIncome: totalIncome,
-      totalExpenses: totalExpenses,
-      netBalance: netBalance,
-      expensesByType: expensesByType,
-      incomeByType: incomeByType,
-      todayIncome: todayTotals.income,
-      todayExpenses: todayTotals.expense,
-      thisWeekIncome: weekTotals.income,
-      thisWeekExpenses: weekTotals.expense,
-      thisMonthIncome: monthTotals.income,
-      thisMonthExpenses: monthTotals.expense,
-    );
+    return {
+      'totalIncome': totalIncome,
+      'totalExpenses': totalExpenses,
+      'netBalance': netBalance,
+      'expensesByType': expensesByType,
+      'incomeByType': incomeByType,
+      'todayIncome': todayTotals.income,
+      'todayExpenses': todayTotals.expense,
+      'thisWeekIncome': weekTotals.income,
+      'thisWeekExpenses': weekTotals.expense,
+      'thisMonthIncome': monthTotals.income,
+      'thisMonthExpenses': monthTotals.expense,
+    };
   }
 
-  ({double income, double expense}) _calculatePeriodTotalsWithCache(
-    List<ActivityData> activities,
-    ({DateTime start, DateTime end}) range,
-    String period,
-  ) {
-    final cacheKey = _getCacheKey(period, range.start, range.end);
-    if (!cachedCalculations.containsKey('${cacheKey}_income')) {
-      final totals = _activityUtil.calculatePeriodTotals(activities, range);
-      cachedCalculations['${cacheKey}_income'] = totals.income;
-      cachedCalculations['${cacheKey}_expense'] = totals.expense;
+  Future<List<ActivityData>> _generateRecurringInstances(
+      DateTime untilDate) async {
+    final newInstances = <ActivityData>[];
+    final existingInstanceKeys = _buildExistingInstanceKeys();
+
+    for (final recurring in state.recurringActivities) {
+      if (!_shouldRegenerateRecurring(recurring, untilDate)) continue;
+
+      final instances = await _generateInstancesForRecurring(
+          recurring, untilDate, existingInstanceKeys);
+      newInstances.addAll(instances);
+
+      _recurringGenerationCache[recurring.id] = untilDate;
     }
-    return (
-      income: cachedCalculations['${cacheKey}_income']!,
-      expense: cachedCalculations['${cacheKey}_expense']!,
+
+    return newInstances;
+  }
+
+  Set<String> _buildExistingInstanceKeys() {
+    return state.allActivities
+        .where((act) => act.recurringActivityId != null)
+        .map((act) => '${act.recurringActivityId}-${_formatDateKey(act.date)}')
+        .toSet();
+  }
+
+  String _formatDateKey(DateTime date) {
+    return '${date.year}-${date.month}-${date.day}';
+  }
+
+  bool _shouldRegenerateRecurring(
+      RecurringActivity recurring, DateTime untilDate) {
+    final lastGenerated = _recurringGenerationCache[recurring.id];
+    if (lastGenerated == null) return true;
+
+    return switch (recurring.frequency) {
+      RecurringFrequency.daily =>
+        untilDate.difference(lastGenerated).inDays >= 1,
+      RecurringFrequency.weekly =>
+        untilDate.difference(lastGenerated).inDays >= 7,
+      RecurringFrequency.biWeekly =>
+        untilDate.difference(lastGenerated).inDays >= 14,
+      RecurringFrequency.monthly => untilDate.month != lastGenerated.month ||
+          untilDate.year != lastGenerated.year,
+      RecurringFrequency.yearly => untilDate.year != lastGenerated.year,
+    };
+  }
+
+  Future<List<ActivityData>> _generateInstancesForRecurring(
+    RecurringActivity recurring,
+    DateTime untilDate,
+    Set<String> existingKeys,
+  ) async {
+    final instances = <ActivityData>[];
+    var nextDate = _findStartDate(recurring, existingKeys);
+
+    if (nextDate.isAfter(untilDate)) return instances;
+
+    while (!nextDate.isAfter(untilDate) &&
+        instances.length < _maxRecurringInstances) {
+      if (recurring.endDate != null && nextDate.isAfter(recurring.endDate!)) {
+        break;
+      }
+
+      final instanceKey = '${recurring.id}-${_formatDateKey(nextDate)}';
+      if (!existingKeys.contains(instanceKey)) {
+        instances.add(_createRecurringInstance(recurring, nextDate));
+        existingKeys.add(instanceKey);
+      }
+
+      nextDate = _calculateNextDueDate(nextDate, recurring.frequency);
+
+      if (nextDate.year > untilDate.year + _maxYearsAhead) break;
+    }
+
+    return instances;
+  }
+
+  DateTime _findStartDate(
+      RecurringActivity recurring, Set<String> existingKeys) {
+    // Find the latest existing instance to continue from there
+    var latestExisting = DateTime(1900);
+    for (final activity in state.allActivities) {
+      if (activity.recurringActivityId == recurring.id &&
+          activity.date.isAfter(latestExisting)) {
+        latestExisting = activity.date;
+      }
+    }
+
+    return latestExisting.year > 1900
+        ? _calculateNextDueDate(latestExisting, recurring.frequency)
+        : recurring.startDate;
+  }
+
+  ActivityData _createRecurringInstance(
+      RecurringActivity recurring, DateTime date) {
+    return ActivityData(
+      id: _uuid.v4(),
+      nature: _determineActivityNature(recurring.type),
+      title: recurring.title,
+      amount: recurring.amount,
+      date: date,
+      type: recurring.type,
+      recurringActivityId: recurring.id,
     );
   }
 
-  // Budget Analytics Methods
+  DateTime _calculateNextDueDate(
+      DateTime current, RecurringFrequency frequency) {
+    return switch (frequency) {
+      RecurringFrequency.daily => current.add(const Duration(days: 1)),
+      RecurringFrequency.weekly => current.add(const Duration(days: 7)),
+      RecurringFrequency.biWeekly => current.add(const Duration(days: 14)),
+      RecurringFrequency.monthly => _addMonths(current, 1),
+      RecurringFrequency.yearly => _addYears(current, 1),
+    };
+  }
+
+  DateTime _addMonths(DateTime date, int months) {
+    var newMonth = date.month + months;
+    var newYear = date.year;
+
+    while (newMonth > 12) {
+      newMonth -= 12;
+      newYear++;
+    }
+
+    final daysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
+    final newDay = date.day > daysInNewMonth ? daysInNewMonth : date.day;
+
+    return DateTime(newYear, newMonth, newDay);
+  }
+
+  DateTime _addYears(DateTime date, int years) {
+    final newYear = date.year + years;
+    final daysInTargetMonth = DateTime(newYear, date.month + 1, 0).day;
+    final newDay = date.day > daysInTargetMonth ? daysInTargetMonth : date.day;
+
+    return DateTime(newYear, date.month, newDay);
+  }
+
+  ActivityNature _determineActivityNature(ActivityType type) {
+    const incomeTypes = {
+      ActivityType.salary,
+      ActivityType.freelance,
+      ActivityType.investment,
+    };
+
+    return incomeTypes.contains(type) ||
+            type.name.toLowerCase().contains('income')
+        ? ActivityNature.income
+        : ActivityNature.expense;
+  }
+
+  // ==================== BUDGET PROCESSING ====================
+
+  Future<List<Budget>> _processAndUpdateBudgets(List<Budget> budgets) async {
+    final now = DateTime.now();
+    final processedBudgets = <Budget>[];
+
+    // Group budgets by period and category for efficient processing
+    final budgetGroups = <String, List<Budget>>{};
+    for (final budget in budgets) {
+      final key = '${budget.period.index}-${budget.category.index}';
+      budgetGroups.putIfAbsent(key, () => []).add(budget);
+    }
+
+    for (final budgetGroup in budgetGroups.values) {
+      for (final budget in budgetGroup) {
+        final resetBudget =
+            _shouldResetBudget(budget, now) ? budget.resetSpending() : budget;
+
+        final spending = await _calculateBudgetSpending(resetBudget);
+        processedBudgets.add(resetBudget.updateSpending(spending));
+      }
+    }
+
+    return processedBudgets;
+  }
+
+  bool _shouldResetBudget(Budget budget, DateTime now) {
+    if (budget.lastUpdated == null) return false;
+
+    return switch (budget.period) {
+      BudgetPeriod.weekly => budget.lastUpdated!.weekOfYear != now.weekOfYear,
+      BudgetPeriod.monthly => budget.lastUpdated!.month != now.month ||
+          budget.lastUpdated!.year != now.year,
+      BudgetPeriod.yearly => budget.lastUpdated!.year != now.year,
+    };
+  }
+
+  Future<double> _calculateBudgetSpending(Budget budget) async {
+    final cacheKey = '${budget.period.index}-${budget.category.index}';
+
+    if (_budgetSpendingCache.containsKey(cacheKey)) {
+      return _budgetSpendingCache[cacheKey]!;
+    }
+
+    final activityType = _convertBudgetCategoryToActivityType(budget.category);
+    final periodRange = _getPeriodDateRange(budget.period);
+
+    final spending = state.allActivities
+        .where((a) =>
+            a.nature == ActivityNature.expense &&
+            a.type == activityType &&
+            !a.date.isBefore(periodRange.start) &&
+            a.date.isBefore(periodRange.end))
+        .fold(0.0, (sum, activity) => sum + activity.amount);
+
+    _budgetSpendingCache[cacheKey] = spending;
+    return spending;
+  }
+
+  ActivityType _convertBudgetCategoryToActivityType(BudgetCategory category) {
+    return switch (category) {
+      BudgetCategory.shopping => ActivityType.shopping,
+      BudgetCategory.foodAndDrinks => ActivityType.foodAndDrinks,
+      BudgetCategory.rent => ActivityType.rent,
+      BudgetCategory.utilities => ActivityType.utilities,
+      BudgetCategory.groceries => ActivityType.groceries,
+      BudgetCategory.entertainment => ActivityType.entertainment,
+      BudgetCategory.education => ActivityType.education,
+      BudgetCategory.healthcare => ActivityType.healthcare,
+      BudgetCategory.travel => ActivityType.travel,
+      BudgetCategory.expenseOther => ActivityType.expenseOther,
+    };
+  }
+
+  ({DateTime start, DateTime end}) _getPeriodDateRange(BudgetPeriod period) {
+    final now = DateTime.now();
+
+    return switch (period) {
+      BudgetPeriod.weekly => _getWeeklyRange(now),
+      BudgetPeriod.monthly => _getMonthlyRange(now),
+      BudgetPeriod.yearly => _getYearlyRange(now),
+    };
+  }
+
+  ({DateTime start, DateTime end}) _getWeeklyRange(DateTime now) {
+    final start = now.subtract(Duration(days: now.weekday - 1));
+    final end = start.add(const Duration(days: 7));
+    return (
+      start: DateTime(start.year, start.month, start.day),
+      end: DateTime(end.year, end.month, end.day),
+    );
+  }
+
+  ({DateTime start, DateTime end}) _getMonthlyRange(DateTime now) {
+    return (
+      start: DateTime(now.year, now.month, 1),
+      end: DateTime(now.year, now.month + 1, 1),
+    );
+  }
+
+  ({DateTime start, DateTime end}) _getYearlyRange(DateTime now) {
+    return (
+      start: DateTime(now.year, 1, 1),
+      end: DateTime(now.year + 1, 1, 1),
+    );
+  }
+
+  // ==================== ANALYTICS METHODS ====================
+
   Map<
       BudgetCategory,
       ({
@@ -173,30 +596,26 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
         double progress,
         bool isOverBudget,
       })> getBudgetAnalytics() {
-    Map<
-        BudgetCategory,
+    final analytics = <BudgetCategory,
         ({
-          double allocated,
-          double spent,
-          double remaining,
-          double progress,
-          bool isOverBudget,
-        })> analytics = {};
+      double allocated,
+      double spent,
+      double remaining,
+      double progress,
+      bool isOverBudget,
+    })>{};
 
-    for (final category in BudgetCategory.values) {
-      final budgetsForCategory =
-          state.budgets.where((b) => b.category == category).toList();
+    final budgetsByCategory = <BudgetCategory, List<Budget>>{};
+    for (final budget in state.budgets) {
+      budgetsByCategory.putIfAbsent(budget.category, () => []).add(budget);
+    }
 
-      if (budgetsForCategory.isEmpty) continue;
+    for (final entry in budgetsByCategory.entries) {
+      final category = entry.key;
+      final budgets = entry.value;
 
-      double totalAllocated = 0.0;
-      double totalSpent = 0.0;
-
-      for (final budget in budgetsForCategory) {
-        totalAllocated += budget.amount;
-        totalSpent += budget.currentSpending;
-      }
-
+      final totalAllocated = budgets.fold(0.0, (sum, b) => sum + b.amount);
+      final totalSpent = budgets.fold(0.0, (sum, b) => sum + b.currentSpending);
       final remaining = totalAllocated - totalSpent;
       final progress = totalAllocated > 0
           ? (totalSpent / totalAllocated).clamp(0.0, 1.0)
@@ -214,47 +633,65 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     return analytics;
   }
 
-  List<
-      ({
-        DateTime date,
-        Map<BudgetCategory, double> spending,
-      })> getDailySpendingTrend({
+  List<({DateTime date, Map<BudgetCategory, double> spending})>
+      getDailySpendingTrend({
     required DateTime startDate,
     required DateTime endDate,
   }) {
-    List<({DateTime date, Map<BudgetCategory, double> spending})> trend = [];
+    final trend = <({DateTime date, Map<BudgetCategory, double> spending})>[];
+
+    // Pre-group activities by date for better performance
+    final activitiesByDate = <String, List<ActivityData>>{};
+    for (final activity in state.allActivities) {
+      if (activity.nature == ActivityNature.expense &&
+          !activity.date.isBefore(startDate) &&
+          !activity.date.isAfter(endDate)) {
+        final dateKey = _formatDateKey(activity.date);
+        activitiesByDate.putIfAbsent(dateKey, () => []).add(activity);
+      }
+    }
 
     var currentDate = startDate;
     while (!currentDate.isAfter(endDate)) {
-      Map<BudgetCategory, double> daySpending = {};
+      final dateKey = _formatDateKey(currentDate);
+      final dayActivities = activitiesByDate[dateKey] ?? [];
 
-      for (final category in BudgetCategory.values) {
-        final activityType = _convertBudgetCategoryToActivityType(category);
-        final spending = state.allActivities
-            .where((a) =>
-                a.nature == ActivityNature.expense &&
-                a.type == activityType &&
-                a.date.year == currentDate.year &&
-                a.date.month == currentDate.month &&
-                a.date.day == currentDate.day)
-            .fold(0.0, (sum, activity) => sum + activity.amount);
+      if (dayActivities.isNotEmpty) {
+        final daySpending = <BudgetCategory, double>{};
 
-        if (spending > 0) {
-          daySpending[category] = spending;
+        for (final activity in dayActivities) {
+          final category = _convertActivityTypeToBudgetCategory(activity.type);
+          if (category != null) {
+            daySpending[category] =
+                (daySpending[category] ?? 0.0) + activity.amount;
+          }
         }
-      }
 
-      if (daySpending.isNotEmpty) {
-        trend.add((
-          date: currentDate,
-          spending: daySpending,
-        ));
+        if (daySpending.isNotEmpty) {
+          trend.add((date: currentDate, spending: daySpending));
+        }
       }
 
       currentDate = currentDate.add(const Duration(days: 1));
     }
 
     return trend;
+  }
+
+  BudgetCategory? _convertActivityTypeToBudgetCategory(ActivityType type) {
+    return switch (type) {
+      ActivityType.shopping => BudgetCategory.shopping,
+      ActivityType.foodAndDrinks => BudgetCategory.foodAndDrinks,
+      ActivityType.rent => BudgetCategory.rent,
+      ActivityType.utilities => BudgetCategory.utilities,
+      ActivityType.groceries => BudgetCategory.groceries,
+      ActivityType.entertainment => BudgetCategory.entertainment,
+      ActivityType.education => BudgetCategory.education,
+      ActivityType.healthcare => BudgetCategory.healthcare,
+      ActivityType.travel => BudgetCategory.travel,
+      ActivityType.expenseOther => BudgetCategory.expenseOther,
+      _ => null,
+    };
   }
 
   ({
@@ -267,23 +704,21 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     double totalRemaining,
     double overallProgress,
   }) getBudgetSummary() {
-    int totalBudgets = state.budgets.length;
-    int activeBudgets = 0;
-    int nearingLimitBudgets = 0;
-    int overBudgetBudgets = 0;
-    double totalAllocated = 0.0;
-    double totalSpent = 0.0;
+    var activeBudgets = 0;
+    var nearingLimitBudgets = 0;
+    var overBudgetBudgets = 0;
+    var totalAllocated = 0.0;
+    var totalSpent = 0.0;
 
     for (final budget in state.budgets) {
       totalAllocated += budget.amount;
       totalSpent += budget.currentSpending;
 
-      if (budget.currentSpending > 0) {
-        activeBudgets++;
-      }
+      if (budget.currentSpending > 0) activeBudgets++;
 
       final progress =
           budget.amount > 0 ? (budget.currentSpending / budget.amount) : 0.0;
+
       if (progress > 1.0) {
         overBudgetBudgets++;
       } else if (progress > 0.8) {
@@ -297,7 +732,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
         : 0.0;
 
     return (
-      totalBudgets: totalBudgets,
+      totalBudgets: state.budgets.length,
       activeBudgets: activeBudgets,
       nearingLimitBudgets: nearingLimitBudgets,
       overBudgetBudgets: overBudgetBudgets,
@@ -318,8 +753,7 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
             double remaining,
             DateTime? lastUpdated,
           })>> getBudgetsByCategory() {
-    Map<
-        BudgetCategory,
+    final result = <BudgetCategory,
         List<
             ({
               BudgetPeriod period,
@@ -327,11 +761,10 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
               double spent,
               double remaining,
               DateTime? lastUpdated,
-            })>> result = {};
+            })>>{};
 
     for (final budget in state.budgets) {
-      result.putIfAbsent(budget.category, () => []);
-      result[budget.category]!.add((
+      result.putIfAbsent(budget.category, () => []).add((
         period: budget.period,
         amount: budget.amount,
         spent: budget.currentSpending,
@@ -343,442 +776,14 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     return result;
   }
 
-  // Enhanced Activity Handlers with Error Handling
-  void _onAddActivity(AddActivity event, Emitter<ActivityState> emit) {
-    try {
-      // Clear cache to ensure fresh calculations
-      cachedCalculations.clear();
-      _lastCacheReset = DateTime.now();
+  // ==================== HYDRATED BLOC OVERRIDES ====================
 
-      final activityWithId = event.newActivity.copyWith(
-        id: _uuid.v4(),
-      );
-      final updatedList = List<ActivityData>.from(state.allActivities)
-        ..add(activityWithId);
-      final prunedList = _activityUtil.pruneActivities(updatedList);
-      prunedList.sort((a, b) => b.date.compareTo(a.date));
-
-      final analytics = _calculateAnalyticsWithCache(prunedList);
-
-      emit(state.copyWith(
-        allActivities: prunedList,
-        totalIncome: analytics.totalIncome,
-        totalExpenses: analytics.totalExpenses,
-        netBalance: analytics.netBalance,
-        expensesByType: analytics.expensesByType,
-        incomeByType: analytics.incomeByType,
-        todayIncome: analytics.todayIncome,
-        todayExpenses: analytics.todayExpenses,
-        thisWeekIncome: analytics.thisWeekIncome,
-        thisWeekExpenses: analytics.thisWeekExpenses,
-        thisMonthIncome: analytics.thisMonthIncome,
-        thisMonthExpenses: analytics.thisMonthExpenses,
-      ));
-
-      // Update budgets after adding activity
-      _checkAndResetBudgets(emit);
-    } catch (e, stackTrace) {
-      LogUtil.e('Error adding activity: $e\n$stackTrace');
-      // Consider emitting an error state or handling the error appropriately
-    }
-  }
-
-  void _onRemoveActivity(RemoveActivity event, Emitter<ActivityState> emit) {
-    try {
-      final updatedList = List<ActivityData>.from(state.allActivities)
-        ..removeWhere((activity) => activity.id == event.activityId);
-      updatedList.sort((a, b) => b.date.compareTo(a.date));
-
-      final analytics = _calculateAnalyticsWithCache(updatedList);
-
-      emit(state.copyWith(
-        allActivities: updatedList,
-        totalIncome: analytics.totalIncome,
-        totalExpenses: analytics.totalExpenses,
-        netBalance: analytics.netBalance,
-        expensesByType: analytics.expensesByType,
-        incomeByType: analytics.incomeByType,
-        todayIncome: analytics.todayIncome,
-        todayExpenses: analytics.todayExpenses,
-        thisWeekIncome: analytics.thisWeekIncome,
-        thisWeekExpenses: analytics.thisWeekExpenses,
-        thisMonthIncome: analytics.thisMonthIncome,
-        thisMonthExpenses: analytics.thisMonthExpenses,
-      ));
-
-      // Update budgets after removing activity
-      _checkAndResetBudgets(emit);
-    } catch (e, stackTrace) {
-      LogUtil.e('Error removing activity: $e\n$stackTrace');
-    }
-  }
-
-  void _onClearAllActivities(
-      ClearAllActivities event, Emitter<ActivityState> emit) {
-    try {
-      // Clear all caches first
-      cachedCalculations.clear();
-      _lastGeneratedDates.clear();
-      _lastCacheReset = DateTime.now();
-
-      // Reset the state to initial
-      emit(state.reset());
-
-      // Force save the reset state
-      toJson(state);
-    } catch (e, stackTrace) {
-      LogUtil.e('Error clearing activities: $e\n$stackTrace');
-    }
-  }
-
-  // Enhanced Budget Handlers
-  void _onAddBudget(AddBudget event, Emitter<ActivityState> emit) {
-    try {
-      final budgetWithId = event.budget.copyWith(id: _uuid.v4());
-      final updatedBudgets = List<Budget>.from(state.budgets)
-        ..add(budgetWithId);
-      emit(state.copyWith(budgets: updatedBudgets));
-      _checkAndResetBudgets(emit);
-    } catch (e, stackTrace) {
-      LogUtil.e('Error adding budget: $e\n$stackTrace');
-    }
-  }
-
-  void _onUpdateBudget(UpdateBudget event, Emitter<ActivityState> emit) {
-    try {
-      final updatedBudgets = state.budgets.map((budget) {
-        return budget.id == event.updatedBudget.id
-            ? event.updatedBudget
-            : budget;
-      }).toList();
-      emit(state.copyWith(budgets: updatedBudgets));
-      _checkAndResetBudgets(emit);
-    } catch (e, stackTrace) {
-      LogUtil.e('Error updating budget: $e\n$stackTrace');
-    }
-  }
-
-  void _onRemoveBudget(RemoveBudget event, Emitter<ActivityState> emit) {
-    try {
-      final updatedBudgets = List<Budget>.from(state.budgets)
-        ..removeWhere((budget) => budget.id == event.budgetId);
-      emit(state.copyWith(budgets: updatedBudgets));
-    } catch (e, stackTrace) {
-      LogUtil.e('Error removing budget: $e\n$stackTrace');
-    }
-  }
-
-  // Budget tracking helper
-  void _checkAndResetBudgets(Emitter<ActivityState> emit) {
-    try {
-      final now = DateTime.now();
-      List<Budget> updatedBudgets = state.budgets.map((budget) {
-        if (budget.lastUpdated == null) {
-          return budget.updateSpending(0);
-        }
-
-        bool shouldReset = false;
-        switch (budget.period) {
-          case BudgetPeriod.weekly:
-            final lastWeek = budget.lastUpdated!.weekOfYear;
-            final currentWeek = now.weekOfYear;
-            shouldReset = lastWeek != currentWeek;
-            break;
-          case BudgetPeriod.monthly:
-            shouldReset = budget.lastUpdated!.month != now.month ||
-                budget.lastUpdated!.year != now.year;
-            break;
-          case BudgetPeriod.yearly:
-            shouldReset = budget.lastUpdated!.year != now.year;
-            break;
-        }
-
-        return shouldReset ? budget.resetSpending() : budget;
-      }).toList();
-
-      // Update spending for each budget based on activities
-      for (var budget in updatedBudgets) {
-        final activityType =
-            _convertBudgetCategoryToActivityType(budget.category);
-        final periodRange = _getPeriodDateRange(budget.period);
-
-        final spending = state.allActivities
-            .where((a) =>
-                a.nature == ActivityNature.expense &&
-                a.type == activityType &&
-                !a.date.isBefore(periodRange.start) &&
-                a.date.isBefore(periodRange.end))
-            .fold(0.0, (sum, activity) => sum + activity.amount);
-
-        final index = updatedBudgets.indexOf(budget);
-        updatedBudgets[index] = budget.updateSpending(spending);
-      }
-
-      if (!listEquals(state.budgets, updatedBudgets)) {
-        emit(state.copyWith(budgets: updatedBudgets));
-      }
-    } catch (e, stackTrace) {
-      LogUtil.e('Error checking/resetting budgets: $e\n$stackTrace');
-    }
-  }
-
-  // Helper methods for budget tracking
-  ActivityType _convertBudgetCategoryToActivityType(BudgetCategory category) {
-    switch (category) {
-      case BudgetCategory.shopping:
-        return ActivityType.shopping;
-      case BudgetCategory.foodAndDrinks:
-        return ActivityType.foodAndDrinks;
-      case BudgetCategory.rent:
-        return ActivityType.rent;
-      case BudgetCategory.utilities:
-        return ActivityType.utilities;
-      case BudgetCategory.groceries:
-        return ActivityType.groceries;
-      case BudgetCategory.entertainment:
-        return ActivityType.entertainment;
-      case BudgetCategory.education:
-        return ActivityType.education;
-      case BudgetCategory.healthcare:
-        return ActivityType.healthcare;
-      case BudgetCategory.travel:
-        return ActivityType.travel;
-      case BudgetCategory.expenseOther:
-        return ActivityType.expenseOther;
-    }
-  }
-
-  ({DateTime start, DateTime end}) _getPeriodDateRange(BudgetPeriod period) {
-    final now = DateTime.now();
-    switch (period) {
-      case BudgetPeriod.weekly:
-        final start = now.subtract(Duration(days: now.weekday - 1));
-        final end = start.add(const Duration(days: 7));
-        return (
-          start: DateTime(start.year, start.month, start.day),
-          end: DateTime(end.year, end.month, end.day),
-        );
-
-      case BudgetPeriod.monthly:
-        return (
-          start: DateTime(now.year, now.month, 1),
-          end: DateTime(now.year, now.month + 1, 1),
-        );
-
-      case BudgetPeriod.yearly:
-        return (
-          start: DateTime(now.year, 1, 1),
-          end: DateTime(now.year + 1, 1, 1),
-        );
-    }
-  }
-
-  // Recurring Activity Handlers
-  void _onAddRecurringActivity(
-      AddRecurringActivity event, Emitter<ActivityState> emit) {
-    try {
-      final recurringWithId = event.recurringActivity.copyWith(id: _uuid.v4());
-      final updatedRecurring =
-          List<RecurringActivity>.from(state.recurringActivities)
-            ..add(recurringWithId);
-      emit(state.copyWith(recurringActivities: updatedRecurring));
-      add(GenerateRecurringInstances(untilDate: DateTime.now()));
-    } catch (e, stackTrace) {
-      LogUtil.e('Error adding recurring activity: $e\n$stackTrace');
-    }
-  }
-
-  void _onUpdateRecurringActivity(
-      UpdateRecurringActivity event, Emitter<ActivityState> emit) {
-    try {
-      final updatedRecurring = state.recurringActivities.map((rec) {
-        return rec.id == event.updatedRecurringActivity.id
-            ? event.updatedRecurringActivity
-            : rec;
-      }).toList();
-      emit(state.copyWith(recurringActivities: updatedRecurring));
-      add(GenerateRecurringInstances(untilDate: DateTime.now()));
-    } catch (e, stackTrace) {
-      LogUtil.e('Error updating recurring activity: $e\n$stackTrace');
-    }
-  }
-
-  void _onRemoveRecurringActivity(
-      RemoveRecurringActivity event, Emitter<ActivityState> emit) {
-    try {
-      // Remove from recurring activities list
-      final updatedRecurring =
-          List<RecurringActivity>.from(state.recurringActivities)
-            ..removeWhere((rec) => rec.id == event.recurringActivityId);
-
-      // Remove all generated instances
-      final updatedActivities = List<ActivityData>.from(state.allActivities)
-        ..removeWhere(
-            (act) => act.recurringActivityId == event.recurringActivityId);
-      updatedActivities.sort((a, b) => b.date.compareTo(a.date));
-
-      // Clear cache for the removed recurring activity
-      _lastGeneratedDates.remove(_getRecurringCacheKey(state.recurringActivities
-          .firstWhere((r) => r.id == event.recurringActivityId)));
-
-      // Clear analytics cache to force recalculation
-      cachedCalculations.clear();
-      _lastCacheReset = DateTime.now();
-
-      // Recalculate analytics with updated activities
-      final analytics = _calculateAnalyticsWithCache(updatedActivities);
-
-      emit(state.copyWith(
-        recurringActivities: updatedRecurring,
-        allActivities: updatedActivities,
-        totalIncome: analytics.totalIncome,
-        totalExpenses: analytics.totalExpenses,
-        netBalance: analytics.netBalance,
-        expensesByType: analytics.expensesByType,
-        incomeByType: analytics.incomeByType,
-        todayIncome: analytics.todayIncome,
-        todayExpenses: analytics.todayExpenses,
-        thisWeekIncome: analytics.thisWeekIncome,
-        thisWeekExpenses: analytics.thisWeekExpenses,
-        thisMonthIncome: analytics.thisMonthIncome,
-        thisMonthExpenses: analytics.thisMonthExpenses,
-      ));
-
-      // Update budgets after removing recurring activity instances
-      _checkAndResetBudgets(emit);
-    } catch (e, stackTrace) {
-      LogUtil.e('Error removing recurring activity: $e\n$stackTrace');
-    }
-  }
-
-  void _onGenerateRecurringInstances(
-      GenerateRecurringInstances event, Emitter<ActivityState> emit) {
-    try {
-      List<ActivityData> newlyGenerated = [];
-      final now = event.untilDate;
-
-      for (final recurring in state.recurringActivities) {
-        // Skip regeneration if not needed
-        if (!_needsRegeneration(recurring, now)) continue;
-
-        DateTime nextDueDate = recurring.startDate;
-        // Skip if start date is in the future
-        if (nextDueDate.isAfter(now)) continue;
-
-        while (nextDueDate.isBefore(now) || nextDueDate.isAtSameMomentAs(now)) {
-          if (recurring.endDate != null &&
-              nextDueDate.isAfter(recurring.endDate!)) break;
-
-          // Check for existing instance using optimized query
-          final ActivityData existingActivity = state.allActivities.firstWhere(
-            (activity) =>
-                activity.recurringActivityId == recurring.id &&
-                activity.date.year == nextDueDate.year &&
-                activity.date.month == nextDueDate.month &&
-                activity.date.day == nextDueDate.day,
-            orElse: () => ActivityData(
-                id: '',
-                nature: ActivityNature.expense,
-                title: '',
-                amount: 0.0,
-                date: DateTime.now(),
-                type: ActivityType.expenseOther,
-                recurringActivityId: null),
-          );
-
-          if (existingActivity.id.isEmpty) {
-            newlyGenerated.add(ActivityData(
-              id: _uuid.v4(),
-              nature: _determineActivityNature(recurring.type),
-              title: recurring.title,
-              amount: recurring.amount,
-              date: nextDueDate,
-              type: recurring.type,
-              recurringActivityId: recurring.id,
-            ));
-          }
-
-          nextDueDate = _calculateNextDueDate(nextDueDate, recurring.frequency);
-
-          // Safety checks
-          if (nextDueDate.year > now.year + 10 || newlyGenerated.length > 1000)
-            break;
-        }
-
-        // Update generation cache
-        _lastGeneratedDates[_getRecurringCacheKey(recurring)] = now;
-      }
-
-      if (newlyGenerated.isNotEmpty) {
-        final updatedList = List<ActivityData>.from(state.allActivities)
-          ..addAll(newlyGenerated)
-          ..sort((a, b) => b.date.compareTo(a.date));
-
-        final analytics = _calculateAnalyticsWithCache(updatedList);
-        emit(state.copyWith(
-          allActivities: updatedList,
-          totalIncome: analytics.totalIncome,
-          totalExpenses: analytics.totalExpenses,
-          netBalance: analytics.netBalance,
-          expensesByType: analytics.expensesByType,
-          incomeByType: analytics.incomeByType,
-          todayIncome: analytics.todayIncome,
-          todayExpenses: analytics.todayExpenses,
-          thisWeekIncome: analytics.thisWeekIncome,
-          thisWeekExpenses: analytics.thisWeekExpenses,
-          thisMonthIncome: analytics.thisMonthIncome,
-          thisMonthExpenses: analytics.thisMonthExpenses,
-        ));
-
-        _checkAndResetBudgets(emit);
-      }
-    } catch (e, stackTrace) {
-      LogUtil.e('Error generating recurring instances: $e\n$stackTrace');
-    }
-  }
-
-  ActivityNature _determineActivityNature(ActivityType type) {
-    return type.name.toLowerCase().contains('income') ||
-            type == ActivityType.salary ||
-            type == ActivityType.freelance ||
-            type == ActivityType.investment
-        ? ActivityNature.income
-        : ActivityNature.expense;
-  }
-
-  DateTime _calculateNextDueDate(
-      DateTime current, RecurringFrequency frequency) {
-    switch (frequency) {
-      case RecurringFrequency.daily:
-        return current.add(const Duration(days: 1));
-      case RecurringFrequency.weekly:
-        return current.add(const Duration(days: 7));
-      case RecurringFrequency.biWeekly:
-        return current.add(const Duration(days: 14));
-      case RecurringFrequency.monthly:
-        var newMonth = current.month + 1;
-        var newYear = current.year;
-        if (newMonth > 12) {
-          newMonth = 1;
-          newYear++;
-        }
-        var daysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
-        var newDay =
-            current.day > daysInNewMonth ? daysInNewMonth : current.day;
-        return DateTime(newYear, newMonth, newDay);
-      case RecurringFrequency.yearly:
-        return DateTime(current.year + 1, current.month, current.day);
-    }
-  }
-
-  // HydratedBloc overrides with enhanced error handling
   @override
   ActivityState? fromJson(Map<String, dynamic> json) {
     try {
-      final state = ActivityState.fromJson(json);
-      return state;
+      return ActivityState.fromJson(json);
     } catch (e, stackTrace) {
-      LogUtil.e('Error hydrating ActivityBloc state: $e\n$stackTrace');
+      _logError('Error hydrating ActivityBloc state', e, stackTrace);
       return ActivityState.initial();
     }
   }
@@ -788,8 +793,14 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     try {
       return state.toJson();
     } catch (e, stackTrace) {
-      LogUtil.e('Error serializing ActivityBloc state: $e\n$stackTrace');
+      _logError('Error serializing ActivityBloc state', e, stackTrace);
       return null;
     }
+  }
+
+  // ==================== UTILITY METHODS ====================
+
+  void _logError(String message, Object error, StackTrace stackTrace) {
+    LogUtil.e('$message: $error\n$stackTrace');
   }
 }
