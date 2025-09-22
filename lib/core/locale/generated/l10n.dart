@@ -829,6 +829,326 @@ class S {
       args: [name],
     );
   }
+
+  /// `Travel notes`
+  String get travelNotes {
+    return Intl.message(
+      'Travel notes',
+      name: 'travelNotes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No trips yet`
+  String get noTripYet {
+    return Intl.message('No trips yet', name: 'noTripYet', desc: '', args: []);
+  }
+
+  /// `Create your first trip to get started`
+  String get createFirstTrip {
+    return Intl.message(
+      'Create your first trip to get started',
+      name: 'createFirstTrip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit`
+  String get edit {
+    return Intl.message('Edit', name: 'edit', desc: '', args: []);
+  }
+
+  /// `Delete`
+  String get delete {
+    return Intl.message('Delete', name: 'delete', desc: '', args: []);
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
+  }
+
+  /// `Update`
+  String get update {
+    return Intl.message('Update', name: 'update', desc: '', args: []);
+  }
+
+  /// `Create`
+  String get create {
+    return Intl.message('Create', name: 'create', desc: '', args: []);
+  }
+
+  /// `No dates set`
+  String get noDatesSet {
+    return Intl.message('No dates set', name: 'noDatesSet', desc: '', args: []);
+  }
+
+  /// `Delete Trip`
+  String get deleteTrip {
+    return Intl.message('Delete Trip', name: 'deleteTrip', desc: '', args: []);
+  }
+
+  /// `Are you sure you want to delete {name}?`
+  String sureDeleteTrip(Object name) {
+    return Intl.message(
+      'Are you sure you want to delete $name?',
+      name: 'sureDeleteTrip',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Edit Trip`
+  String get editTrip {
+    return Intl.message('Edit Trip', name: 'editTrip', desc: '', args: []);
+  }
+
+  /// `Create New Trip`
+  String get createNewTrip {
+    return Intl.message(
+      'Create New Trip',
+      name: 'createNewTrip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Trip Title`
+  String get tripTitle {
+    return Intl.message('Trip Title', name: 'tripTitle', desc: '', args: []);
+  }
+
+  /// `Please enter a trip title`
+  String get pleaseEnterTripTitle {
+    return Intl.message(
+      'Please enter a trip title',
+      name: 'pleaseEnterTripTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Description (Optional)`
+  String get description {
+    return Intl.message(
+      'Description (Optional)',
+      name: 'description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select Date`
+  String get selectDate {
+    return Intl.message('Select Date', name: 'selectDate', desc: '', args: []);
+  }
+
+  /// `Trip Details`
+  String get tripDetail {
+    return Intl.message('Trip Details', name: 'tripDetail', desc: '', args: []);
+  }
+
+  /// `Member`
+  String get member {
+    return Intl.message('Member', name: 'member', desc: '', args: []);
+  }
+
+  /// `Notes`
+  String get notes {
+    return Intl.message('Notes', name: 'notes', desc: '', args: []);
+  }
+
+  /// `Summary`
+  String get summary {
+    return Intl.message('Summary', name: 'summary', desc: '', args: []);
+  }
+
+  /// `No members yet`
+  String get noMembersYet {
+    return Intl.message(
+      'No members yet',
+      name: 'noMembersYet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add member`
+  String get addMember {
+    return Intl.message('Add member', name: 'addMember', desc: '', args: []);
+  }
+
+  /// `Trip Members ({number})`
+  String tripMember(Object number) {
+    return Intl.message(
+      'Trip Members ($number)',
+      name: 'tripMember',
+      desc: '',
+      args: [number],
+    );
+  }
+
+  /// `Delete Member`
+  String get deleteMember {
+    return Intl.message(
+      'Delete Member',
+      name: 'deleteMember',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to remove {name} from this trip?`
+  String areYouSureDeleteMember(Object name) {
+    return Intl.message(
+      'Are you sure you want to remove $name from this trip?',
+      name: 'areYouSureDeleteMember',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Add New Member`
+  String get addNewMember {
+    return Intl.message(
+      'Add New Member',
+      name: 'addNewMember',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get name {
+    return Intl.message('Name', name: 'name', desc: '', args: []);
+  }
+
+  /// `Email (Optional)`
+  String get email {
+    return Intl.message('Email (Optional)', name: 'email', desc: '', args: []);
+  }
+
+  /// `Add members first before creating expenses`
+  String get addMemberFirstEx {
+    return Intl.message(
+      'Add members first before creating expenses',
+      name: 'addMemberFirstEx',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No expenses yet`
+  String get noExpenses {
+    return Intl.message(
+      'No expenses yet',
+      name: 'noExpenses',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Expense`
+  String get addExpenses {
+    return Intl.message('Add Expense', name: 'addExpenses', desc: '', args: []);
+  }
+
+  /// `Total Expenses`
+  String get totalExpenses {
+    return Intl.message(
+      'Total Expenses',
+      name: 'totalExpenses',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expenses {number}`
+  String expensesLength(Object number) {
+    return Intl.message(
+      'Expenses $number',
+      name: 'expensesLength',
+      desc: '',
+      args: [number],
+    );
+  }
+
+  /// `Paid by {name}`
+  String paidBy(Object name) {
+    return Intl.message(
+      'Paid by $name',
+      name: 'paidBy',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Add members first before creating notes`
+  String get addMemberFirstNote {
+    return Intl.message(
+      'Add members first before creating notes',
+      name: 'addMemberFirstNote',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No notes yet`
+  String get noNotesYet {
+    return Intl.message('No notes yet', name: 'noNotesYet', desc: '', args: []);
+  }
+
+  /// `Edit Expense`
+  String get editExpense {
+    return Intl.message(
+      'Edit Expense',
+      name: 'editExpense',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add New Expense`
+  String get addNewExpense {
+    return Intl.message(
+      'Add New Expense',
+      name: 'addNewExpense',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expense Title`
+  String get expenseTitle {
+    return Intl.message(
+      'Expense Title',
+      name: 'expenseTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter an expense title`
+  String get pleaseEnterExpenseTitle {
+    return Intl.message(
+      'Please enter an expense title',
+      name: 'pleaseEnterExpenseTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter an amount`
+  String get pleaseEnterAmount {
+    return Intl.message(
+      'Please enter an amount',
+      name: 'pleaseEnterAmount',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

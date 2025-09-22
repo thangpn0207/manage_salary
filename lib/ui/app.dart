@@ -18,6 +18,9 @@ import 'package:manage_salary/core/theme/app_theme.dart';
 import 'package:manage_salary/core/util/deep_link_handler.dart';
 import 'package:manage_salary/core/util/log_util.dart';
 
+import '../bloc/travel_note/travel_note_bloc.dart';
+import '../bloc/travel_note/travel_note_event.dart';
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -108,6 +111,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         BlocProvider(create: (context) => getIt<CurrencyCubit>()),
         BlocProvider(create: (context) => getIt<LocaleCubit>()),
         BlocProvider(create: (context) => getIt<ActivityBloc>()),
+        BlocProvider(
+            create: (context) => getIt<TravelNoteBloc>()..add(LoadTrips())),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:manage_salary/bloc/activity/activity_event.dart';
 import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/ui/components/banner_ad_widget.dart';
@@ -11,6 +12,7 @@ import 'package:manage_salary/ui/home/widgets/card_dashboard/card_dashboard.dart
 import '../../bloc/activity/activity_bloc.dart';
 import '../../core/dependency/injection.dart';
 import '../../core/locale/generated/l10n.dart';
+import '../../core/routes/app_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,6 +74,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           text: S.current.addActivity,
                           onPressed: _handleAddNewActivity,
                           icon: const Icon(Icons.add)),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: BaseButton(
+                          text: "Travel Notes",
+                          onPressed: () {
+                            context.push(AppRoutes.trips);
+                          },
+                          icon: const Icon(Icons.travel_explore)),
                     ),
                   ],
                 ),

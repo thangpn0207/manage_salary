@@ -16,31 +16,7 @@ class RouteTransitionFactory {
   static final Map<String, Map<String, TransitionBuilder>> _transitions = {
     // From home to various destinations
     AppRoutes.home: {
-      AppRoutes.login: PageTransitions.fadeTransition,
-      AppRoutes.profile: PageTransitions.slideFromRightTransition,
-      AppRoutes.settings: PageTransitions.slideFromBottomTransition,
       'default': PageTransitions.fadeTransition,
-    },
-
-    // From login to various destinations
-    AppRoutes.login: {
-      AppRoutes.home: PageTransitions.slideFromLeftTransition,
-      AppRoutes.profile: PageTransitions.slideFromRightTransition,
-      'default': PageTransitions.fadeTransition,
-    },
-
-    // From profile to various destinations
-    AppRoutes.profile: {
-      AppRoutes.home: PageTransitions.slideFromLeftTransition,
-      AppRoutes.settings: PageTransitions.slideFromBottomTransition,
-      'default': PageTransitions.slideFromRightTransition,
-    },
-
-    // From settings to various destinations
-    AppRoutes.settings: {
-      AppRoutes.home: PageTransitions.fadeTransition,
-      AppRoutes.profile: PageTransitions.scaleTransition,
-      'default': PageTransitions.slideFromBottomTransition,
     },
 
     // Default transition if source route is not defined

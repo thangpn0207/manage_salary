@@ -8,8 +8,8 @@ class MoneyUtil {
     return oCcy.format(number);
   }
 
-  static String formatDefault(num number) {
-    final oCcy = NumberFormat.simpleCurrency( locale: "vi_VN");
+  static String formatDefault(num number, {String currency = "vi_VN"}) {
+    final oCcy = NumberFormat.simpleCurrency(locale: currency);
     return oCcy.format(number);
   }
 }
