@@ -1025,9 +1025,9 @@ class S {
     return Intl.message('Name', name: 'name', desc: '', args: []);
   }
 
-  /// `Email (Optional)`
+  /// `Phone (Optional)`
   String get email {
-    return Intl.message('Email (Optional)', name: 'email', desc: '', args: []);
+    return Intl.message('Phone (Optional)', name: 'email', desc: '', args: []);
   }
 
   /// `Add members first before creating expenses`
@@ -1145,6 +1145,141 @@ class S {
     return Intl.message(
       'Please enter an amount',
       name: 'pleaseEnterAmount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Using group budget`
+  String get isUsingGroupBudget {
+    return Intl.message(
+      'Using group budget',
+      name: 'isUsingGroupBudget',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Split Type`
+  String get splitType {
+    return Intl.message('Split Type', name: 'splitType', desc: '', args: []);
+  }
+
+  /// `Equal Split`
+  String get equalSplit {
+    return Intl.message('Equal Split', name: 'equalSplit', desc: '', args: []);
+  }
+
+  /// `Split equally among all members`
+  String get equalSplitDes {
+    return Intl.message(
+      'Split equally among all members',
+      name: 'equalSplitDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom Split`
+  String get customSplit {
+    return Intl.message(
+      'Custom Split',
+      name: 'customSplit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set custom amounts for each member`
+  String get customSplitDes {
+    return Intl.message(
+      'Set custom amounts for each member',
+      name: 'customSplitDes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom Split Amount`
+  String get customSplitAmount {
+    return Intl.message(
+      'Custom Split Amount',
+      name: 'customSplitAmount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Deposit`
+  String get deposit {
+    return Intl.message('Deposit', name: 'deposit', desc: '', args: []);
+  }
+
+  /// `Add deposit`
+  String get addDeposit {
+    return Intl.message('Add deposit', name: 'addDeposit', desc: '', args: []);
+  }
+
+  /// `No deposits yet`
+  String get noDepositsYet {
+    return Intl.message(
+      'No deposits yet',
+      name: 'noDepositsYet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Deposits`
+  String get deposits {
+    return Intl.message('Deposits', name: 'deposits', desc: '', args: []);
+  }
+
+  /// `Remaining Group Deposit`
+  String get remainingGroupDeposit {
+    return Intl.message(
+      'Remaining Group Deposit',
+      name: 'remainingGroupDeposit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Member Balances`
+  String get memberBalances {
+    return Intl.message(
+      'Member Balances',
+      name: 'memberBalances',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paid`
+  String get paid {
+    return Intl.message('Paid', name: 'paid', desc: '', args: []);
+  }
+
+  /// `Owes`
+  String get owes {
+    return Intl.message('Owes', name: 'owes', desc: '', args: []);
+  }
+
+  /// `Total Trip Cost`
+  String get totalTripCost {
+    return Intl.message(
+      'Total Trip Cost',
+      name: 'totalTripCost',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Suggested Settlements`
+  String get suggestedSettlements {
+    return Intl.message(
+      'Suggested Settlements',
+      name: 'suggestedSettlements',
       desc: '',
       args: [],
     );

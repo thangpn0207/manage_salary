@@ -123,7 +123,7 @@
   "areYouSureDeleteMember": "Bạn có chắc muốn xóa {name} khỏi chuyến đi này?",
   "addNewMember": "Thêm thành viên mới",
   "name": "Tên",
-  "email": "Email (Không bắt buộc)",
+  "email": "SDT đòi nợ (Không bắt buộc)",
   "addMemberFirstEx": "Thêm thành viên trước khi tạo chi phí",
   "noExpenses": "Chưa có chi phí nào",
   "addExpenses": "Thêm chi phí",
@@ -137,5 +137,25 @@
   "addNewExpense": "Thêm chi phí mới",
   "expenseTitle": "Tiêu đề chi phí",
   "pleaseEnterExpenseTitle": "Vui lòng nhập tiêu đề chi phí",
-  "pleaseEnterAmount": "Vui lòng nhập số tiền"
+  "pleaseEnterAmount": "Vui lòng nhập số tiền",
+  "isUsingGroupBudget": "Dùng tiền quỹ",
+  "splitType": "Kiểu chia tiền",
+  "equalSplit": "Chia đều hết",
+  "equalSplitDes": "Chia đều cho mỗi người trong nhóm",
+  "customSplit": "Tự chia",
+  "customSplitDes": "Tự nhập số tiền chia mỗi người trong nhóm",
+  "customSplitAmount": "Số tiền chia",
+
+  "deposit": "Đóng họ",
+  "addDeposit": "Bốc họ",
+  "noDepositsYet": "Nhóm chưa đóng gì??",
+
+  "deposits": "Những bát họ",
+  "remainingGroupDeposit": "Tiền đóng họ còn dư",
+  "memberBalances": "Chi tiêu theo thành viên",
+  "paid": "Thanh toán",
+  "owes": "Ăn mất",
+  "totalTripCost": "Chuyến này mất",
+  "suggestedSettlements": "Gợi ý thanh toán"
+
 }

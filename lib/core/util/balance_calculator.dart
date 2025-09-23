@@ -38,14 +38,31 @@ class BalanceCalculator {
     required TravelNoteRepository repository,
   }) async {
     final memberBalances = <MemberBalance>[];
+
+    // Tổng chi phí chuyến đi (bao gồm cả group budget và non-group budget)
     final totalTripCost =
         actions.fold<double>(0.0, (sum, action) => sum + action.amount);
 
+    // Tính tổng deposit nhóm
+    final totalDeposits =
+        deposits.fold<double>(0.0, (sum, d) => sum + d.amount);
+
+    // Tính tổng chi từ group budget
+    final totalGroupBudget = actions
+        .where((a) => a.isGroupBudget)
+        .fold<double>(0.0, (s, a) => s + a.amount);
+
+    // Deposit nhóm còn lại sau khi trừ group budget
+    final remainingGroupDeposit = totalDeposits - totalGroupBudget;
+
     for (final member in members) {
+      // 1. Tổng tiền member đã thanh toán (chỉ tính action không phải group budget)
       final totalPaid = actions
-          .where((action) => action.payerId == member.id)
+          .where(
+              (action) => !action.isGroupBudget && action.payerId == member.id)
           .fold<double>(0.0, (sum, action) => sum + action.amount);
 
+      // 2. Tổng tiền member phải trả (owed)
       double totalOwed = 0.0;
       for (final action in actions) {
         final shares = await repository.getActionSharesByActionId(action.id!);
@@ -57,6 +74,7 @@ class BalanceCalculator {
         totalOwed += memberShare.amountOwed;
       }
 
+      // 3. Tổng deposit của member
       final deposit = deposits
           .where((d) => d.memberId == member.id)
           .fold<double>(0.0, (sum, d) => sum + d.amount);
@@ -75,7 +93,25 @@ class BalanceCalculator {
       'totalTripCost': totalTripCost,
       'memberBalances': memberBalances,
       'settlements': settlements,
+      'totalDeposits': totalDeposits,
+      'totalGroupBudget': totalGroupBudget,
+      'remainingGroupDeposit': remainingGroupDeposit,
     };
+  }
+
+  /// Tính toán số tiền mỗi member cần nộp thêm hoặc sẽ được hoàn lại
+  static Map<MemberModel, double> calculateAdditionalPayments(
+      List<MemberBalance> balances, double remainingGroupDeposit) {
+    final results = <MemberModel, double>{};
+
+    for (final balance in balances) {
+      // balance = (paid + deposit) - owed
+      // Nếu có group deposit dư, coi như đã "trừ" rồi, nên mỗi member
+      // chỉ quan tâm tới balance cá nhân
+      results[balance.member] = balance.balance;
+    }
+
+    return results;
   }
 
   static List<Settlement> _calculateSettlements(List<MemberBalance> balances) {

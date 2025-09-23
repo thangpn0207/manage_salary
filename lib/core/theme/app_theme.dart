@@ -88,6 +88,33 @@ class AppTheme {
         bodyMedium: TextStyle(color: AppColors.onSurface),
         bodySmall: TextStyle(color: AppColors.onSurfaceVariant),
       ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color>(
+          (states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.teal; // màu khi bật
+            }
+            return Colors.grey; // màu khi tắt
+          },
+        ),
+        trackColor: WidgetStateProperty.resolveWith<Color>(
+          (states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.teal.withValues(alpha: 0.5); // track khi bật
+            }
+            return Colors.grey.withValues(alpha: 0.4); // track khi tắt
+          },
+        ),
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+        thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
+          (states) {
+            if (states.contains(WidgetState.selected)) {
+              return const Icon(Icons.check, color: Colors.white);
+            }
+            return const Icon(Icons.close, color: Colors.white);
+          },
+        ),
+      ),
       dividerTheme: const DividerThemeData(
         color: AppColors.outline,
         thickness: 1,

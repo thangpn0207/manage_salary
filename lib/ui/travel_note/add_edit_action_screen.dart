@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../bloc/concurrent/concurrent_cubit.dart';
 import '../../core/locale/generated/l10n.dart';
 import '../../core/util/formatter.dart';
+import '../../core/util/money_util.dart';
 import '../../core/util/spell_number.dart';
 import '../../models/travel_note/action_model.dart';
 import '../../models/travel_note/member.dart';
@@ -84,7 +85,8 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Expense' : 'Add New Expense'),
+        title:
+            Text(isEditing ? S.current.editExpense : S.current.addNewExpense),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: SingleChildScrollView(
@@ -96,14 +98,14 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
             children: [
               FormBuilderTextField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Expense Title',
+                decoration: InputDecoration(
+                  labelText: S.current.expenseTitle,
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.receipt),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter an expense title';
+                    return S.current.pleaseEnterExpenseTitle;
                   }
                   return null;
                 },
@@ -113,8 +115,8 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
               const SizedBox(height: 16),
               FormBuilderTextField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description (Optional)',
+                decoration: InputDecoration(
+                  labelText: S.current.description,
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.description),
                 ),
@@ -166,10 +168,10 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
                 ]),
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<int>(
+              FormBuilderDropdown<int>(
                 initialValue: _selectedPayerId,
-                decoration: const InputDecoration(
-                  labelText: 'Paid by',
+                decoration: InputDecoration(
+                  labelText: S.current.paidBy("??"),
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
@@ -190,10 +192,33 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
                   }
                   return null;
                 },
+                name: 'paidBy',
+              ),
+              const SizedBox(height: 16),
+              FormBuilderSwitch(
+                initialValue: false,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.payment),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    // _selectedPayerId = value;
+                  });
+                },
+                validator: (value) {
+                  return null;
+                },
+                name: 'isGroupBudget',
+                title: Text(
+                  S.current.isUsingGroupBudget,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
               ),
               const SizedBox(height: 24),
               Text(
-                'Split Type',
+                S.current.splitType,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -211,14 +236,13 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
                   child: Column(
                     children: [
                       RadioListTile<SplitType>(
-                        title: const Text('Equal Split'),
-                        subtitle: const Text('Split equally among all members'),
+                        title: Text(S.current.equalSplit),
+                        subtitle: Text(S.current.equalSplitDes),
                         value: SplitType.equal,
                       ),
                       RadioListTile<SplitType>(
-                        title: const Text('Custom Split'),
-                        subtitle:
-                            const Text('Set custom amounts for each member'),
+                        title: Text(S.current.customSplit),
+                        subtitle: Text(S.current.customSplitDes),
                         value: SplitType.custom,
                       ),
                     ],
@@ -234,7 +258,7 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Custom Split Amounts',
+                          S.current.customSplitAmount,
                           style:
                               Theme.of(context).textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
@@ -256,56 +280,88 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
-                                  child: TextFormField(
+                                  child: FormBuilderTextField(
                                     controller:
                                         _customAmountControllers[member.id!],
-                                    decoration: const InputDecoration(
-                                      labelText: 'Amount',
-                                      border: OutlineInputBorder(),
-                                      prefixText: '\$',
-                                      isDense: true,
+                                    decoration: InputDecoration(
+                                      helperText: spelledAmount,
+                                      labelText: S.of(context).amountLabel,
+                                      prefixText:
+                                          '${NumberFormat.simpleCurrency(locale: context.read<CurrencyCubit>().state.languageCode).currencySymbol} ',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
                                     ),
                                     keyboardType:
                                         const TextInputType.numberWithOptions(
                                             decimal: true),
                                     inputFormatters: [
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp(r'^\d+\.?\d{0,2}')),
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      MoneyInputFormatter(),
                                     ],
-                                    validator: (value) {
-                                      if (_splitType == SplitType.custom) {
-                                        if (value == null ||
-                                            value.trim().isEmpty) {
-                                          return 'Required';
-                                        }
-                                        final amount =
-                                            double.tryParse(value.trim());
-                                        if (amount == null || amount < 0) {
-                                          return 'Invalid';
-                                        }
+                                    onChanged: (value) => setState(() {
+                                      if (value?.isEmpty ?? true) {
+                                        spelledAmount = '';
+                                        return;
                                       }
-                                      return null;
-                                    },
+                                      final cleanAmount =
+                                          value?.replaceAll(RegExp(r'\D'), '');
+                                      final amount = double.parse(cleanAmount ??
+                                          '0'); // Convert back to actual amount
+                                      context
+                                                  .read<CurrencyCubit>()
+                                                  .state
+                                                  .languageCode ==
+                                              'vi'
+                                          ? spelledAmount = SpellNumber()
+                                              .spellMoneyVND(amount)
+                                          : spelledAmount =
+                                              SpellNumber().spellMoney(amount);
+                                    }),
+                                    validator: FormBuilderValidators.compose([
+                                      FormBuilderValidators.required(
+                                          errorText:
+                                              S.of(context).fieldRequired),
+                                      (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return null;
+                                        }
+                                        final cleanValue = value.replaceAll(
+                                            RegExp(r'[^\d]'), '');
+                                        if (cleanValue.isEmpty ||
+                                            double.parse(cleanValue) <= 0) {
+                                          return S
+                                              .of(context)
+                                              .amountMustBePositive;
+                                        }
+                                        return null;
+                                      },
+                                    ]),
+                                    name: 'amount+${member.id}',
                                   ),
                                 ),
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                         const Divider(),
                         Row(
                           children: [
-                            const Expanded(
+                            Expanded(
                               flex: 2,
                               child: Text(
-                                'Total:',
+                                S.current.totalBalance,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: Text(
-                                '\$${_calculateCustomTotal().toStringAsFixed(2)}',
+                                MoneyUtil.formatDefault(_calculateCustomTotal(),
+                                    currency: context
+                                        .read<CurrencyCubit>()
+                                        .state
+                                        .languageCode),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
                               ),
@@ -326,7 +382,7 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: Text(
-                    isEditing ? 'Update Expense' : 'Add Expense',
+                    isEditing ? S.current.update : S.current.add,
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),
@@ -364,6 +420,7 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final totalAmount =
           double.parse(_amountController.text.trim().replaceAll('.', ''));
+      final formData = _formKey.currentState?.value;
 
       // Validate custom split totals match
       if (_splitType == SplitType.custom) {
@@ -372,8 +429,8 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Custom split total (\$${customTotal.toStringAsFixed(2)}) '
-                'must equal the expense amount (\$${totalAmount.toStringAsFixed(2)})',
+                'Custom split total (${MoneyUtil.formatDefault(customTotal, currency: context.read<CurrencyCubit>().state.languageCode)}) '
+                'must equal the expense amount (${MoneyUtil.formatDefault(totalAmount, currency: context.read<CurrencyCubit>().state.languageCode)})',
               ),
               backgroundColor: Colors.red,
             ),
@@ -405,6 +462,7 @@ class _AddEditActionScreenState extends State<AddEditActionScreen> {
         splitType: _splitType,
         createdAt: widget.action?.createdAt ?? now,
         updatedAt: now,
+        isGroupBudget: formData?['isGroupBudget'],
       );
 
       widget.onSave(action, customShares);

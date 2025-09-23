@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:intl/intl.dart';
 
 import '../../bloc/concurrent/concurrent_cubit.dart';
 import '../../bloc/travel_note/travel_note_bloc.dart';
 import '../../bloc/travel_note/travel_note_event.dart';
 import '../../bloc/travel_note/travel_note_state.dart';
 import '../../core/locale/generated/l10n.dart';
+import '../../core/util/formatter.dart';
 import '../../core/util/money_util.dart';
+import '../../core/util/spell_number.dart';
 import '../../models/travel_note/action_model.dart';
+import '../../models/travel_note/deposit.dart';
 import '../../models/travel_note/member.dart';
 import '../../models/travel_note/travel_note.dart';
 import 'add_edit_action_screen.dart';
@@ -21,7 +28,7 @@ class TripDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: BlocBuilder<TravelNoteBloc, TravelNoteState>(
@@ -36,6 +43,9 @@ class TripDetailScreen extends StatelessWidget {
           bottom: TabBar(
             tabs: [
               Tab(icon: Icon(Icons.people), text: S.current.member),
+              Tab(
+                  icon: Icon(Icons.account_balance_wallet),
+                  text: S.current.deposit),
               Tab(icon: Icon(Icons.receipt_long), text: S.current.expenses),
               Tab(icon: Icon(Icons.note), text: S.current.notes),
               Tab(icon: Icon(Icons.summarize), text: S.current.summary),
@@ -45,11 +55,161 @@ class TripDetailScreen extends StatelessWidget {
         body: TabBarView(
           children: [
             _MembersTab(tripId: tripId),
+            _DepositsTab(tripId: tripId),
             _ExpensesTab(tripId: tripId),
             _NotesTab(tripId: tripId),
             SummaryScreen(tripId: tripId),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DepositsTab extends StatelessWidget {
+  final int tripId;
+
+  const _DepositsTab({super.key, required this.tripId});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TravelNoteBloc, TravelNoteState>(
+      builder: (context, state) {
+        if (state.deposits.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.account_balance_wallet,
+                    size: 80, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(
+                  S.current.noDepositsYet,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () =>
+                      _showAddDepositDialog(context, state.members),
+                  icon: const Icon(Icons.add),
+                  label: Text(S.current.addDeposit),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Text(
+                    S.current.deposits,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  ElevatedButton.icon(
+                    onPressed: () =>
+                        _showAddDepositDialog(context, state.members),
+                    icon: const Icon(Icons.add),
+                    label: Text(S.current.addDeposit),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: state.deposits.length,
+                itemBuilder: (context, index) {
+                  final deposit = state.deposits[index];
+                  final member =
+                      state.members.firstWhere((m) => m.id == deposit.memberId);
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: _getAvatarColor(index),
+                        child: Text(
+                          member.name.isNotEmpty
+                              ? member.name[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      title: Text(member.name),
+                      subtitle: Text(
+                        MoneyUtil.formatDefault(deposit.amount,
+                            currency: context
+                                .read<CurrencyCubit>()
+                                .state
+                                .languageCode),
+                        style: const TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold),
+                      ),
+                      trailing: PopupMenuButton(
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text(S.current.delete,
+                                    style: TextStyle(color: Colors.red)),
+                              ],
+                            ),
+                          ),
+                        ],
+                        onSelected: (value) {
+                          if (value == 'delete') {
+                            context
+                                .read<TravelNoteBloc>()
+                                .add(DeleteDeposit(deposit.id!));
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Color _getAvatarColor(int index) {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.red,
+      Colors.teal
+    ];
+    return colors[index % colors.length];
+  }
+
+  void _showAddDepositDialog(BuildContext context, List members) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _AddDepositDialog(
+        tripId: tripId,
+        members: members,
+        onSave: (deposit) {
+          context.read<TravelNoteBloc>().add(AddDeposit(deposit));
+        },
       ),
     );
   }
@@ -184,6 +344,7 @@ class _MembersTab extends StatelessWidget {
   void _showAddMemberDialog(BuildContext context) {
     showDialog(
       context: context,
+      fullscreenDialog: true,
       builder: (dialogContext) => _AddMemberDialog(
         tripId: tripId,
         onSave: (member) {
@@ -244,36 +405,40 @@ class _AddMemberDialogState extends State<_AddMemberDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(S.current.addMember),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: S.current.name,
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
+      content: Container(
+        width: 500,
+        margin: EdgeInsets.symmetric(horizontal: 16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: S.current.name,
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a name';
+                  }
+                  return null;
+                },
               ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter a name';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: S.current.email,
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: S.current.email,
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.phone),
+                ),
+                keyboardType: TextInputType.emailAddress,
               ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [
@@ -828,6 +993,146 @@ class _AddNoteDialogState extends State<_AddNoteDialog> {
       );
 
       widget.onSave(note);
+      Navigator.pop(context);
+    }
+  }
+}
+
+class _AddDepositDialog extends StatefulWidget {
+  final int tripId;
+  final List members;
+  final Function(DepositModel) onSave;
+
+  const _AddDepositDialog({
+    required this.tripId,
+    required this.members,
+    required this.onSave,
+  });
+
+  @override
+  State<_AddDepositDialog> createState() => _AddDepositDialogState();
+}
+
+class _AddDepositDialogState extends State<_AddDepositDialog> {
+  final _formKey = GlobalKey<FormBuilderState>();
+  final _amountController = TextEditingController();
+  int? _selectedMemberId;
+  String spelledAmount = '';
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(S.current.addDeposit),
+      content: Container(
+        width: 500,
+        child: FormBuilder(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FormBuilderDropdown<int>(
+                initialValue: _selectedMemberId,
+                decoration: const InputDecoration(
+                  labelText: 'Member',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+                items: widget.members.map((member) {
+                  return DropdownMenuItem<int>(
+                    value: member.id,
+                    child: Text(member.name),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedMemberId = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select a member';
+                  }
+                  return null;
+                },
+                name: 'member',
+              ),
+              const SizedBox(height: 16),
+              FormBuilderTextField(
+                name: 'amount',
+                controller: _amountController,
+                decoration: InputDecoration(
+                  helperText: spelledAmount,
+                  labelText: S.of(context).amountLabel,
+                  prefixText:
+                      '${NumberFormat.simpleCurrency(locale: context.read<CurrencyCubit>().state.languageCode).currencySymbol} ',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  MoneyInputFormatter(),
+                ],
+                onChanged: (value) => setState(() {
+                  if (value?.isEmpty ?? true) {
+                    spelledAmount = '';
+                    return;
+                  }
+                  final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
+                  final amount = double.parse(
+                      cleanAmount ?? '0'); // Convert back to actual amount
+                  context.read<CurrencyCubit>().state.languageCode == 'vi'
+                      ? spelledAmount = SpellNumber().spellMoneyVND(amount)
+                      : spelledAmount = SpellNumber().spellMoney(amount);
+                }),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(
+                      errorText: S.of(context).fieldRequired),
+                  (value) {
+                    if (value == null || value.isEmpty) return null;
+                    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+                    if (cleanValue.isEmpty || double.parse(cleanValue) <= 0) {
+                      return S.of(context).amountMustBePositive;
+                    }
+                    return null;
+                  },
+                ]),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(S.current.cancel),
+        ),
+        ElevatedButton(
+          onPressed: _saveDeposit,
+          child: Text(S.current.add),
+        ),
+      ],
+    );
+  }
+
+  void _saveDeposit() {
+    if (_formKey.currentState?.saveAndValidate() ?? false) {
+      final deposit = DepositModel(
+        tripId: widget.tripId,
+        memberId: _selectedMemberId!,
+        amount: double.parse(_amountController.text.trim().replaceAll('.', '')),
+        createdAt: DateTime.now(),
+      );
+
+      widget.onSave(deposit);
       Navigator.pop(context);
     }
   }

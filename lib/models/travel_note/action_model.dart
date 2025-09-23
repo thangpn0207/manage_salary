@@ -7,6 +7,7 @@ class ActionModel extends Equatable {
   final int tripId;
   final String title;
   final String? description;
+  final bool isGroupBudget;
   final int payerId;
   final double amount;
   final SplitType splitType;
@@ -14,6 +15,7 @@ class ActionModel extends Equatable {
   final DateTime updatedAt;
 
   const ActionModel({
+    required this.isGroupBudget,
     this.id,
     required this.tripId,
     required this.title,
@@ -31,6 +33,7 @@ class ActionModel extends Equatable {
     String? title,
     String? description,
     int? payerId,
+    bool? isGroupBudget,
     double? amount,
     SplitType? splitType,
     DateTime? createdAt,
@@ -46,6 +49,7 @@ class ActionModel extends Equatable {
       splitType: splitType ?? this.splitType,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isGroupBudget: isGroupBudget ?? this.isGroupBudget,
     );
   }
 
@@ -60,5 +64,6 @@ class ActionModel extends Equatable {
         splitType,
         createdAt,
         updatedAt,
+        isGroupBudget
       ];
 }

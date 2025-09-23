@@ -717,6 +717,15 @@ class $ActionsTable extends Actions with TableInfo<$ActionsTable, Action> {
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isGroupBudgetMeta =
+      const VerificationMeta('isGroupBudget');
+  @override
+  late final GeneratedColumn<bool> isGroupBudget = GeneratedColumn<bool>(
+      'is_group_budget', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_group_budget" IN (0, 1))'));
   static const VerificationMeta _payerIdMeta =
       const VerificationMeta('payerId');
   @override
@@ -758,6 +767,7 @@ class $ActionsTable extends Actions with TableInfo<$ActionsTable, Action> {
         tripId,
         title,
         description,
+        isGroupBudget,
         payerId,
         amount,
         splitType,
@@ -794,6 +804,14 @@ class $ActionsTable extends Actions with TableInfo<$ActionsTable, Action> {
           _descriptionMeta,
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('is_group_budget')) {
+      context.handle(
+          _isGroupBudgetMeta,
+          isGroupBudget.isAcceptableOrUnknown(
+              data['is_group_budget']!, _isGroupBudgetMeta));
+    } else if (isInserting) {
+      context.missing(_isGroupBudgetMeta);
     }
     if (data.containsKey('payer_id')) {
       context.handle(_payerIdMeta,
@@ -832,6 +850,8 @@ class $ActionsTable extends Actions with TableInfo<$ActionsTable, Action> {
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      isGroupBudget: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_group_budget'])!,
       payerId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}payer_id'])!,
       amount: attachedDatabase.typeMapping
@@ -860,6 +880,7 @@ class Action extends DataClass implements Insertable<Action> {
   final int tripId;
   final String title;
   final String? description;
+  final bool isGroupBudget;
   final int payerId;
   final double amount;
   final SplitType splitType;
@@ -870,6 +891,7 @@ class Action extends DataClass implements Insertable<Action> {
       required this.tripId,
       required this.title,
       this.description,
+      required this.isGroupBudget,
       required this.payerId,
       required this.amount,
       required this.splitType,
@@ -884,6 +906,7 @@ class Action extends DataClass implements Insertable<Action> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
+    map['is_group_budget'] = Variable<bool>(isGroupBudget);
     map['payer_id'] = Variable<int>(payerId);
     map['amount'] = Variable<double>(amount);
     {
@@ -903,6 +926,7 @@ class Action extends DataClass implements Insertable<Action> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      isGroupBudget: Value(isGroupBudget),
       payerId: Value(payerId),
       amount: Value(amount),
       splitType: Value(splitType),
@@ -919,6 +943,7 @@ class Action extends DataClass implements Insertable<Action> {
       tripId: serializer.fromJson<int>(json['tripId']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String?>(json['description']),
+      isGroupBudget: serializer.fromJson<bool>(json['isGroupBudget']),
       payerId: serializer.fromJson<int>(json['payerId']),
       amount: serializer.fromJson<double>(json['amount']),
       splitType: $ActionsTable.$convertersplitType
@@ -935,6 +960,7 @@ class Action extends DataClass implements Insertable<Action> {
       'tripId': serializer.toJson<int>(tripId),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String?>(description),
+      'isGroupBudget': serializer.toJson<bool>(isGroupBudget),
       'payerId': serializer.toJson<int>(payerId),
       'amount': serializer.toJson<double>(amount),
       'splitType': serializer
@@ -949,6 +975,7 @@ class Action extends DataClass implements Insertable<Action> {
           int? tripId,
           String? title,
           Value<String?> description = const Value.absent(),
+          bool? isGroupBudget,
           int? payerId,
           double? amount,
           SplitType? splitType,
@@ -959,6 +986,7 @@ class Action extends DataClass implements Insertable<Action> {
         tripId: tripId ?? this.tripId,
         title: title ?? this.title,
         description: description.present ? description.value : this.description,
+        isGroupBudget: isGroupBudget ?? this.isGroupBudget,
         payerId: payerId ?? this.payerId,
         amount: amount ?? this.amount,
         splitType: splitType ?? this.splitType,
@@ -972,6 +1000,9 @@ class Action extends DataClass implements Insertable<Action> {
       title: data.title.present ? data.title.value : this.title,
       description:
           data.description.present ? data.description.value : this.description,
+      isGroupBudget: data.isGroupBudget.present
+          ? data.isGroupBudget.value
+          : this.isGroupBudget,
       payerId: data.payerId.present ? data.payerId.value : this.payerId,
       amount: data.amount.present ? data.amount.value : this.amount,
       splitType: data.splitType.present ? data.splitType.value : this.splitType,
@@ -987,6 +1018,7 @@ class Action extends DataClass implements Insertable<Action> {
           ..write('tripId: $tripId, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
+          ..write('isGroupBudget: $isGroupBudget, ')
           ..write('payerId: $payerId, ')
           ..write('amount: $amount, ')
           ..write('splitType: $splitType, ')
@@ -997,8 +1029,8 @@ class Action extends DataClass implements Insertable<Action> {
   }
 
   @override
-  int get hashCode => Object.hash(id, tripId, title, description, payerId,
-      amount, splitType, createdAt, updatedAt);
+  int get hashCode => Object.hash(id, tripId, title, description, isGroupBudget,
+      payerId, amount, splitType, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1007,6 +1039,7 @@ class Action extends DataClass implements Insertable<Action> {
           other.tripId == this.tripId &&
           other.title == this.title &&
           other.description == this.description &&
+          other.isGroupBudget == this.isGroupBudget &&
           other.payerId == this.payerId &&
           other.amount == this.amount &&
           other.splitType == this.splitType &&
@@ -1019,6 +1052,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
   final Value<int> tripId;
   final Value<String> title;
   final Value<String?> description;
+  final Value<bool> isGroupBudget;
   final Value<int> payerId;
   final Value<double> amount;
   final Value<SplitType> splitType;
@@ -1029,6 +1063,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
     this.tripId = const Value.absent(),
     this.title = const Value.absent(),
     this.description = const Value.absent(),
+    this.isGroupBudget = const Value.absent(),
     this.payerId = const Value.absent(),
     this.amount = const Value.absent(),
     this.splitType = const Value.absent(),
@@ -1040,6 +1075,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
     required int tripId,
     required String title,
     this.description = const Value.absent(),
+    required bool isGroupBudget,
     required int payerId,
     required double amount,
     required SplitType splitType,
@@ -1047,6 +1083,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
     this.updatedAt = const Value.absent(),
   })  : tripId = Value(tripId),
         title = Value(title),
+        isGroupBudget = Value(isGroupBudget),
         payerId = Value(payerId),
         amount = Value(amount),
         splitType = Value(splitType);
@@ -1055,6 +1092,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
     Expression<int>? tripId,
     Expression<String>? title,
     Expression<String>? description,
+    Expression<bool>? isGroupBudget,
     Expression<int>? payerId,
     Expression<double>? amount,
     Expression<int>? splitType,
@@ -1066,6 +1104,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
       if (tripId != null) 'trip_id': tripId,
       if (title != null) 'title': title,
       if (description != null) 'description': description,
+      if (isGroupBudget != null) 'is_group_budget': isGroupBudget,
       if (payerId != null) 'payer_id': payerId,
       if (amount != null) 'amount': amount,
       if (splitType != null) 'split_type': splitType,
@@ -1079,6 +1118,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
       Value<int>? tripId,
       Value<String>? title,
       Value<String?>? description,
+      Value<bool>? isGroupBudget,
       Value<int>? payerId,
       Value<double>? amount,
       Value<SplitType>? splitType,
@@ -1089,6 +1129,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
       tripId: tripId ?? this.tripId,
       title: title ?? this.title,
       description: description ?? this.description,
+      isGroupBudget: isGroupBudget ?? this.isGroupBudget,
       payerId: payerId ?? this.payerId,
       amount: amount ?? this.amount,
       splitType: splitType ?? this.splitType,
@@ -1111,6 +1152,9 @@ class ActionsCompanion extends UpdateCompanion<Action> {
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
+    }
+    if (isGroupBudget.present) {
+      map['is_group_budget'] = Variable<bool>(isGroupBudget.value);
     }
     if (payerId.present) {
       map['payer_id'] = Variable<int>(payerId.value);
@@ -1138,6 +1182,7 @@ class ActionsCompanion extends UpdateCompanion<Action> {
           ..write('tripId: $tripId, ')
           ..write('title: $title, ')
           ..write('description: $description, ')
+          ..write('isGroupBudget: $isGroupBudget, ')
           ..write('payerId: $payerId, ')
           ..write('amount: $amount, ')
           ..write('splitType: $splitType, ')
@@ -3263,6 +3308,7 @@ typedef $$ActionsTableCreateCompanionBuilder = ActionsCompanion Function({
   required int tripId,
   required String title,
   Value<String?> description,
+  required bool isGroupBudget,
   required int payerId,
   required double amount,
   required SplitType splitType,
@@ -3274,6 +3320,7 @@ typedef $$ActionsTableUpdateCompanionBuilder = ActionsCompanion Function({
   Value<int> tripId,
   Value<String> title,
   Value<String?> description,
+  Value<bool> isGroupBudget,
   Value<int> payerId,
   Value<double> amount,
   Value<SplitType> splitType,
@@ -3346,6 +3393,9 @@ class $$ActionsTableFilterComposer
 
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isGroupBudget => $composableBuilder(
+      column: $table.isGroupBudget, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get amount => $composableBuilder(
       column: $table.amount, builder: (column) => ColumnFilters(column));
@@ -3441,6 +3491,10 @@ class $$ActionsTableOrderingComposer
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get isGroupBudget => $composableBuilder(
+      column: $table.isGroupBudget,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get amount => $composableBuilder(
       column: $table.amount, builder: (column) => ColumnOrderings(column));
 
@@ -3511,6 +3565,9 @@ class $$ActionsTableAnnotationComposer
 
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<bool> get isGroupBudget => $composableBuilder(
+      column: $table.isGroupBudget, builder: (column) => column);
 
   GeneratedColumn<double> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
@@ -3614,6 +3671,7 @@ class $$ActionsTableTableManager extends RootTableManager<
             Value<int> tripId = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String?> description = const Value.absent(),
+            Value<bool> isGroupBudget = const Value.absent(),
             Value<int> payerId = const Value.absent(),
             Value<double> amount = const Value.absent(),
             Value<SplitType> splitType = const Value.absent(),
@@ -3625,6 +3683,7 @@ class $$ActionsTableTableManager extends RootTableManager<
             tripId: tripId,
             title: title,
             description: description,
+            isGroupBudget: isGroupBudget,
             payerId: payerId,
             amount: amount,
             splitType: splitType,
@@ -3636,6 +3695,7 @@ class $$ActionsTableTableManager extends RootTableManager<
             required int tripId,
             required String title,
             Value<String?> description = const Value.absent(),
+            required bool isGroupBudget,
             required int payerId,
             required double amount,
             required SplitType splitType,
@@ -3647,6 +3707,7 @@ class $$ActionsTableTableManager extends RootTableManager<
             tripId: tripId,
             title: title,
             description: description,
+            isGroupBudget: isGroupBudget,
             payerId: payerId,
             amount: amount,
             splitType: splitType,

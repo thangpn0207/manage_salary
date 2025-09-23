@@ -140,7 +140,7 @@ class TravelNoteBloc extends Bloc<TravelNoteEvent, TravelNoteState> {
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
     } finally {
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -149,14 +149,17 @@ class TravelNoteBloc extends Bloc<TravelNoteEvent, TravelNoteState> {
     try {
       final trip = await _repository.getTripById(event.tripId);
       emit(state.copyWith(selectedTrip: trip));
-      // Load related data
-      add(LoadMembers(event.tripId));
-      add(LoadActions(event.tripId));
-      add(LoadDeposits(event.tripId));
-      add(LoadTravelNotes(event.tripId));
+      _onLoadDataTrip(event.tripId);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
     }
+  }
+
+  void _onLoadDataTrip(int tripId) {
+    add(LoadMembers(tripId));
+    add(LoadActions(tripId));
+    add(LoadDeposits(tripId));
+    add(LoadTravelNotes(tripId));
   }
 
   Future<void> _onLoadMembers(
@@ -181,6 +184,7 @@ class TravelNoteBloc extends Bloc<TravelNoteEvent, TravelNoteState> {
     try {
       emit(state.copyWith(isLoading: true));
       await _repository.createMember(event.member);
+      _onLoadDataTrip(state.selectedTrip!.id!);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
     } finally {
@@ -193,6 +197,7 @@ class TravelNoteBloc extends Bloc<TravelNoteEvent, TravelNoteState> {
     try {
       emit(state.copyWith(isLoading: true));
       await _repository.updateMember(event.member);
+      _onLoadDataTrip(state.selectedTrip!.id!);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
     } finally {
@@ -205,6 +210,7 @@ class TravelNoteBloc extends Bloc<TravelNoteEvent, TravelNoteState> {
     try {
       emit(state.copyWith(isLoading: true));
       await _repository.deleteMember(event.memberId);
+      _onLoadDataTrip(state.selectedTrip!.id!);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
     } finally {

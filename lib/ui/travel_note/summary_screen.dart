@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:intl/intl.dart';
 
 import '../../bloc/concurrent/concurrent_cubit.dart';
 import '../../bloc/travel_note/travel_note_bloc.dart';
@@ -11,10 +7,7 @@ import '../../bloc/travel_note/travel_note_event.dart';
 import '../../bloc/travel_note/travel_note_state.dart';
 import '../../core/locale/generated/l10n.dart';
 import '../../core/util/balance_calculator.dart';
-import '../../core/util/formatter.dart';
 import '../../core/util/money_util.dart';
-import '../../core/util/spell_number.dart';
-import '../../models/travel_note/deposit.dart';
 
 class SummaryScreen extends StatefulWidget {
   final int tripId;
@@ -58,6 +51,9 @@ class _SummaryScreenState extends State<SummaryScreen> {
 
         final summary = state.summary!;
         final totalTripCost = summary['totalTripCost'] as double;
+        final remainingGroupDeposit =
+            summary['remainingGroupDeposit'] as double;
+        final totalGroupBudget = summary['totalGroupBudget'] as double;
         final memberBalances = summary['memberBalances'] as List<MemberBalance>;
         final settlements = summary['settlements'] as List<Settlement>;
 
@@ -67,103 +63,99 @@ class _SummaryScreenState extends State<SummaryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Total Trip Cost Card
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.account_balance_wallet,
-                        size: 48,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Total Trip Cost',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        MoneyUtil.formatDefault(totalTripCost,
-                            currency: context
-                                .read<CurrencyCubit>()
-                                .state
-                                .languageCode),
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Deposits Section
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Deposits',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.wallet,
+                              size: 48,
+                              color: Theme.of(context).highlightColor,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              S.current.totalTripCost,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              MoneyUtil.formatDefault(totalTripCost,
+                                  currency: context
+                                      .read<CurrencyCubit>()
+                                      .state
+                                      .languageCode),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineMedium
+                                  ?.copyWith(
+                                    fontSize: 14,
+                                    color: Colors.redAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
                         ),
+                      ),
+                    ),
                   ),
-                  const Spacer(),
-                  TextButton.icon(
-                    onPressed: () =>
-                        _showAddDepositDialog(context, state.members),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Deposit'),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet,
+                            size: 48,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            S.current.remainingGroupDeposit,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            MoneyUtil.formatDefault(remainingGroupDeposit,
+                                currency: context
+                                    .read<CurrencyCubit>()
+                                    .state
+                                    .languageCode),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.copyWith(
+                                  fontSize: 14,
+                                  color: Theme.of(context).primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              if (state.deposits.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Center(
-                      child: Text('No deposits recorded'),
-                    ),
-                  ),
-                )
-              else
-                ...state.deposits.map((deposit) {
-                  final member =
-                      state.members.firstWhere((m) => m.id == deposit.memberId);
-                  return Card(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.green,
-                        child: const Icon(Icons.savings, color: Colors.white),
-                      ),
-                      title: Text(member.name),
-                      trailing: Text(
-                        MoneyUtil.formatDefault(deposit.amount,
-                            currency: context
-                                .read<CurrencyCubit>()
-                                .state
-                                .languageCode),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
               const SizedBox(height: 24),
-
               // Member Balances
               Text(
-                'Member Balances',
+                S.current.memberBalances,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -235,7 +227,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Paid',
+                                    S.current.paid,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
@@ -260,7 +252,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Owes',
+                                    S.current.owes,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
@@ -285,7 +277,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Deposit',
+                                    S.current.deposit,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
@@ -311,13 +303,13 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     ),
                   ),
                 );
-              }).toList(),
+              }),
               const SizedBox(height: 24),
 
               // Settlements
               if (settlements.isNotEmpty) ...[
                 Text(
-                  'Suggested Settlements',
+                  S.current.suggestedSettlements,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -325,7 +317,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
                 const SizedBox(height: 8),
                 ...settlements.map((settlement) {
                   return Card(
-                    color: Colors.orange.withValues(alpha: 0.1),
                     child: ListTile(
                       leading: const CircleAvatar(
                         backgroundColor: Colors.orange,
@@ -378,155 +369,5 @@ class _SummaryScreenState extends State<SummaryScreen> {
         );
       },
     );
-  }
-
-  void _showAddDepositDialog(BuildContext context, List members) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => _AddDepositDialog(
-        tripId: widget.tripId,
-        members: members,
-        onSave: (deposit) {
-          context.read<TravelNoteBloc>().add(AddDeposit(deposit));
-        },
-      ),
-    );
-  }
-}
-
-class _AddDepositDialog extends StatefulWidget {
-  final int tripId;
-  final List members;
-  final Function(DepositModel) onSave;
-
-  const _AddDepositDialog({
-    required this.tripId,
-    required this.members,
-    required this.onSave,
-  });
-
-  @override
-  State<_AddDepositDialog> createState() => _AddDepositDialogState();
-}
-
-class _AddDepositDialogState extends State<_AddDepositDialog> {
-  final _formKey = GlobalKey<FormBuilderState>();
-  final _amountController = TextEditingController();
-  int? _selectedMemberId;
-  String spelledAmount = '';
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add Deposit'),
-      content: FormBuilder(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FormBuilderDropdown<int>(
-              initialValue: _selectedMemberId,
-              decoration: const InputDecoration(
-                labelText: 'Member',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
-              ),
-              items: widget.members.map((member) {
-                return DropdownMenuItem<int>(
-                  value: member.id,
-                  child: Text(member.name),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedMemberId = value;
-                });
-              },
-              validator: (value) {
-                if (value == null) {
-                  return 'Please select a member';
-                }
-                return null;
-              },
-              name: 'member',
-            ),
-            const SizedBox(height: 16),
-            FormBuilderTextField(
-              name: 'amount',
-              controller: _amountController,
-              decoration: InputDecoration(
-                helperText: spelledAmount,
-                labelText: S.of(context).amountLabel,
-                prefixText:
-                    '${NumberFormat.simpleCurrency(locale: context.read<CurrencyCubit>().state.languageCode).currencySymbol} ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                MoneyInputFormatter(),
-              ],
-              onChanged: (value) => setState(() {
-                if (value?.isEmpty ?? true) {
-                  spelledAmount = '';
-                  return;
-                }
-                final cleanAmount = value?.replaceAll(RegExp(r'[^\d]'), '');
-                final amount = double.parse(
-                    cleanAmount ?? '0'); // Convert back to actual amount
-                context.read<CurrencyCubit>().state.languageCode == 'vi'
-                    ? spelledAmount = SpellNumber().spellMoneyVND(amount)
-                    : spelledAmount = SpellNumber().spellMoney(amount);
-              }),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(
-                    errorText: S.of(context).fieldRequired),
-                (value) {
-                  if (value == null || value.isEmpty) return null;
-                  final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
-                  if (cleanValue.isEmpty || double.parse(cleanValue) <= 0) {
-                    return S.of(context).amountMustBePositive;
-                  }
-                  return null;
-                },
-              ]),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: _saveDeposit,
-          child: const Text('Add'),
-        ),
-      ],
-    );
-  }
-
-  void _saveDeposit() {
-    if (_formKey.currentState?.saveAndValidate() ?? false) {
-      final deposit = DepositModel(
-        tripId: widget.tripId,
-        memberId: _selectedMemberId!,
-        amount: double.parse(_amountController.text.trim().replaceAll('.', '')),
-        createdAt: DateTime.now(),
-      );
-
-      widget.onSave(deposit);
-      Navigator.pop(context);
-    }
   }
 }

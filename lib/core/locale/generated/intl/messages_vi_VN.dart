@@ -81,6 +81,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "addActivityButton": MessageLookupByLibrary.simpleMessage("Thêm hoạt động"),
     "addActivitySuccess": m2,
     "addBudget": MessageLookupByLibrary.simpleMessage("Thêm ngân sách"),
+    "addDeposit": MessageLookupByLibrary.simpleMessage("Bốc họ"),
     "addExpenses": MessageLookupByLibrary.simpleMessage("Thêm chi phí"),
     "addMember": MessageLookupByLibrary.simpleMessage("Thêm thành viên"),
     "addMemberFirstEx": MessageLookupByLibrary.simpleMessage(
@@ -144,12 +145,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "currentSpending": MessageLookupByLibrary.simpleMessage(
       "Chi tiêu hiện tại",
     ),
+    "customSplit": MessageLookupByLibrary.simpleMessage("Tự chia"),
+    "customSplitAmount": MessageLookupByLibrary.simpleMessage("Số tiền chia"),
+    "customSplitDes": MessageLookupByLibrary.simpleMessage(
+      "Tự nhập số tiền chia mỗi người trong nhóm",
+    ),
     "darkMode": MessageLookupByLibrary.simpleMessage("Chế độ tối"),
     "dashboard": MessageLookupByLibrary.simpleMessage("Bảng điều khiển"),
     "dateLabelPrefix": MessageLookupByLibrary.simpleMessage("Ngày: "),
     "delete": MessageLookupByLibrary.simpleMessage("Xóa"),
     "deleteMember": MessageLookupByLibrary.simpleMessage("Xóa thành viên"),
     "deleteTrip": MessageLookupByLibrary.simpleMessage("Xóa chuyến đi"),
+    "deposit": MessageLookupByLibrary.simpleMessage("Đóng họ"),
+    "deposits": MessageLookupByLibrary.simpleMessage("Những bát họ"),
     "description": MessageLookupByLibrary.simpleMessage(
       "Mô tả (Không bắt buộc)",
     ),
@@ -158,10 +166,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "editExpense": MessageLookupByLibrary.simpleMessage("Sửa chi phí"),
     "editRecurring": MessageLookupByLibrary.simpleMessage("Sửa định kỳ"),
     "editTrip": MessageLookupByLibrary.simpleMessage("Sửa chuyến đi"),
-    "email": MessageLookupByLibrary.simpleMessage("Email (Không bắt buộc)"),
+    "email": MessageLookupByLibrary.simpleMessage(
+      "SDT đòi nợ (Không bắt buộc)",
+    ),
     "endDate": MessageLookupByLibrary.simpleMessage("Ngày kết thúc"),
     "enterValidNumber": MessageLookupByLibrary.simpleMessage(
       "Vui lòng nhập số hợp lệ",
+    ),
+    "equalSplit": MessageLookupByLibrary.simpleMessage("Chia đều hết"),
+    "equalSplitDes": MessageLookupByLibrary.simpleMessage(
+      "Chia đều cho mỗi người trong nhóm",
     ),
     "expenseTitle": MessageLookupByLibrary.simpleMessage("Tiêu đề chi phí"),
     "expenses": MessageLookupByLibrary.simpleMessage("Chi phí"),
@@ -181,10 +195,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "frequencyWeekly": MessageLookupByLibrary.simpleMessage("Hằng tuần"),
     "frequencyYearly": MessageLookupByLibrary.simpleMessage("Hằng năm"),
     "income": MessageLookupByLibrary.simpleMessage("Thu nhập"),
+    "isUsingGroupBudget": MessageLookupByLibrary.simpleMessage("Dùng tiền quỹ"),
     "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
     "manageBudgets": MessageLookupByLibrary.simpleMessage("Quản lý ngân sách"),
     "manageRecurring": MessageLookupByLibrary.simpleMessage("Quản lý định kỳ"),
     "member": MessageLookupByLibrary.simpleMessage("Thành viên"),
+    "memberBalances": MessageLookupByLibrary.simpleMessage(
+      "Chi tiêu theo thành viên",
+    ),
     "name": MessageLookupByLibrary.simpleMessage("Tên"),
     "noBudgetsSet": MessageLookupByLibrary.simpleMessage(
       "Chưa có ngân sách nào",
@@ -193,6 +211,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Không có dữ liệu chi tiêu trong giai đoạn này để hiển thị biểu đồ.",
     ),
     "noDatesSet": MessageLookupByLibrary.simpleMessage("Chưa đặt ngày"),
+    "noDepositsYet": MessageLookupByLibrary.simpleMessage(
+      "Nhóm chưa đóng gì??",
+    ),
     "noEndDate": MessageLookupByLibrary.simpleMessage("Không có ngày kết thúc"),
     "noExpenseActivities": MessageLookupByLibrary.simpleMessage(
       "Chưa có hoạt động chi tiêu nào.",
@@ -214,6 +235,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "ngân sách đã sử dụng",
     ),
     "otherCategory": MessageLookupByLibrary.simpleMessage("Khác"),
+    "owes": MessageLookupByLibrary.simpleMessage("Ăn mất"),
+    "paid": MessageLookupByLibrary.simpleMessage("Thanh toán"),
     "paidBy": m7,
     "period": MessageLookupByLibrary.simpleMessage("Chu kỳ"),
     "pleaseEnterAmount": MessageLookupByLibrary.simpleMessage(
@@ -226,12 +249,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Vui lòng nhập tiêu đề chuyến đi",
     ),
     "remaining": MessageLookupByLibrary.simpleMessage("Còn lại"),
+    "remainingGroupDeposit": MessageLookupByLibrary.simpleMessage(
+      "Tiền đóng họ còn dư",
+    ),
     "remove": MessageLookupByLibrary.simpleMessage("Xóa"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("Lưu thay đổi"),
     "selectDate": MessageLookupByLibrary.simpleMessage("Chọn ngày"),
     "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
     "spent": MessageLookupByLibrary.simpleMessage("Đã chi"),
+    "splitType": MessageLookupByLibrary.simpleMessage("Kiểu chia tiền"),
     "startDate": MessageLookupByLibrary.simpleMessage("Ngày bắt đầu"),
+    "suggestedSettlements": MessageLookupByLibrary.simpleMessage(
+      "Gợi ý thanh toán",
+    ),
     "summary": MessageLookupByLibrary.simpleMessage("Tóm tắt"),
     "sureDeleteTrip": m8,
     "tapToAddBudget": MessageLookupByLibrary.simpleMessage(
@@ -243,6 +273,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "totalBalance": MessageLookupByLibrary.simpleMessage("Tổng số dư"),
     "totalExpenses": MessageLookupByLibrary.simpleMessage("Tổng chi phí"),
+    "totalTripCost": MessageLookupByLibrary.simpleMessage("Chuyến này mất"),
     "travelNotes": MessageLookupByLibrary.simpleMessage("Ghi chú chuyến đi"),
     "tripDetail": MessageLookupByLibrary.simpleMessage("Chi tiết chuyến đi"),
     "tripMember": m9,

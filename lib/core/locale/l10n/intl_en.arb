@@ -123,7 +123,7 @@
   "areYouSureDeleteMember": "Are you sure you want to remove {name} from this trip?",
   "addNewMember": "Add New Member",
   "name": "Name",
-  "email": "Email (Optional)",
+  "email": "Phone (Optional)",
   "addMemberFirstEx": "Add members first before creating expenses",
   "noExpenses": "No expenses yet",
   "addExpenses": "Add Expense",
@@ -137,5 +137,25 @@
   "addNewExpense": "Add New Expense",
   "expenseTitle": "Expense Title",
   "pleaseEnterExpenseTitle": "Please enter an expense title",
-  "pleaseEnterAmount": "Please enter an amount"
+  "pleaseEnterAmount": "Please enter an amount",
+  "isUsingGroupBudget": "Using group budget",
+  "splitType": "Split Type",
+  "equalSplit": "Equal Split",
+  "equalSplitDes": "Split equally among all members",
+  "customSplit": "Custom Split",
+  "customSplitDes": "Set custom amounts for each member",
+  "customSplitAmount": "Custom Split Amount",
+
+  "deposit": "Deposit",
+  "addDeposit": "Add deposit",
+  "noDepositsYet": "No deposits yet",
+
+  "deposits": "Deposits",
+  "remainingGroupDeposit": "Remaining Group Deposit",
+  "memberBalances": "Member Balances",
+  "paid": "Paid",
+  "owes": "Owes",
+  "totalTripCost": "Total Trip Cost",
+  "suggestedSettlements": "Suggested Settlements"
+
 }
