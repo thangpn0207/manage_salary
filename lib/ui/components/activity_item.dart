@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:manage_salary/core/util/money_util.dart';
 
+import '../../bloc/concurrent/concurrent_cubit.dart';
 import '../../models/activity_data.dart'; // For currency formatting
 
 class ActivityListItem extends StatelessWidget {
@@ -50,7 +52,7 @@ class ActivityListItem extends StatelessWidget {
       case ActivityType.travel:
         return Icons.flight_takeoff_outlined; // Updated icon
       case ActivityType.expenseOther:
-      // Fallback icon for expenseOther or any unexpected value
+        // Fallback icon for expenseOther or any unexpected value
         return Icons.receipt_long_outlined;
     }
   }
@@ -69,7 +71,8 @@ class ActivityListItem extends StatelessWidget {
     final Color iconBackgroundColor = colorScheme.surfaceContainerHighest;
     final Color iconColor = colorScheme.onSurfaceVariant;
     final Color amountColor = activity.nature == ActivityNature.income
-        ? Colors.green.shade700 // Consider using theme colors like colorScheme.tertiary
+        ? Colors.green
+            .shade700 // Consider using theme colors like colorScheme.tertiary
         : colorScheme.error; // Use theme error color for expenses
 
     final itemContent = ListTile(
@@ -83,7 +86,8 @@ class ActivityListItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.0),
         ),
         // Use the updated icon helper and the activity's type field
-        child: Icon(_getIconForType(activity.type), color: iconColor, size: 24.0),
+        child:
+            Icon(_getIconForType(activity.type), color: iconColor, size: 24.0),
       ),
       title: Text(
         activity.title,
@@ -99,7 +103,7 @@ class ActivityListItem extends StatelessWidget {
       ),
       trailing: Text(
         // Add sign based on nature for clarity
-        '${activity.nature == ActivityNature.income ? '+' : '-'}${MoneyUtil.formatDefault(activity.amount)}',
+        '${activity.nature == ActivityNature.income ? '+' : '-'}${MoneyUtil.formatDefault(activity.amount, currency: context.read<CurrencyCubit>().state.languageCode)}',
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w600,
           color: amountColor,
@@ -107,8 +111,8 @@ class ActivityListItem extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Adjusted padding
+      contentPadding: const EdgeInsets.symmetric(
+          vertical: 8.0, horizontal: 16.0), // Adjusted padding
     );
 
     // Wrap with Dismissible if onDismissed callback is provided

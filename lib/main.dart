@@ -43,6 +43,8 @@ void main() async {
     showBlocLogs: kDebugMode,
     showRouteLogs: kDebugMode,
   );
+  // Set bloc observer
+  Bloc.observer = ObserverBloc();
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
         ? HydratedStorageDirectory.web
@@ -52,7 +54,5 @@ void main() async {
   // Initialize dependencies with environment
   await inject.init(BuildConfig.debug ? "dev" : "prod");
 
-  // Set bloc observer
-  Bloc.observer = ObserverBloc();
   runApp(const MyApp());
 }

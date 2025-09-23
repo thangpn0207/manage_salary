@@ -193,7 +193,6 @@ class SettingsScreen extends StatelessWidget {
         context.read<ActivityBloc>().add(ClearAllActivities()); // Reset locale
         await HydratedBloc.storage.clear();
         LogUtil.i("HydratedBloc storage cleared.");
-
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
