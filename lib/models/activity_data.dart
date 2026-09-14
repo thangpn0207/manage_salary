@@ -15,6 +15,7 @@ class ActivityData extends Equatable {
       type; // REQUIRED: Category, renamed from activityType, using new enum
   final String?
       recurringActivityId; // Optional: Link to the recurring activity if generated from one
+  final String? currencyCode; // Optional: Currency code at the time of entry (e.g. 'vi', 'en')
 
   ActivityData({
     String? id, // Optional: Will be generated if not provided
@@ -24,6 +25,7 @@ class ActivityData extends Equatable {
     required this.date,
     required this.type, // Now required
     this.recurringActivityId,
+    this.currencyCode,
   })  : assert(amount >= 0, 'Amount must be non-negative'),
         // Enforce positive amount storage
         id = id ??
@@ -33,7 +35,7 @@ class ActivityData extends Equatable {
   @override
   // Include all fields that define the identity and value of an entry
   List<Object?> get props =>
-      [id, nature, title, amount, date, type, recurringActivityId];
+      [id, nature, title, amount, date, type, recurringActivityId, currencyCode];
 
   // --- JSON Serialization for HydratedBloc ---
 
@@ -49,6 +51,7 @@ class ActivityData extends Equatable {
       'type': type.name,
       // Store category name (now required)
       'recurringActivityId': recurringActivityId,
+      'currencyCode': currencyCode,
     };
   }
 
@@ -95,6 +98,7 @@ class ActivityData extends Equatable {
         date: date,
         type: type,
         recurringActivityId: json['recurringActivityId'] as String?,
+        currencyCode: json['currencyCode'] as String?,
       );
     } catch (e, stackTrace) {
       LogUtil.i(
@@ -121,6 +125,7 @@ class ActivityData extends Equatable {
     DateTime? date,
     ActivityType? type,
     String? recurringActivityId,
+    String? currencyCode,
     bool clearRecurringId = false, // Flag to explicitly clear recurring ID
   }) {
     return ActivityData(
@@ -133,6 +138,7 @@ class ActivityData extends Equatable {
       recurringActivityId: clearRecurringId
           ? null
           : (recurringActivityId ?? this.recurringActivityId),
+      currencyCode: currencyCode ?? this.currencyCode,
     );
   }
 }

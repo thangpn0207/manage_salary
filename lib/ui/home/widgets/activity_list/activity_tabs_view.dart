@@ -115,7 +115,10 @@ class _ActivityTabsViewState extends State<ActivityTabsView>
     // Use ListView.builder for performance with long lists
     return ListView.builder(
       physics: const ClampingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(vertical: 8.0), // Add some padding
+      padding: EdgeInsets.only(
+        top: 8.0, 
+        bottom: 8.0 + MediaQuery.of(context).padding.bottom + 100,
+      ), // Add some padding
       itemCount: activities.length,
       itemBuilder: (context, index) {
         final activity = activities[index];

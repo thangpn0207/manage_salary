@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Redesign Showcase · Manager Salary & Cashflow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body class="bg-[#090D16] text-slate-100 min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+  <!-- Showcase Header -->
+  <header class="max-w-6xl w-full mb-8 text-center">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-3">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      HUASHU-DESIGN · 3 HƯỚNG THIẾT KẾ ĐỘC BẢN
+    </div>
+    <h1 class="text-2xl md:text-4xl font-black text-white tracking-tight">
+      Tái Cấu Trúc Toàn Diện Giao Diện & Tính Năng
+    </h1>
+    <p class="text-sm md:text-base text-slate-400 mt-2 max-w-2xl mx-auto">
+      So sánh trực quan 3 phong cách thiết kế UI/UX mới: giải quyết triệt để vấn đề tương phản màu sắc Light/Dark, tích hợp Signature Chart nhận diện thương hiệu, lưu trữ tiền tệ theo từng bản ghi và bố cục tối ưu quảng cáo.
+    </p>
+
+    <!-- Navigation Tabs Between Directions -->
+    <div class="flex flex-wrap items-center justify-center gap-2 mt-6">
+      <button onclick="switchDirection(1)" id="btn-dir-1" class="dir-btn px-4 py-2.5 rounded-2xl text-xs md:text-sm font-bold bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all">
+        <i data-lucide="shield-check" class="w-4 h-4"></i>
+        <span>Hướng 1: Precision FinTech (Đề xuất)</span>
+      </button>
+      <button onclick="switchDirection(2)" id="btn-dir-2" class="dir-btn px-4 py-2.5 rounded-2xl text-xs md:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-2 transition-all">
+        <i data-lucide="sparkles" class="w-4 h-4"></i>
+        <span>Hướng 2: Nordic Minimalist</span>
+      </button>
+      <button onclick="switchDirection(3)" id="btn-dir-3" class="dir-btn px-4 py-2.5 rounded-2xl text-xs md:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-2 transition-all">
+        <i data-lucide="zap" class="w-4 h-4"></i>
+        <span>Hướng 3: Cyber Dynamic</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Live Preview Frame -->
+  <section class="max-w-6xl w-full flex flex-col lg:flex-row items-center justify-center gap-8 mb-12">
+    
+    <!-- Mobile Frame Iframe Viewer -->
+    <div class="w-full max-w-[420px] flex justify-center">
+      <iframe id="previewIframe" src="direction-1-precision-fintech.html" class="w-[400px] h-[870px] rounded-[52px] border-0 shadow-2xl"></iframe>
+    </div>
+
+    <!-- Direction Insights & Comparison Panel -->
+    <div class="w-full lg:max-w-xl space-y-6">
+      
+      <!-- Dynamic Info Card -->
+      <div id="dirInfoCard" class="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 shadow-xl space-y-4">
+        <div class="flex items-center justify-between">
+          <span id="dirTag" class="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">HƯỚNG 1</span>
+          <a id="dirDirectLink" href="direction-1-precision-fintech.html" target="_blank" class="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1">
+            <span>Mở tab riêng</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+
+        <h3 id="dirTitle" class="text-xl font-bold text-white">Precision FinTech · Chuẩn Stripe & Linear</h3>
+        <p id="dirDesc" class="text-xs md:text-sm text-slate-400 leading-relaxed">
+          Độ tương phản tối đa đạt chuẩn WCAG AAA (14:1) trên cả Dark & Light mode. Bỏ hoàn toàn cyan nhạt, dùng hệ Slate-50/Slate-900 kết hợp Emerald #10B981 và Rose #EF4444.
+        </p>
+
+        <!-- Feature Highlights -->
+        <div class="space-y-2.5 pt-2 border-t border-slate-800">
+          <div class="flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="text-xs text-slate-300">
+              <strong class="text-white">Signature Chart:</strong> Dual-wave Cashflow Spline biểu diễn dòng tiền thu - chi mượt mà kèm interactive tooltip.
+            </div>
+          </div>
+
+          <div class="flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="text-xs text-slate-300">
+              <strong class="text-white">Bottom Navigation:</strong> Dock 5 vị trí cao cấp, đưa Bảng Lương ra tab chính, nút (+) nổi bật trung tâm.
+            </div>
+          </div>
+
+          <div class="flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="text-xs text-slate-300">
+              <strong class="text-white">Đa Tiền Tệ & Định dạng số:</strong> Lưu cứng mã tiền tệ cho từng giao dịch, chuyển đổi nhanh giữa dạng rút gọn (15.5M ₫) và chi tiết (15.500.000 ₫).
+            </div>
+          </div>
+
+          <div class="flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="text-xs text-slate-300">
+              <strong class="text-white">Settings Đầy Đủ:</strong> Thêm Chính sách bảo mật (Privacy Policy), Điều khoản, Thông tin phiên bản, Sao lưu dữ liệu chuẩn Play Store / App Store.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action: Direct Links Box -->
+      <div class="p-5 rounded-3xl bg-slate-900/50 border border-slate-800 text-xs text-slate-400 space-y-2">
+        <div class="font-bold text-slate-300 uppercase tracking-wider">💡 Hướng dẫn kiểm tra trực tiếp:</div>
+        <p>• Trong màn hình demo trên, bạn có thể click nút <span class="text-amber-400 font-bold">☀️ / 🌙</span> ở góc trên để đổi giao diện Sáng / Tối.</p>
+        <p>• Click nút <span class="text-emerald-400 font-bold font-mono">15.5M</span> để chuyển đổi định dạng số tiền gọn gàng.</p>
+        <p>• Click nút <span class="text-emerald-400 font-bold">"Chấm công hôm nay"</span> để thử tương tác 1 chạm.</p>
+        <p>• Click icon <span class="text-white font-bold">⚙️ Cài đặt</span> trên thanh điều hướng dưới để xem trang Settings mới đầy đủ pháp lý.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    lucide.createIcons();
+
+    const directions = {
+      1: {
+        file: 'direction-1-precision-fintech.html',
+        tag: 'HƯỚNG 1 (KHUYẾN NGHỊ)',
+        title: 'Precision FinTech · Chuẩn Stripe & Linear',
+        desc: 'Độ tương phản tối đa đạt chuẩn WCAG AAA (14:1) trên cả Dark & Light mode. Bỏ hoàn toàn cyan nhạt, dùng hệ Slate-50/Slate-900 kết hợp Emerald #10B981 và Rose #EF4444.',
+        chart: 'Dual-wave Cashflow Spline biểu diễn dòng tiền thu - chi mượt mà kèm interactive tooltip.',
+        nav: 'Dock 5 vị trí cao cấp, đưa Bảng Lương ra tab chính, nút (+) nổi bật trung tâm.'
+      },
+      2: {
+        file: 'direction-2-nordic-minimalist.html',
+        tag: 'HƯỚNG 2',
+        title: 'Nordic Minimalist · Warm Obsidian & Stacked Bars',
+        desc: 'Phong cách tối giản Bắc Âu ấm áp, dịu mắt. Nền obsidian #121212 / thạch anh #FDFBF7, điểm nhấn vàng hổ phách #F59E0B.',
+        chart: 'Stacked Column Chart ngày-qua-ngày so sánh công làm, giờ OT và chi phí sinh hoạt kèm Donut tiến độ % tiết kiệm.',
+        nav: 'Thanh trượt mềm Haptic Pill bo tròn tối giản.'
+      },
+      3: {
+        file: 'direction-3-cyber-dynamic.html',
+        tag: 'HƯỚNG 3',
+        title: 'Cyber Dynamic · Electric Indigo & Pulse Wave',
+        desc: 'Phong cách Neo-Fintech năng động, tương phản cao trên nền đen vũ trụ #030712 và tím điện #6366F1, tích hợp thẻ Rewarded Ads mở khóa tính năng.',
+        chart: 'Pulse Wave Sparkline nhịp đập tài chính nhận diện các đỉnh chi tiêu bất thường.',
+        nav: 'Glassmorphic Dock với hiệu ứng đèn neon glow phản hồi theo thao tác chạm.'
+      }
+    };
+
+    function switchDirection(num) {
+      const d = directions[num];
+      document.getElementById('previewIframe').src = d.file;
+      document.getElementById('dirTag').textContent = d.tag;
+      document.getElementById('dirTitle').textContent = d.title;
+      document.getElementById('dirDesc').textContent = d.desc;
+      document.getElementById('dirDirectLink').href = d.file;
+
+      // Update button styling
+      document.querySelectorAll('.dir-btn').forEach((btn, idx) => {
+        if (idx + 1 === num) {
+          btn.className = 'dir-btn px-4 py-2.5 rounded-2xl text-xs md:text-sm font-bold bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all';
+        } else {
+          btn.className = 'dir-btn px-4 py-2.5 rounded-2xl text-xs md:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-2 transition-all';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

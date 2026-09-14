@@ -48,6 +48,8 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       final formData = _formKey.currentState?.value;
 
+      final currentCurrencyCode = context.read<CurrencyCubit>().state.languageCode;
+
       final activityData = ActivityData(
         nature: formData?['activityNature'],
         type: formData?['activityType'],
@@ -56,6 +58,7 @@ class _AddActivitySheetContentState extends State<AddActivitySheetContent> {
             double.tryParse(formData?['amount']?.replaceAll('.', '') ?? '0') ??
                 0,
         date: _selectedDate,
+        currencyCode: currentCurrencyCode,
       );
 
       Navigator.pop(context, activityData);

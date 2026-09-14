@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Play Store Feature Graphic Banner - English (1024x500)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 1024px;
+      height: 500px;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #0F172A; /* App Dark Background */
+      color: #FFFFFF;
+      position: relative;
+    }
+
+    /* Ambient Lighting Mesh */
+    .ambient-glow-emerald {
+      position: absolute;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0) 70%);
+      top: -100px;
+      right: 150px;
+      pointer-events: none;
+    }
+    .ambient-glow-amber {
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0) 70%);
+      bottom: -120px;
+      right: -80px;
+      pointer-events: none;
+    }
+    .ambient-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    /* Layout Container */
+    .banner-content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      padding: 44px 52px;
+    }
+
+    /* Left Column: Brand & Copy */
+    .left-col {
+      width: 530px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .icon-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: #FFFFFF;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .icon-badge svg {
+      width: 46px;
+      height: 46px;
+    }
+    .brand-tag {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34D399;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    h1.title {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      margin-bottom: 10px;
+      color: #FFFFFF;
+    }
+    h1.title span {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 50%, #F59E0B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: 15px;
+      color: #94A3B8;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* Benefits List */
+    .features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      color: #E2E8F0;
+      font-weight: 600;
+    }
+    .feature-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: #10B981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feature-check svg {
+      width: 12px;
+      height: 12px;
+      stroke: #FFFFFF;
+      stroke-width: 3;
+    }
+
+    /* Right Column: Dynamic Mockup Phones */
+    .right-col {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Phone 1: Front Mockup (Attendance Calendar) */
+    .phone-front {
+      position: absolute;
+      width: 236px;
+      height: 440px;
+      background: #F8FAFC;
+      border-radius: 36px;
+      border: 6px solid #1E293B;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+      left: 30px;
+      top: 36px;
+      overflow: hidden;
+      transform: rotate(-3deg);
+      z-index: 5;
+    }
+    .phone-notch {
+      width: 72px;
+      height: 14px;
+      background: #1E293B;
+      border-radius: 0 0 10px 10px;
+      margin: 0 auto 10px;
+    }
+    .phone-screen-header {
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #0F172A;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .cal-grid {
+      padding: 0 12px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+    .cal-cell {
+      height: 26px;
+      border-radius: 6px;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      font-size: 9px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+    }
+    .cal-cell.done {
+      background: #10B981;
+      color: #FFFFFF;
+      border-color: #10B981;
+    }
+    .cal-cell.ot {
+      background: #F59E0B;
+      color: #FFFFFF;
+      border-color: #F59E0B;
+    }
+    .cal-card-info {
+      margin: 0 12px;
+      background: #1E293B;
+      color: #FFFFFF;
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .cal-card-title {
+      font-size: 10px;
+      color: #94A3B8;
+      margin-bottom: 3px;
+    }
+    .cal-card-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: #34D399;
+    }
+
+    /* Phone 2: Back Mockup (Salary Sheet) */
+    .phone-back {
+      position: absolute;
+      width: 226px;
+      height: 410px;
+      background: #1E293B;
+      border-radius: 34px;
+      border: 5px solid #334155;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      right: 20px;
+      top: 52px;
+      overflow: hidden;
+      transform: rotate(5deg);
+      z-index: 2;
+      padding: 16px 12px;
+    }
+    .salary-badge {
+      background: #0F172A;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .salary-label {
+      font-size: 10px;
+      color: #94A3B8;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .salary-num {
+      font-size: 18px;
+      font-weight: 800;
+      color: #10B981;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 2px;
+    }
+    .salary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10.5px;
+      color: #CBD5E1;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .salary-row span:last-child {
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    /* Floating Pill Badges */
+    .floating-pill {
+      position: absolute;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    .pill-1 {
+      top: 22px;
+      right: 140px;
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .pill-2 {
+      bottom: 24px;
+      right: 40px;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .pill-dot-green { width: 8px; height: 8px; border-radius: 50%; background: #10B981; }
+    .pill-dot-amber { width: 8px; height: 8px; border-radius: 50%; background: #F59E0B; }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-grid"></div>
+  <div class="ambient-glow-emerald"></div>
+  <div class="ambient-glow-amber"></div>
+
+  <div class="banner-content">
+    <!-- Left Column: Copy & Brand -->
+    <div class="left-col">
+      <div class="brand-row">
+        <!-- Exact Bản C SVG Icon -->
+        <div class="icon-badge">
+          <svg viewBox="0 0 512 512" fill="none">
+            <rect width="512" height="512" rx="128" fill="#FFFFFF"/>
+            <path d="M 190 128 H 154 A 48 48 0 0 0 106 176 V 346 A 48 48 0 0 0 154 394 H 358 A 48 48 0 0 0 406 346 V 276 M 346 128 H 358 A 48 48 0 0 1 406 176 V 210" stroke="#1E293B" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="180" y="96" width="24" height="64" rx="12" fill="#F59E0B"/>
+            <rect x="308" y="96" width="24" height="64" rx="12" fill="#F59E0B"/>
+            <path d="M164 278 L232 346 L402 148" stroke="#10B981" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="402" cy="148" r="22" fill="#F59E0B"/>
+            <circle cx="402" cy="148" r="14" fill="#FFFFFF"/>
+          </svg>
+        </div>
+        <div class="brand-tag">Smart Timecard & Salary Tracker</div>
+      </div>
+
+      <h1 class="title">Manage Salary<br><span>Smart Paycheck Tracker</span></h1>
+      <p class="subtitle">Track work shifts, overtime hours, and net salary calculations accurately. Export professional PDF & Excel reports in seconds.</p>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <div class="feature-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none"/></svg></div>
+          <span>Auto calculate OT (1.5x, 2.0x) & shift earnings</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none"/></svg></div>
+          <span>Instant timesheet export to PDF & Excel format</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none"/></svg></div>
+          <span>100% Offline SQLite · 100% Safe, Private & Secure</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Smartphone Mockups -->
+    <div class="right-col">
+      <!-- Floating Pill 1 -->
+      <div class="floating-pill pill-1">
+        <span class="pill-dot-green"></span>
+        <span>Export PDF / Excel</span>
+      </div>
+
+      <!-- Phone 1: Front Attendance Mockup -->
+      <div class="phone-front">
+        <div class="phone-notch"></div>
+        <div class="phone-screen-header">
+          <span>October 2024</span>
+          <span style="color: #10B981;">24 Shifts</span>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-cell">M</div><div class="cal-cell">T</div><div class="cal-cell">W</div><div class="cal-cell">T</div><div class="cal-cell">F</div><div class="cal-cell">S</div><div class="cal-cell">S</div>
+          <div class="cal-cell done">1</div><div class="cal-cell done">2</div><div class="cal-cell ot">3</div><div class="cal-cell done">4</div><div class="cal-cell done">5</div><div class="cal-cell">6</div><div class="cal-cell">7</div>
+          <div class="cal-cell done">8</div><div class="cal-cell done">9</div><div class="cal-cell done">10</div><div class="cal-cell ot">11</div><div class="cal-cell done">12</div><div class="cal-cell">13</div><div class="cal-cell">14</div>
+          <div class="cal-cell done">15</div><div class="cal-cell done">16</div><div class="cal-cell done">17</div><div class="cal-cell done">18</div><div class="cal-cell ot">19</div><div class="cal-cell">20</div><div class="cal-cell">21</div>
+        </div>
+        <div class="cal-card-info">
+          <div class="cal-card-title">Today: Day Shift + 2.5h OT</div>
+          <div class="cal-card-val">+$48.50</div>
+        </div>
+      </div>
+
+      <!-- Phone 2: Back Salary Calculation Mockup -->
+      <div class="phone-back">
+        <div class="salary-badge">
+          <div class="salary-label">Net Take-Home Pay</div>
+          <div class="salary-num">$2,850.00</div>
+        </div>
+        <div class="salary-row"><span>Base salary:</span><span>$2,200.00</span></div>
+        <div class="salary-row"><span>Overtime pay:</span><span style="color: #F59E0B;">+$450.00</span></div>
+        <div class="salary-row"><span>Allowances:</span><span style="color: #34D399;">+$200.00</span></div>
+        <div class="salary-row"><span>Tax & deductions:</span><span>-$150.00</span></div>
+      </div>
+
+      <!-- Floating Pill 2 -->
+      <div class="floating-pill pill-2">
+        <span class="pill-dot-amber"></span>
+        <span>Auto OT 1.5x - 2.0x</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

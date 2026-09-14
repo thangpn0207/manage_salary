@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Android 13/14/15/16 Material You Themed Monochrome Icon -->
+  <g transform="translate(46, 46) scale(0.82)">
+    <path d="
+      M 190 128 
+      H 154 
+      A 48 48 0 0 0 106 176 
+      V 346 
+      A 48 48 0 0 0 154 394 
+      H 358 
+      A 48 48 0 0 0 406 346 
+      V 276
+      M 346 128
+      H 358
+      A 48 48 0 0 1 406 176
+      V 210
+    " stroke="#000000" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <rect x="180" y="96" width="24" height="64" rx="12" fill="#000000"/>
+    <rect x="308" y="96" width="24" height="64" rx="12" fill="#000000"/>
+
+    <path d="M164 278 L232 346 L402 148" stroke="#000000" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <circle cx="402" cy="148" r="22" fill="#000000"/>
+  </g>
+</svg>

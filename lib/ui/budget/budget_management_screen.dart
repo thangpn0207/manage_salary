@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/util/convert_enum.dart';
@@ -131,12 +130,10 @@ class BudgetManagementScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.only(bottom: 80),
             children: [
-              BuildConfig.enableAds
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: BannerAdWidget(),
-                    )
-                  : SizedBox.shrink(),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: BannerAdWidget(),
+              ),
               _buildSummaryCardWithAddButton(
                 context: context,
                 period: s.budgetPeriodMonthly,

@@ -69,7 +69,7 @@ class TripDetailScreen extends StatelessWidget {
 class _DepositsTab extends StatelessWidget {
   final int tripId;
 
-  const _DepositsTab({super.key, required this.tripId});
+  const _DepositsTab({required this.tripId});
 
   @override
   Widget build(BuildContext context) {
@@ -1029,7 +1029,7 @@ class _AddDepositDialogState extends State<_AddDepositDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(S.current.addDeposit),
-      content: Container(
+      content: SizedBox(
         width: 500,
         child: FormBuilder(
           key: _formKey,

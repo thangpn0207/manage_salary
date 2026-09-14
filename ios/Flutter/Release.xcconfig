@@ -2,5 +2,4 @@
 #include "Generated.xcconfig"
 
 // AdMob Configuration
-ADMOB_APP_ID=$(ADMOB_APP_ID)
-ENABLE_ADS=YES
+ADMOB_APP_ID=ca-app-pub-2103558986527802~5808548229

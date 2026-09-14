@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:manage_salary/core/observers/go_router_observer.dart';
 import 'package:manage_salary/ui/home/home_screen.dart';
 import 'package:manage_salary/ui/main/main_screen.dart';
+import 'package:manage_salary/ui/salary/salary_screen.dart';
 import 'package:manage_salary/ui/travel_note/trip_detail_screen.dart';
 
 import '../../ui/travel_note/trip_list_screen.dart';
@@ -15,6 +16,7 @@ import '../../ui/travel_note/trip_list_screen.dart';
 class AppRoutes {
   static const home = '/home';
   static const main = '/';
+  static const salary = '/salary';
   static const trips = '/trips';
   static const tripDetail = '$trips/:id';
   static const addAction = '$tripDetail/add-action';
@@ -70,6 +72,10 @@ class AppRouter {
           state: state,
           child: const HomeScreen(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.salary,
+        builder: (context, state) => const SalaryScreen(),
       ),
       GoRoute(
         path: AppRoutes.trips,

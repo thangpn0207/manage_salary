@@ -1,13 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"     xmlns:tools="http://schemas.android.com/tools"
 >
     <application
-            android:label="${FLUTTER_APP_NAME}"
+            android:label="Manage Salary"
             android:name="${applicationName}"
             android:icon="@mipmap/launcher_icon">
         <!-- AdMob app ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${ADMOB_APP_ID}"/>
+            android:value="ca-app-pub-2103558986527802~5808548229"/>
         <meta-data
                 android:name="io.flutter.embedding.android.EnableImpeller"
                 android:value="true"/>
@@ -26,6 +26,21 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- Deep Linking (Custom Scheme & Web URL) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="managesalary"/>
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="managesalary.app"/>
             </intent-filter>
         </activity>
         <meta-data

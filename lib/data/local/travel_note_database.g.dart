@@ -2278,7 +2278,7 @@ final class $$TripsTableReferences
   static MultiTypedResultKey<$MembersTable, List<Member>> _membersRefsTable(
           _$TravelNoteDatabase db) =>
       MultiTypedResultKey.fromTable(db.members,
-          aliasName: $_aliasNameGenerator(db.trips.id, db.members.tripId));
+          aliasName: 'trips__id__members__trip_id');
 
   $$MembersTableProcessedTableManager get membersRefs {
     final manager = $$MembersTableTableManager($_db, $_db.members)
@@ -2292,7 +2292,7 @@ final class $$TripsTableReferences
   static MultiTypedResultKey<$ActionsTable, List<Action>> _actionsRefsTable(
           _$TravelNoteDatabase db) =>
       MultiTypedResultKey.fromTable(db.actions,
-          aliasName: $_aliasNameGenerator(db.trips.id, db.actions.tripId));
+          aliasName: 'trips__id__actions__trip_id');
 
   $$ActionsTableProcessedTableManager get actionsRefs {
     final manager = $$ActionsTableTableManager($_db, $_db.actions)
@@ -2306,7 +2306,7 @@ final class $$TripsTableReferences
   static MultiTypedResultKey<$DepositsTable, List<Deposit>> _depositsRefsTable(
           _$TravelNoteDatabase db) =>
       MultiTypedResultKey.fromTable(db.deposits,
-          aliasName: $_aliasNameGenerator(db.trips.id, db.deposits.tripId));
+          aliasName: 'trips__id__deposits__trip_id');
 
   $$DepositsTableProcessedTableManager get depositsRefs {
     final manager = $$DepositsTableTableManager($_db, $_db.deposits)
@@ -2320,8 +2320,7 @@ final class $$TripsTableReferences
   static MultiTypedResultKey<$TravelNotesTable, List<TravelNote>>
       _travelNotesRefsTable(_$TravelNoteDatabase db) =>
           MultiTypedResultKey.fromTable(db.travelNotes,
-              aliasName:
-                  $_aliasNameGenerator(db.trips.id, db.travelNotes.tripId));
+              aliasName: 'trips__id__travel_notes__trip_id');
 
   $$TravelNotesTableProcessedTableManager get travelNotesRefs {
     final manager = $$TravelNotesTableTableManager($_db, $_db.travelNotes)
@@ -2657,8 +2656,10 @@ class $$TripsTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$TripsTableReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable<$TripsTable, Trip>(table),
+                    $$TripsTableReferences(db, table, e)
+                  ))
               .toList(),
           prefetchHooksCallback: (
               {membersRefs = false,
@@ -2763,8 +2764,8 @@ final class $$MembersTableReferences
     extends BaseReferences<_$TravelNoteDatabase, $MembersTable, Member> {
   $$MembersTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) => db.trips
-      .createAlias($_aliasNameGenerator(db.members.tripId, db.trips.id));
+  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) =>
+      db.trips.createAlias('members__trip_id__trips__id');
 
   $$TripsTableProcessedTableManager get tripId {
     final $_column = $_itemColumn<int>('trip_id')!;
@@ -2780,7 +2781,7 @@ final class $$MembersTableReferences
   static MultiTypedResultKey<$ActionsTable, List<Action>> _actionsRefsTable(
           _$TravelNoteDatabase db) =>
       MultiTypedResultKey.fromTable(db.actions,
-          aliasName: $_aliasNameGenerator(db.members.id, db.actions.payerId));
+          aliasName: 'members__id__actions__payer_id');
 
   $$ActionsTableProcessedTableManager get actionsRefs {
     final manager = $$ActionsTableTableManager($_db, $_db.actions)
@@ -2794,8 +2795,7 @@ final class $$MembersTableReferences
   static MultiTypedResultKey<$ActionSharesTable, List<ActionShare>>
       _actionSharesRefsTable(_$TravelNoteDatabase db) =>
           MultiTypedResultKey.fromTable(db.actionShares,
-              aliasName: $_aliasNameGenerator(
-                  db.members.id, db.actionShares.memberId));
+              aliasName: 'members__id__action_shares__member_id');
 
   $$ActionSharesTableProcessedTableManager get actionSharesRefs {
     final manager = $$ActionSharesTableTableManager($_db, $_db.actionShares)
@@ -2809,7 +2809,7 @@ final class $$MembersTableReferences
   static MultiTypedResultKey<$DepositsTable, List<Deposit>> _depositsRefsTable(
           _$TravelNoteDatabase db) =>
       MultiTypedResultKey.fromTable(db.deposits,
-          aliasName: $_aliasNameGenerator(db.members.id, db.deposits.memberId));
+          aliasName: 'members__id__deposits__member_id');
 
   $$DepositsTableProcessedTableManager get depositsRefs {
     final manager = $$DepositsTableTableManager($_db, $_db.deposits)
@@ -2823,8 +2823,7 @@ final class $$MembersTableReferences
   static MultiTypedResultKey<$TravelNotesTable, List<TravelNote>>
       _travelNotesRefsTable(_$TravelNoteDatabase db) =>
           MultiTypedResultKey.fromTable(db.travelNotes,
-              aliasName:
-                  $_aliasNameGenerator(db.members.id, db.travelNotes.ownerId));
+              aliasName: 'members__id__travel_notes__owner_id');
 
   $$TravelNotesTableProcessedTableManager get travelNotesRefs {
     final manager = $$TravelNotesTableTableManager($_db, $_db.travelNotes)
@@ -3186,8 +3185,10 @@ class $$MembersTableTableManager extends RootTableManager<
             createdAt: createdAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$MembersTableReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable<$MembersTable, Member>(table),
+                    $$MembersTableReferences(db, table, e)
+                  ))
               .toList(),
           prefetchHooksCallback: (
               {tripId = false,
@@ -3332,8 +3333,8 @@ final class $$ActionsTableReferences
     extends BaseReferences<_$TravelNoteDatabase, $ActionsTable, Action> {
   $$ActionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) => db.trips
-      .createAlias($_aliasNameGenerator(db.actions.tripId, db.trips.id));
+  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) =>
+      db.trips.createAlias('actions__trip_id__trips__id');
 
   $$TripsTableProcessedTableManager get tripId {
     final $_column = $_itemColumn<int>('trip_id')!;
@@ -3346,8 +3347,8 @@ final class $$ActionsTableReferences
         manager.$state.copyWith(prefetchedData: [item]));
   }
 
-  static $MembersTable _payerIdTable(_$TravelNoteDatabase db) => db.members
-      .createAlias($_aliasNameGenerator(db.actions.payerId, db.members.id));
+  static $MembersTable _payerIdTable(_$TravelNoteDatabase db) =>
+      db.members.createAlias('actions__payer_id__members__id');
 
   $$MembersTableProcessedTableManager get payerId {
     final $_column = $_itemColumn<int>('payer_id')!;
@@ -3363,8 +3364,7 @@ final class $$ActionsTableReferences
   static MultiTypedResultKey<$ActionSharesTable, List<ActionShare>>
       _actionSharesRefsTable(_$TravelNoteDatabase db) =>
           MultiTypedResultKey.fromTable(db.actionShares,
-              aliasName: $_aliasNameGenerator(
-                  db.actions.id, db.actionShares.actionId));
+              aliasName: 'actions__id__action_shares__action_id');
 
   $$ActionSharesTableProcessedTableManager get actionSharesRefs {
     final manager = $$ActionSharesTableTableManager($_db, $_db.actionShares)
@@ -3715,8 +3715,10 @@ class $$ActionsTableTableManager extends RootTableManager<
             updatedAt: updatedAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$ActionsTableReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable<$ActionsTable, Action>(table),
+                    $$ActionsTableReferences(db, table, e)
+                  ))
               .toList(),
           prefetchHooksCallback: (
               {tripId = false, payerId = false, actionSharesRefs = false}) {
@@ -3813,8 +3815,7 @@ final class $$ActionSharesTableReferences extends BaseReferences<
   $$ActionSharesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $ActionsTable _actionIdTable(_$TravelNoteDatabase db) =>
-      db.actions.createAlias(
-          $_aliasNameGenerator(db.actionShares.actionId, db.actions.id));
+      db.actions.createAlias('action_shares__action_id__actions__id');
 
   $$ActionsTableProcessedTableManager get actionId {
     final $_column = $_itemColumn<int>('action_id')!;
@@ -3828,8 +3829,7 @@ final class $$ActionSharesTableReferences extends BaseReferences<
   }
 
   static $MembersTable _memberIdTable(_$TravelNoteDatabase db) =>
-      db.members.createAlias(
-          $_aliasNameGenerator(db.actionShares.memberId, db.members.id));
+      db.members.createAlias('action_shares__member_id__members__id');
 
   $$MembersTableProcessedTableManager get memberId {
     final $_column = $_itemColumn<int>('member_id')!;
@@ -4073,7 +4073,7 @@ class $$ActionSharesTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable(table),
+                    e.readTable<$ActionSharesTable, ActionShare>(table),
                     $$ActionSharesTableReferences(db, table, e)
                   ))
               .toList(),
@@ -4156,8 +4156,8 @@ final class $$DepositsTableReferences
     extends BaseReferences<_$TravelNoteDatabase, $DepositsTable, Deposit> {
   $$DepositsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) => db.trips
-      .createAlias($_aliasNameGenerator(db.deposits.tripId, db.trips.id));
+  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) =>
+      db.trips.createAlias('deposits__trip_id__trips__id');
 
   $$TripsTableProcessedTableManager get tripId {
     final $_column = $_itemColumn<int>('trip_id')!;
@@ -4170,8 +4170,8 @@ final class $$DepositsTableReferences
         manager.$state.copyWith(prefetchedData: [item]));
   }
 
-  static $MembersTable _memberIdTable(_$TravelNoteDatabase db) => db.members
-      .createAlias($_aliasNameGenerator(db.deposits.memberId, db.members.id));
+  static $MembersTable _memberIdTable(_$TravelNoteDatabase db) =>
+      db.members.createAlias('deposits__member_id__members__id');
 
   $$MembersTableProcessedTableManager get memberId {
     final $_column = $_itemColumn<int>('member_id')!;
@@ -4413,8 +4413,10 @@ class $$DepositsTableTableManager extends RootTableManager<
             createdAt: createdAt,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$DepositsTableReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable<$DepositsTable, Deposit>(table),
+                    $$DepositsTableReferences(db, table, e)
+                  ))
               .toList(),
           prefetchHooksCallback: ({tripId = false, memberId = false}) {
             return PrefetchHooks(
@@ -4500,8 +4502,8 @@ final class $$TravelNotesTableReferences extends BaseReferences<
     _$TravelNoteDatabase, $TravelNotesTable, TravelNote> {
   $$TravelNotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) => db.trips
-      .createAlias($_aliasNameGenerator(db.travelNotes.tripId, db.trips.id));
+  static $TripsTable _tripIdTable(_$TravelNoteDatabase db) =>
+      db.trips.createAlias('travel_notes__trip_id__trips__id');
 
   $$TripsTableProcessedTableManager get tripId {
     final $_column = $_itemColumn<int>('trip_id')!;
@@ -4514,8 +4516,8 @@ final class $$TravelNotesTableReferences extends BaseReferences<
         manager.$state.copyWith(prefetchedData: [item]));
   }
 
-  static $MembersTable _ownerIdTable(_$TravelNoteDatabase db) => db.members
-      .createAlias($_aliasNameGenerator(db.travelNotes.ownerId, db.members.id));
+  static $MembersTable _ownerIdTable(_$TravelNoteDatabase db) =>
+      db.members.createAlias('travel_notes__owner_id__members__id');
 
   $$MembersTableProcessedTableManager get ownerId {
     final $_column = $_itemColumn<int>('owner_id')!;
@@ -4785,7 +4787,7 @@ class $$TravelNotesTableTableManager extends RootTableManager<
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
-                    e.readTable(table),
+                    e.readTable<$TravelNotesTable, TravelNote>(table),
                     $$TravelNotesTableReferences(db, table, e)
                   ))
               .toList(),

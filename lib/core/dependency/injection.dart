@@ -4,26 +4,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../bloc/activity/activity_bloc.dart';
 import '../../bloc/locale/locale_cubit.dart';
+import '../../bloc/salary/salary_bloc.dart';
 import '../../bloc/theme/theme_cubit.dart';
 import '../../bloc/travel_note/travel_note_bloc.dart';
+import '../../data/local/salary_database.dart';
 import '../../data/local/travel_note_database.dart';
+import '../../data/repositories/salary_repository.dart';
 import '../../data/repositories/travel_note_repository.dart';
 
 final getIt = GetIt.instance;
 
-Future<void> init(String baseUrl) async {
+Future<void> init() async {
   // Initialize shared preferences first
   final prefs = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(prefs);
-  _configureCores(baseUrl);
+  _configureCores();
   _configureRepositories();
   _configureBlocs();
   _configureUseCases();
 }
 
-void _configureCores(String baseUrl) {
-  // getIt.registerLazySingleton<Dio>(() => DioManager(baseUrl).createDio());
+void _configureCores() {
+  // getIt.registerLazySingleton<Dio>(() => DioManager().createDio());
   getIt.registerLazySingleton<TravelNoteDatabase>(() => TravelNoteDatabase());
+  getIt.registerLazySingleton<SalaryDatabase>(() => SalaryDatabase());
 }
 
 void _configureRepositories() {
@@ -31,14 +35,18 @@ void _configureRepositories() {
   getIt.registerSingleton<TravelNoteRepository>(
     TravelNoteRepository(getIt<TravelNoteDatabase>()),
   );
+  getIt.registerSingleton<SalaryRepository>(
+    SalaryRepository(getIt<SalaryDatabase>()),
+  );
 }
 
 void _configureUseCases() {}
 
 void _configureBlocs() {
   // Register ThemeCubit
+  final activityBloc = ActivityBloc();
   getIt
-    ..registerSingleton<ActivityBloc>(ActivityBloc())
+    ..registerSingleton<ActivityBloc>(activityBloc)
     ..registerSingleton<ThemeCubit>(ThemeCubit())
     ..registerSingleton<CurrencyCubit>(CurrencyCubit())
 
@@ -48,5 +56,13 @@ void _configureBlocs() {
     // Register TravelNoteBloc
     ..registerSingleton<TravelNoteBloc>(
       TravelNoteBloc(getIt<TravelNoteRepository>()),
+    )
+
+    // Register SalaryBloc
+    ..registerSingleton<SalaryBloc>(
+      SalaryBloc(
+        repository: getIt<SalaryRepository>(),
+        activityBloc: activityBloc,
+      ),
     );
 }

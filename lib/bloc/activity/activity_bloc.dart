@@ -71,10 +71,6 @@ class ActivityBloc extends HydratedBloc<ActivityEvent, ActivityState> {
     }
   }
 
-  String _generateCacheKey(String operation, [DateTime? start, DateTime? end]) {
-    return '$operation-${start?.millisecondsSinceEpoch ?? "all"}-${end?.millisecondsSinceEpoch ?? "all"}';
-  }
-
   // ==================== ACTIVITY HANDLERS ====================
 
   Future<void> _handleAddActivity(

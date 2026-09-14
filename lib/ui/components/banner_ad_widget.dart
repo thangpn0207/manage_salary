@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:manage_salary/core/config/build_config.dart';
+
+import 'package:manage_salary/core/services/ad_manager.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key});
@@ -20,12 +21,11 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   }
 
   void _loadAd() {
-    if (!BuildConfig.enableAds) return;
+    final adUnitId = AdManager.instance.bannerAdUnitId;
+    if (adUnitId.isEmpty) return;
 
     _bannerAd = BannerAd(
-      adUnitId: BuildConfig.adsKey.isEmpty
-          ? 'ca-app-pub-2103558986527802/2723219889' // Test ad unit ID
-          : BuildConfig.adsKey,
+      adUnitId: adUnitId,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
@@ -53,7 +53,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (!BuildConfig.enableAds || !_isLoaded || _bannerAd == null) {
+    if (!_isLoaded || _bannerAd == null) {
       return const SizedBox.shrink();
     }
 

@@ -1,15 +1,14 @@
-// presentation/screens/dashboard_screen.dart
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_tilt/flutter_tilt.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
-import 'package:manage_salary/core/util/localization_utils.dart'; // Import the utils
+import 'package:manage_salary/core/util/localization_utils.dart';
 import 'package:manage_salary/core/util/money_util.dart';
 import 'package:manage_salary/ui/home/widgets/card_dashboard/card_info.dart';
 import 'package:manage_salary/ui/home/widgets/chart/chart_session.dart';
+import 'package:manage_salary/ui/home/widgets/chart/weekly_chart.dart';
 
 import '../../../../bloc/activity/activity_bloc.dart';
 import '../../../../bloc/activity/activity_state.dart';
@@ -17,8 +16,15 @@ import '../../../../core/constants/colors.dart';
 import '../../../../core/constants/enums.dart';
 import '../../../../models/chart_display_data.dart';
 
-class DashboardCard extends StatelessWidget {
+class DashboardCard extends StatefulWidget {
   const DashboardCard({super.key});
+
+  @override
+  State<DashboardCard> createState() => _DashboardCardState();
+}
+
+class _DashboardCardState extends State<DashboardCard> {
+  bool _isWeeklyView = false;
 
   // Define colors for the chart
   final List<Color> _chartColors = const [
@@ -29,57 +35,48 @@ class DashboardCard extends StatelessWidget {
     Color(0xFFAB47BC), // Violet
   ];
 
-  // --- Helper to prepare aggregated chart data --- (Uses localization)
   List<ChartDisplayData> _prepareChartData(
-      BuildContext context,
-      // Need context for localization
-      Map<ActivityType, double> expensesByType,
-      double totalExpenses) {
-    if (totalExpenses <= 0 || expensesByType.isEmpty) {
-      return [];
-    }
-
-    final sortedEntries = expensesByType.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
+      Map<ActivityType, double> expensesByType, double totalExpenses) {
+    if (totalExpenses == 0) return [];
+    
     final List<ChartDisplayData> displayData = [];
     int colorIndex = 0;
-    double otherTotal = 0.0;
-    const int maxIndividualCategories = 5; // Show top 5 potentially
 
-    // Process top categories
-    for (int i = 0;
-        i < min(maxIndividualCategories, sortedEntries.length);
-        i++) {
-      final entry = sortedEntries[i];
-      final percentage = (entry.value / totalExpenses) * 100;
-      final color = _chartColors[colorIndex % _chartColors.length];
-      colorIndex++;
-      displayData.add(ChartDisplayData(
-        name: localizedActivityPaying(context, entry.key), // Use utils
-        value: entry.value,
-        percentage: percentage,
-        color: color,
-      ));
-    }
-
-    // Calculate "Other" total
-    if (sortedEntries.length > maxIndividualCategories) {
-      for (int i = maxIndividualCategories; i < sortedEntries.length; i++) {
-        otherTotal += sortedEntries[i].value;
+    expensesByType.forEach((type, amount) {
+      if (amount > 0) {
+        final percentage = (amount / totalExpenses) * 100;
+        
+        displayData.add(ChartDisplayData(
+          name: localizedActivityPaying(context, type),
+          value: amount,
+          percentage: percentage,
+          color: _chartColors[colorIndex % _chartColors.length],
+        ));
+        colorIndex++;
       }
-    }
+    });
 
-    // Add "Other" category if it has value
-    if (otherTotal > 0) {
-      final percentage = (otherTotal / totalExpenses) * 100;
-      final color = _chartColors[colorIndex % _chartColors.length];
-      displayData.add(ChartDisplayData(
-        name: S.of(context).otherCategory, // Use localized "Other"
-        value: otherTotal,
-        percentage: percentage,
-        color: color,
+    // Sort by amount descending
+    displayData.sort((a, b) => b.value.compareTo(a.value));
+    
+    // Group small items into "Other" if there are many categories
+    if (displayData.length > 5) {
+      final topItems = displayData.sublist(0, 4);
+      final otherItems = displayData.sublist(4);
+      
+      double otherAmount = 0;
+      for (var item in otherItems) {
+        otherAmount += item.value;
+      }
+      
+      topItems.add(ChartDisplayData(
+        name: S.of(context).activityTypeExpenseOther,
+        value: otherAmount,
+        percentage: (otherAmount / totalExpenses) * 100,
+        color: Colors.grey,
       ));
+      
+      return topItems;
     }
 
     return displayData;
@@ -87,165 +84,287 @@ class DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return BlocBuilder<ActivityBloc, ActivityState>(
       builder: (context, state) {
-        // Prepare data for the Pie Chart using the new helper
         final double totalExpensesForChart = state.thisMonthExpenses;
         final List<ChartDisplayData> chartDisplayItems = _prepareChartData(
-            context,
-            state.expensesByType,
-            totalExpensesForChart); // Pass context
+            state.expensesByType, totalExpensesForChart);
+
+        // Compute weekly data
+        final List<double> weeklyIncomes = List.filled(7, 0.0);
+        final List<double> weeklyExpenses = List.filled(7, 0.0);
+        double maxWeeklyVal = 0.0;
+        
+        final today = DateTime.now();
+        // Determine the start of this week (Monday)
+        final int currentWeekday = today.weekday;
+        final startOfWeek = DateTime(today.year, today.month, today.day).subtract(Duration(days: currentWeekday - 1));
+        final endOfWeek = startOfWeek.add(const Duration(days: 7));
+        
+        for (var a in state.allActivities) {
+          if (!a.date.isBefore(startOfWeek) && a.date.isBefore(endOfWeek)) {
+            final dayIndex = a.date.weekday - 1; // 0 = Monday, 6 = Sunday
+            if (a.nature == ActivityNature.income) {
+              weeklyIncomes[dayIndex] += a.amount;
+              maxWeeklyVal = max(maxWeeklyVal, weeklyIncomes[dayIndex]);
+            } else {
+              weeklyExpenses[dayIndex] += a.amount;
+              maxWeeklyVal = max(maxWeeklyVal, weeklyExpenses[dayIndex]);
+            }
+          }
+        }
+
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
-          child: Tilt(
-            borderRadius: BorderRadius.circular(30),
-            tiltConfig: const TiltConfig(
-              angle: 30,
-              leaveDuration: Duration(milliseconds: 800),
-              leaveCurve: Curves.elasticOut,
-            ),
-            lightConfig: const LightConfig(
-              color: Colors.white,
-              minIntensity: 0.2,
-              maxIntensity: 0.8,
-            ),
-            shadowConfig: const ShadowConfig(
-              disable: false,
-              color: Colors.black54,
-            ),
-            childLayout: ChildLayout(
-              outer: [
-                Positioned(
-                  top: 20.h,
-                  left: 0,
-                  right: 0,
-                  child: TiltParallax(
-                    size: const Offset(15, 15),
-                    child: _buildTotalBalance(context, state.netBalance),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Bento Tile 1: Total Balance (Nordic Minimalist)
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkSurface : Colors.white,
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.darkOutline
+                        : AppColors.outline,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black
+                          .withValues(alpha: isDark ? 0.2 : 0.04),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-                Positioned(
-                  top: 90.h,
-                  left: 20.w,
-                  right: 20.w,
-                  child: TiltParallax(
-                    size: const Offset(25, 25),
-                    child: _buildIncomeExpenseRow(context,
-                        state.thisMonthIncome, state.thisMonthExpenses),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(8.w),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10.r),
+                              ),
+                              child: Icon(
+                                Icons.account_balance_wallet_rounded,
+                                color: AppColors.primary,
+                                size: 18.sp,
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Text(
+                              S.of(context).totalBalance,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.hintColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: (state.netBalance >= 0
+                                    ? const Color(0xFF10B981)
+                                    : const Color(0xFFEF4444))
+                                .withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                state.netBalance >= 0
+                                    ? Icons.arrow_upward_rounded
+                                    : Icons.arrow_downward_rounded,
+                                size: 13.sp,
+                                color: state.netBalance >= 0
+                                    ? const Color(0xFF10B981)
+                                    : const Color(0xFFEF4444),
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                state.netBalance >= 0 ? 'Surplus' : 'Deficit',
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: state.netBalance >= 0
+                                      ? const Color(0xFF10B981)
+                                      : const Color(0xFFEF4444),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 14.h),
+
+                    // Primary Balance Display
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        MoneyUtil.formatDefault(state.netBalance),
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                          color: state.netBalance >= 0
+                              ? (isDark
+                                  ? Colors.white
+                                  : const Color(0xFF0F172A))
+                              : const Color(0xFFEF4444),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 18.h),
+
+                    // Bento Subgrid: Income & Expenses
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CardInfo(
+                            title: S.of(context).income,
+                            amount: state.thisMonthIncome,
+                            amountColor: const Color(0xFF10B981),
+                            icon: Icons.south_west_rounded,
+                            iconColor: const Color(0xFF10B981),
+                            iconBg: const Color(0xFF10B981)
+                                .withValues(alpha: 0.14),
+                          ),
+                        ),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: CardInfo(
+                            title: S.of(context).expenses,
+                            amount: state.thisMonthExpenses,
+                            amountColor: const Color(0xFFEF4444),
+                            icon: Icons.north_east_rounded,
+                            iconColor: const Color(0xFFEF4444),
+                            iconBg: const Color(0xFFEF4444)
+                                .withValues(alpha: 0.14),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Bento Tile 2: Analytics Chart
+              if (chartDisplayItems.isNotEmpty || maxWeeklyVal > 0) ...[
+                SizedBox(height: 14.h),
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    borderRadius: BorderRadius.circular(22.r),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : const Color(0xFFE2E8F0),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.2 : 0.04),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ),
-                // --- Chart Section ---
-                Positioned(
-                  bottom: 20.h,
-                  left: 10.w,
-                  right: 10.w,
-                  height: 200.h,
-                  child: TiltParallax(
-                    size: const Offset(20, 20),
-                    child: (chartDisplayItems.isNotEmpty)
-                        ? ChartSession(chartItems: chartDisplayItems)
-                        : _buildEmptyChartPlaceholder(context),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                _isWeeklyView ? Icons.bar_chart_rounded : Icons.pie_chart_outline_rounded,
+                                size: 16.sp, 
+                                color: theme.hintColor
+                              ),
+                              SizedBox(width: 6.w),
+                              Text(
+                                _isWeeklyView ? "This Week" : S.of(context).expenses,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              if (!_isWeeklyView)
+                                Text(
+                                  MoneyUtil.formatDefault(totalExpensesForChart),
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFFEF4444),
+                                  ),
+                                ),
+                              if (!_isWeeklyView) SizedBox(width: 10.w),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isWeeklyView = !_isWeeklyView;
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                                  decoration: BoxDecoration(
+                                    color: theme.primaryColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Icon(
+                                    Icons.swap_horiz_rounded,
+                                    size: 18.sp,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
+                      SizedBox(
+                        height: 160.h,
+                        child: _isWeeklyView
+                            ? WeeklyChart(
+                                weeklyIncomes: weeklyIncomes,
+                                weeklyExpenses: weeklyExpenses,
+                                maxY: maxWeeklyVal,
+                              )
+                            : (chartDisplayItems.isNotEmpty 
+                                ? ChartSession(chartItems: chartDisplayItems)
+                                : const Center(child: Text("No Data"))),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primary,
-                    AppColors.onSurface,
-                  ],
-                  stops: [0.1, 0.9],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 5,
-                    spreadRadius: -2,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-            ),
+            ],
           ),
         );
       },
-    );
-  }
-
-  // --- Helper Widgets ---
-
-  Widget _buildTotalBalance(BuildContext context, double balance) {
-    final theme = Theme.of(context);
-    // Determine color based on balance
-    final balanceColor =
-        balance >= 0 ? AppColors.onSurface : theme.colorScheme.error;
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            S.of(context).totalBalance, // Use localization
-            style: theme.textTheme.titleMedium?.copyWith(
-                color: AppColors.onSurface
-                    .withValues(alpha: 0.8)), // Keep subtle color
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            MoneyUtil.formatDefault(balance),
-            style: theme.textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: balanceColor, // Apply determined color
-                shadows: [
-                  Shadow(
-                    blurRadius: 1.0,
-                    color: Colors.black.withValues(alpha: 0.2),
-                    offset: const Offset(1.0, 1.0),
-                  ),
-                ]),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIncomeExpenseRow(
-      BuildContext context, double income, double expenses) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-            child: CardInfo(
-          title: S.of(context).income, // Use localization
-          amount: income,
-          amountColor: AppColors.upGreen,
-        )),
-        SizedBox(width: 10.w),
-        Expanded(
-            child: CardInfo(
-          title: S.of(context).expenses, // Use localization
-          amount: expenses,
-          amountColor: Theme.of(context).colorScheme.error,
-        )),
-      ],
-    );
-  }
-
-  Widget _buildEmptyChartPlaceholder(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.all(16.w),
-      child: Text(
-        S.of(context).noChartData, // Use localization
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).hintColor.withValues(alpha: 0.7)),
-        textAlign: TextAlign.center,
-      ),
     );
   }
 }

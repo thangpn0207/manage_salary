@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:manage_salary/bloc/activity/activity_bloc.dart';
 import 'package:manage_salary/bloc/activity/activity_event.dart';
 import 'package:manage_salary/bloc/activity/activity_state.dart';
-import 'package:manage_salary/core/config/build_config.dart';
 import 'package:manage_salary/core/constants/enums.dart';
 import 'package:manage_salary/core/locale/generated/l10n.dart';
 import 'package:manage_salary/core/util/localization_utils.dart';
@@ -129,12 +128,10 @@ class RecurringManagementScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          BuildConfig.enableAds
-              ? Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: BannerAdWidget(),
-                )
-              : SizedBox.shrink(),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: BannerAdWidget(),
+          ),
           BlocBuilder<ActivityBloc, ActivityState>(
             builder: (context, state) {
               if (state.recurringActivities.isEmpty) {

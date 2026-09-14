@@ -45,67 +45,6 @@ activities, view their total balance, see categorized expenses in a chart, and m
    flutter pub run build_runner build --delete-conflicting-outputs
    ```
 
-## Environment Setup
-
-The app supports three environments:
-- Development (`dev`): For development and testing
-- Staging (`staging`): For pre-release testing
-- Production (`prod`): For release builds
-
-Each environment has its own configuration for:
-- API endpoints
-- Ad integration
-- Analytics
-- Feature flags
-
-## Using Scripts
-
-### Run Script (run.sh)
-The project includes a `run.sh` script to simplify running the application in different environments:
-
-```bash
-# Basic usage
-./run.sh {dev|staging|prod} [device-id]
-
-# Examples
-./run.sh dev                  # Run development build on default device
-./run.sh staging pixel6      # Run staging build on Pixel 6 emulator
-./run.sh prod                # Run production build
-./run.sh help               # Show help message and list available devices
-```
-
-Environment configurations:
-- **Development**: Debug mode enabled, ads disabled
-- **Staging**: Debug mode disabled, ads enabled
-- **Production**: Debug mode disabled, ads enabled
-
-### Build Script (build.sh)
-Use the `build.sh` script to create builds for different environments and build types:
-
-```bash
-# Usage
-./build.sh {dev|staging|prod} {apk|appbundle|ios|web}
-
-# Examples
-./build.sh dev apk        # Build development APK
-./build.sh staging ios    # Build staging iOS archive
-./build.sh prod appbundle # Build production App Bundle
-./build.sh prod web      # Build production web release
-```
-
-Build outputs will be located in:
-- **APK**: `build/app/outputs/flutter-apk/app-[flavor]-release.apk`
-- **App Bundle**: `build/app/outputs/bundle/[flavor]/release/app-[flavor]-release.aab`
-- **iOS**: `build/ios/archive/`
-- **Web**: `build/web/`
-
-Note: iOS builds are only supported on macOS.
-
-Make sure to make the scripts executable:
-```bash
-chmod +x run.sh build.sh
-```
-
 ## Development Guidelines
 
 ### Code Style
@@ -129,24 +68,10 @@ flutter drive --target=test_driver/app.dart
 
 ## VS Code Configuration
 
-The project includes VS Code launch configurations for different environments:
-
-1. **Development Environment:**
-   - Name: "Dev"
-   - Features: Debug mode enabled, ads disabled
-   - Launch with: F5 or Debug > Dev
-
-2. **Staging Environment:**
-   - Name: "Staging"
-   - Features: Debug mode disabled, ads enabled
-   - Launch with: F5 or Debug > Staging
-
-3. **Production Environment:**
-   - Name: "Production"
-   - Features: Debug mode disabled, ads enabled
-   - Launch with: F5 or Debug > Production
-
-Profile modes are also available for each environment for performance testing.
+The project includes standard VS Code launch configurations:
+- `manage_salary`: Debug mode
+- `manage_salary (profile mode)`: Profile mode
+- `manage_salary (release mode)`: Release mode
 
 ## Building the Project
 

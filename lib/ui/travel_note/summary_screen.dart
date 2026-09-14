@@ -53,7 +53,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
         final totalTripCost = summary['totalTripCost'] as double;
         final remainingGroupDeposit =
             summary['remainingGroupDeposit'] as double;
-        final totalGroupBudget = summary['totalGroupBudget'] as double;
         final memberBalances = summary['memberBalances'] as List<MemberBalance>;
         final settlements = summary['settlements'] as List<Settlement>;
 
@@ -340,7 +339,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                       ),
                     ),
                   );
-                }).toList(),
+                }),
               ] else ...[
                 Card(
                   child: const Padding(

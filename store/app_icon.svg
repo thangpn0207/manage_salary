@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- App Palette: Light #F8FAFC, Surface #FFFFFF & #1E293B, Emerald #10B981, Amber #F59E0B -->
+    <filter id="zen-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- 1. Base Squircle: App Surface Card (#FFFFFF) on pure light canvas -->
+  <rect width="512" height="512" rx="128" fill="#FFFFFF"/>
+  <rect x="2" y="2" width="508" height="508" rx="126" stroke="#F1F5F9" stroke-width="4"/>
+
+  <!-- 2. Minimalist Calendar Wireframe in Dark Slate (#1E293B) -->
+  <g filter="url(#zen-shadow)">
+    <!-- Calendar Body Outline -->
+    <path d="
+      M 190 128 
+      H 154 
+      A 48 48 0 0 0 106 176 
+      V 346 
+      A 48 48 0 0 0 154 394 
+      H 358 
+      A 48 48 0 0 0 406 346 
+      V 276
+      M 346 128
+      H 358
+      A 48 48 0 0 1 406 176
+      V 210
+    " stroke="#1E293B" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Calendar Ring Pins (#F59E0B Accent Amber) -->
+    <rect x="180" y="96" width="24" height="64" rx="12" fill="#F59E0B"/>
+    <rect x="308" y="96" width="24" height="64" rx="12" fill="#F59E0B"/>
+  </g>
+
+  <!-- 3. The Pure Emerald Check & Growth Vector (#10B981) -->
+  <path d="M164 278 L232 346 L402 148" stroke="#10B981" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 4. The Amber Payday Focal Point (#F59E0B) -->
+  <circle cx="402" cy="148" r="22" fill="#F59E0B"/>
+  <circle cx="402" cy="148" r="14" fill="#FFFFFF"/>
+</svg>

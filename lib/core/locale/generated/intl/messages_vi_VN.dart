@@ -32,16 +32,22 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m5(name) => "Bạn có chắc muốn xóa ngân sách ${name}?";
 
-  static String m6(number) => "Chi phí ${number}";
+  static String m6(month, amount) =>
+      "Bạn có chắc chắn muốn chốt lương tháng ${month} với số tiền là ${amount} không?";
 
-  static String m7(name) => "${name} đã trả";
+  static String m7(number) => "Chi phí ${number}";
 
-  static String m8(name) => "Bạn có chắc muốn xóa ${name}?";
+  static String m8(monthStr) => "BẢNG CHẤM CÔNG & TÍNH LƯƠNG THÁNG ${monthStr}";
 
-  static String m9(number) => "Thành viên chuyến đi (${number})";
+  static String m9(name) => "${name} đã trả";
+
+  static String m10(name) => "Bạn có chắc muốn xóa ${name}?";
+
+  static String m11(number) => "Thành viên chuyến đi (${number})";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "aboutApp": MessageLookupByLibrary.simpleMessage("Thông tin ứng dụng"),
     "activityDeleted": m0,
     "activityNatureExpense": MessageLookupByLibrary.simpleMessage("Chi tiêu"),
     "activityNatureIncome": MessageLookupByLibrary.simpleMessage("Thu nhập"),
@@ -100,12 +106,31 @@ class MessageLookup extends MessageLookupByLibrary {
       "Thêm các hoạt động định kỳ để tự động hóa thu nhập và chi tiêu thường xuyên của bạn",
     ),
     "added": MessageLookupByLibrary.simpleMessage("đã thêm"),
+    "advanceAmount": MessageLookupByLibrary.simpleMessage("Ứng tiền"),
+    "advanceSalary": MessageLookupByLibrary.simpleMessage("Tạm ứng"),
+    "advanceStat": MessageLookupByLibrary.simpleMessage("Tạm ứng"),
     "amount": MessageLookupByLibrary.simpleMessage("Số tiền"),
     "amountLabel": MessageLookupByLibrary.simpleMessage("Số tiền"),
     "amountMustBePositive": MessageLookupByLibrary.simpleMessage(
       "Số tiền phải lớn hơn 0",
     ),
+    "appVersion": MessageLookupByLibrary.simpleMessage("Phiên bản ứng dụng"),
     "areYouSureDeleteMember": m3,
+    "attendanceSheetTitle": MessageLookupByLibrary.simpleMessage(
+      "Chấm công ngày",
+    ),
+    "autoCalculationPreview": MessageLookupByLibrary.simpleMessage(
+      "Tự động quy đổi định mức:",
+    ),
+    "autoDailyRate": MessageLookupByLibrary.simpleMessage("Lương 1 ngày"),
+    "autoDeductRules": MessageLookupByLibrary.simpleMessage(
+      "8% BHXH + 1.5% BHYT + 1% BHTN",
+    ),
+    "autoHourlyRate": MessageLookupByLibrary.simpleMessage("Lương 1 giờ"),
+    "baseSalaryAmount": MessageLookupByLibrary.simpleMessage(
+      "Mức lương cơ bản",
+    ),
+    "bonusMoney": MessageLookupByLibrary.simpleMessage("Thưởng"),
     "budget": MessageLookupByLibrary.simpleMessage("Ngân sách"),
     "budgetAmount": MessageLookupByLibrary.simpleMessage("Số tiền ngân sách"),
     "budgetDetails": MessageLookupByLibrary.simpleMessage("Chi tiết ngân sách"),
@@ -126,6 +151,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "cancelButton": MessageLookupByLibrary.simpleMessage("Hủy"),
     "category": MessageLookupByLibrary.simpleMessage("Danh mục"),
     "changeButton": MessageLookupByLibrary.simpleMessage("Thay đổi"),
+    "checkInFull": MessageLookupByLibrary.simpleMessage("Cả ngày"),
+    "checkInHalf": MessageLookupByLibrary.simpleMessage("Nửa ngày"),
+    "checkedInToday": MessageLookupByLibrary.simpleMessage(
+      "Đã chấm công hôm nay",
+    ),
     "clearButton": MessageLookupByLibrary.simpleMessage("Xóa"),
     "clearCache": MessageLookupByLibrary.simpleMessage("Xóa bộ nhớ đệm"),
     "confirmBudgetDeletion": m5,
@@ -136,6 +166,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Xác nhận xóa bộ nhớ đệm",
     ),
     "confirmDeletion": MessageLookupByLibrary.simpleMessage("Xác nhận xóa"),
+    "confirmFinalizeSalary": m6,
     "create": MessageLookupByLibrary.simpleMessage("Tạo"),
     "createFirstTrip": MessageLookupByLibrary.simpleMessage(
       "Tạo chuyến đi đầu tiên để bắt đầu",
@@ -150,9 +181,22 @@ class MessageLookup extends MessageLookupByLibrary {
     "customSplitDes": MessageLookupByLibrary.simpleMessage(
       "Tự nhập số tiền chia mỗi người trong nhóm",
     ),
+    "dailyOtPay": MessageLookupByLibrary.simpleMessage("Lương OT"),
+    "dailyReminder": MessageLookupByLibrary.simpleMessage("Nhắc nhở chấm công"),
+    "dailyReminderDesc": MessageLookupByLibrary.simpleMessage(
+      "Nhắc nhở mỗi ngày vào 20:00",
+    ),
+    "dailyReminderDisabledMsg": MessageLookupByLibrary.simpleMessage(
+      "Đã tắt nhắc nhở chấm công",
+    ),
+    "dailyReminderEnabledMsg": MessageLookupByLibrary.simpleMessage(
+      "Đã bật nhắc nhở chấm công hàng ngày",
+    ),
+    "dailyWage": MessageLookupByLibrary.simpleMessage("Lương ngày"),
     "darkMode": MessageLookupByLibrary.simpleMessage("Chế độ tối"),
     "dashboard": MessageLookupByLibrary.simpleMessage("Bảng điều khiển"),
     "dateLabelPrefix": MessageLookupByLibrary.simpleMessage("Ngày: "),
+    "daysSuffix": MessageLookupByLibrary.simpleMessage("công"),
     "delete": MessageLookupByLibrary.simpleMessage("Xóa"),
     "deleteMember": MessageLookupByLibrary.simpleMessage("Xóa thành viên"),
     "deleteTrip": MessageLookupByLibrary.simpleMessage("Xóa chuyến đi"),
@@ -169,6 +213,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "email": MessageLookupByLibrary.simpleMessage(
       "SDT đòi nợ (Không bắt buộc)",
     ),
+    "enableInsurance": MessageLookupByLibrary.simpleMessage(
+      "Tự động trừ bảo hiểm (10.5%)",
+    ),
     "endDate": MessageLookupByLibrary.simpleMessage("Ngày kết thúc"),
     "enterValidNumber": MessageLookupByLibrary.simpleMessage(
       "Vui lòng nhập số hợp lệ",
@@ -177,12 +224,73 @@ class MessageLookup extends MessageLookupByLibrary {
     "equalSplitDes": MessageLookupByLibrary.simpleMessage(
       "Chia đều cho mỗi người trong nhóm",
     ),
+    "errorEmptyNote": MessageLookupByLibrary.simpleMessage(
+      "Vui lòng nhập ghi chú",
+    ),
+    "estimatedDailyIncome": MessageLookupByLibrary.simpleMessage(
+      "Thu nhập dự tính hôm nay",
+    ),
+    "estimatedSalary": MessageLookupByLibrary.simpleMessage("Lương dự tính"),
     "expenseTitle": MessageLookupByLibrary.simpleMessage("Tiêu đề chi phí"),
     "expenses": MessageLookupByLibrary.simpleMessage("Chi phí"),
-    "expensesLength": m6,
+    "expensesLength": m7,
+    "exportAdvanceColumn": MessageLookupByLibrary.simpleMessage("Tạm ứng"),
+    "exportAdvancePayment": MessageLookupByLibrary.simpleMessage(
+      "Tạm ứng đã nhận:",
+    ),
+    "exportAttendanceLog": MessageLookupByLibrary.simpleMessage(
+      "NHẬT KÝ CHẤM CÔNG THEO NGÀY",
+    ),
+    "exportBaseSalary": MessageLookupByLibrary.simpleMessage("Lương cơ bản:"),
+    "exportBonus": MessageLookupByLibrary.simpleMessage("Tiền thưởng:"),
+    "exportBonusColumn": MessageLookupByLibrary.simpleMessage("Thưởng"),
+    "exportDate": MessageLookupByLibrary.simpleMessage("Ngày xuất:"),
+    "exportDateColumn": MessageLookupByLibrary.simpleMessage("Ngày"),
+    "exportEmptyLog": MessageLookupByLibrary.simpleMessage(
+      "Chưa có dữ liệu chấm công.",
+    ),
+    "exportExcel": MessageLookupByLibrary.simpleMessage("Xuất Excel"),
+    "exportExcelDesc": MessageLookupByLibrary.simpleMessage("Xuất báo cáo"),
+    "exportFooterDesc": MessageLookupByLibrary.simpleMessage(
+      "Báo cáo tự động từ ứng dụng Manage Salary - Có trên Google Play Store",
+    ),
+    "exportFooterTitle": MessageLookupByLibrary.simpleMessage(
+      "Báo cáo được tạo bởi ứng dụng Manage Salary - Quản lý chi tiêu & chấm công",
+    ),
+    "exportInsuranceDeduction": MessageLookupByLibrary.simpleMessage(
+      "Trừ BHXH (10.5%):",
+    ),
+    "exportMonth": MessageLookupByLibrary.simpleMessage("Tháng:"),
+    "exportNetSalary": MessageLookupByLibrary.simpleMessage("THỰC LĨNH:"),
+    "exportNoteColumn": MessageLookupByLibrary.simpleMessage("Ghi chú"),
+    "exportOtHoursColumn": MessageLookupByLibrary.simpleMessage("Giờ OT"),
+    "exportOtPay": MessageLookupByLibrary.simpleMessage("Tiền làm thêm giờ:"),
+    "exportPdf": MessageLookupByLibrary.simpleMessage("Xuất PDF"),
+    "exportPdfDesc": MessageLookupByLibrary.simpleMessage(
+      "Xuất báo cáo dạng PDF",
+    ),
+    "exportProfileSummary": MessageLookupByLibrary.simpleMessage("HỒ SƠ LƯƠNG"),
+    "exportReport": MessageLookupByLibrary.simpleMessage("Xuất báo cáo"),
+    "exportReportTitle": MessageLookupByLibrary.simpleMessage(
+      "BẢNG CHẤM CÔNG VÀ TÍNH LƯƠNG CÁ NHÂN",
+    ),
+    "exportReportTitlePdf": m8,
+    "exportSalaryType": MessageLookupByLibrary.simpleMessage("Loại lương:"),
+    "exportStandardDays": MessageLookupByLibrary.simpleMessage("Ngày chuẩn:"),
+    "exportStatusColumn": MessageLookupByLibrary.simpleMessage("Trạng thái"),
+    "exportSummary": MessageLookupByLibrary.simpleMessage(
+      "TỔNG KẾT THU NHẬP & KHẤU TRỪ",
+    ),
+    "exportTotalOtHours": MessageLookupByLibrary.simpleMessage(
+      "Tổng giờ tăng ca:",
+    ),
+    "exportTotalWorkDays": MessageLookupByLibrary.simpleMessage(
+      "Tổng ngày công:",
+    ),
     "fieldRequired": MessageLookupByLibrary.simpleMessage(
       "Trường này là bắt buộc",
     ),
+    "finalizeSalary": MessageLookupByLibrary.simpleMessage("Chốt lương"),
     "formValidationError": MessageLookupByLibrary.simpleMessage(
       "Vui lòng điền đầy đủ và chính xác các trường.",
     ),
@@ -194,9 +302,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "frequencyMonthly": MessageLookupByLibrary.simpleMessage("Hằng tháng"),
     "frequencyWeekly": MessageLookupByLibrary.simpleMessage("Hằng tuần"),
     "frequencyYearly": MessageLookupByLibrary.simpleMessage("Hằng năm"),
+    "hoursSuffix": MessageLookupByLibrary.simpleMessage("giờ"),
     "income": MessageLookupByLibrary.simpleMessage("Thu nhập"),
+    "insuranceStat": MessageLookupByLibrary.simpleMessage("Bảo hiểm"),
     "isUsingGroupBudget": MessageLookupByLibrary.simpleMessage("Dùng tiền quỹ"),
     "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
+    "leavePaid": MessageLookupByLibrary.simpleMessage("Nghỉ có lương"),
+    "leaveUnpaid": MessageLookupByLibrary.simpleMessage("Nghỉ không lương"),
     "manageBudgets": MessageLookupByLibrary.simpleMessage("Quản lý ngân sách"),
     "manageRecurring": MessageLookupByLibrary.simpleMessage("Quản lý định kỳ"),
     "member": MessageLookupByLibrary.simpleMessage("Thành viên"),
@@ -230,14 +342,31 @@ class MessageLookup extends MessageLookupByLibrary {
       "Chưa có hoạt động định kỳ",
     ),
     "noTripYet": MessageLookupByLibrary.simpleMessage("Chưa có chuyến đi nào"),
+    "notCheckedInToday": MessageLookupByLibrary.simpleMessage(
+      "Chưa chấm công hôm nay",
+    ),
+    "noteToday": MessageLookupByLibrary.simpleMessage(
+      "Ghi chú công việc hôm nay (tùy chọn)",
+    ),
     "notes": MessageLookupByLibrary.simpleMessage("Ghi chú"),
+    "notifications": MessageLookupByLibrary.simpleMessage("Thông báo"),
     "ofBudgetUsed": MessageLookupByLibrary.simpleMessage(
       "ngân sách đã sử dụng",
     ),
+    "oneTapCheckIn": MessageLookupByLibrary.simpleMessage("Chấm công 1 chạm"),
+    "otHoliday": MessageLookupByLibrary.simpleMessage("x3.0 Ngày lễ"),
+    "otHourlyRateDesc": MessageLookupByLibrary.simpleMessage(
+      "Quy đổi ra giờ làm thêm",
+    ),
+    "otHoursStat": MessageLookupByLibrary.simpleMessage("Giờ OT"),
+    "otNormalDay": MessageLookupByLibrary.simpleMessage("x1.5 Ngày thường"),
+    "otWeekend": MessageLookupByLibrary.simpleMessage("x2.0 Cuối tuần"),
     "otherCategory": MessageLookupByLibrary.simpleMessage("Khác"),
+    "overtimeHours": MessageLookupByLibrary.simpleMessage("Giờ làm thêm (OT)"),
+    "overtimeSection": MessageLookupByLibrary.simpleMessage("Làm thêm"),
     "owes": MessageLookupByLibrary.simpleMessage("Ăn mất"),
     "paid": MessageLookupByLibrary.simpleMessage("Thanh toán"),
-    "paidBy": m7,
+    "paidBy": m9,
     "period": MessageLookupByLibrary.simpleMessage("Chu kỳ"),
     "pleaseEnterAmount": MessageLookupByLibrary.simpleMessage(
       "Vui lòng nhập số tiền",
@@ -248,24 +377,55 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseEnterTripTitle": MessageLookupByLibrary.simpleMessage(
       "Vui lòng nhập tiêu đề chuyến đi",
     ),
+    "privacyPolicy": MessageLookupByLibrary.simpleMessage(
+      "Chính sách quyền riêng tư",
+    ),
+    "privacyPolicyDesc": MessageLookupByLibrary.simpleMessage(
+      "Cách chúng tôi bảo vệ dữ liệu của bạn",
+    ),
+    "quickAttendanceSubtitle": MessageLookupByLibrary.simpleMessage(
+      "Chạm để chấm công",
+    ),
+    "quickCheckIn": MessageLookupByLibrary.simpleMessage("Chấm công nhanh"),
     "remaining": MessageLookupByLibrary.simpleMessage("Còn lại"),
     "remainingGroupDeposit": MessageLookupByLibrary.simpleMessage(
       "Tiền đóng họ còn dư",
     ),
     "remove": MessageLookupByLibrary.simpleMessage("Xóa"),
+    "salaryAndAttendance": MessageLookupByLibrary.simpleMessage(
+      "Lương & Chấm công",
+    ),
+    "salaryDaily": MessageLookupByLibrary.simpleMessage("Lương ngày"),
+    "salaryHourly": MessageLookupByLibrary.simpleMessage("Lương giờ"),
+    "salaryMonthly": MessageLookupByLibrary.simpleMessage("Lương tháng"),
+    "salaryProfile": MessageLookupByLibrary.simpleMessage("Hồ sơ lương"),
+    "salarySettingsTitle": MessageLookupByLibrary.simpleMessage(
+      "Cài đặt lương",
+    ),
+    "salaryType": MessageLookupByLibrary.simpleMessage("Hình thức trả lương"),
+    "saveAttendance": MessageLookupByLibrary.simpleMessage("Lưu chấm công"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("Lưu thay đổi"),
     "selectDate": MessageLookupByLibrary.simpleMessage("Chọn ngày"),
     "settings": MessageLookupByLibrary.simpleMessage("Cài đặt"),
     "spent": MessageLookupByLibrary.simpleMessage("Đã chi"),
     "splitType": MessageLookupByLibrary.simpleMessage("Kiểu chia tiền"),
+    "standardHoursPerDay": MessageLookupByLibrary.simpleMessage(
+      "Số giờ chuẩn/ngày",
+    ),
+    "standardWorkingDays": MessageLookupByLibrary.simpleMessage(
+      "Số ngày công chuẩn/tháng",
+    ),
     "startDate": MessageLookupByLibrary.simpleMessage("Ngày bắt đầu"),
     "suggestedSettlements": MessageLookupByLibrary.simpleMessage(
       "Gợi ý thanh toán",
     ),
     "summary": MessageLookupByLibrary.simpleMessage("Tóm tắt"),
-    "sureDeleteTrip": m8,
+    "sureDeleteTrip": m10,
     "tapToAddBudget": MessageLookupByLibrary.simpleMessage(
       "Nhấn nút + phía trên để thêm ngân sách đầu tiên",
+    ),
+    "termsOfService": MessageLookupByLibrary.simpleMessage(
+      "Điều khoản sử dụng",
     ),
     "title": MessageLookupByLibrary.simpleMessage("Tiêu đề"),
     "titleDescriptionLabel": MessageLookupByLibrary.simpleMessage(
@@ -276,10 +436,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTripCost": MessageLookupByLibrary.simpleMessage("Chuyến này mất"),
     "travelNotes": MessageLookupByLibrary.simpleMessage("Ghi chú chuyến đi"),
     "tripDetail": MessageLookupByLibrary.simpleMessage("Chi tiết chuyến đi"),
-    "tripMember": m9,
+    "tripMember": m11,
     "tripTitle": MessageLookupByLibrary.simpleMessage("Tiêu đề chuyến đi"),
     "type": MessageLookupByLibrary.simpleMessage("Loại"),
     "update": MessageLookupByLibrary.simpleMessage("Cập nhật"),
     "updated": MessageLookupByLibrary.simpleMessage("đã cập nhật"),
+    "workDate": MessageLookupByLibrary.simpleMessage("Ngày làm việc"),
+    "workDay": MessageLookupByLibrary.simpleMessage("Cả ngày"),
+    "workDaysStat": MessageLookupByLibrary.simpleMessage("Công chuẩn"),
+    "workHalfDay": MessageLookupByLibrary.simpleMessage("Nửa ngày"),
+    "workOff": MessageLookupByLibrary.simpleMessage("Nghỉ"),
+    "workStatus": MessageLookupByLibrary.simpleMessage("Trạng thái"),
+    "workType": MessageLookupByLibrary.simpleMessage("Loại công"),
   };
 }

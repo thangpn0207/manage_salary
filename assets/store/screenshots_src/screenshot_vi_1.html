@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Screenshot 1 - VI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: linear-gradient(180deg, #F8FAFC 0%, #EDF2F7 100%);
+      color: #0F172A;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 90px;
+    }
+
+    /* Ambient Background Orbs */
+    .orb-1 {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      top: -150px;
+      right: -200px;
+      pointer-events: none;
+    }
+    .orb-2 {
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%);
+      bottom: 200px;
+      left: -200px;
+      pointer-events: none;
+    }
+
+    /* Header Copy Section */
+    .header-box {
+      text-align: center;
+      max-width: 920px;
+      margin-bottom: 60px;
+      z-index: 10;
+    }
+    .pill-badge {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      color: #059669;
+      font-size: 20px;
+      font-weight: 800;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    }
+    h1.title {
+      font-size: 58px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: #0F172A;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    h1.title span {
+      color: #10B981;
+    }
+    p.subtitle {
+      font-size: 27px;
+      font-weight: 600;
+      color: #64748B;
+      line-height: 1.4;
+    }
+
+    /* Smartphone Device Mockup */
+    .phone-mockup {
+      width: 820px;
+      height: 1480px;
+      background: #FFFFFF;
+      border-radius: 72px;
+      border: 14px solid #1E293B;
+      box-shadow: 0 40px 100px -20px rgba(15, 23, 42, 0.28), 0 0 0 2px rgba(255,255,255,0.8);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    /* Dynamic Island & Status Bar */
+    .phone-notch {
+      width: 200px;
+      height: 38px;
+      background: #1E293B;
+      border-radius: 20px;
+      margin: 18px auto 20px;
+    }
+    .phone-status {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 54px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 20px;
+    }
+
+    /* App UI Inside Phone */
+    .screen-body {
+      padding: 0 36px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .topbar-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #0F172A;
+    }
+    .topbar-badge {
+      background: #ECFDF5;
+      color: #059669;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 12px;
+    }
+
+    /* Calendar Grid */
+    .cal-container {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .cal-days-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #64748B;
+      margin-bottom: 16px;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+    .cal-day {
+      height: 76px;
+      border-radius: 16px;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #334155;
+    }
+    .cal-day .tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    .cal-day.shift-morning {
+      background: #ECFDF5;
+      border-color: #A7F3D0;
+      color: #065F46;
+    }
+    .cal-day.shift-morning .tag { background: #10B981; color: #FFFFFF; }
+
+    .cal-day.shift-afternoon {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+      color: #92400E;
+    }
+    .cal-day.shift-afternoon .tag { background: #F59E0B; color: #FFFFFF; }
+
+    .cal-day.shift-ot {
+      background: #F5F3FF;
+      border-color: #DDD6FE;
+      color: #5B21B6;
+    }
+    .cal-day.shift-ot .tag { background: #8B5CF6; color: #FFFFFF; }
+
+    /* Bottom Shift Detail Card */
+    .detail-card {
+      background: #1E293B;
+      color: #FFFFFF;
+      border-radius: 28px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 30px rgba(15,23,42,0.15);
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-title { font-size: 22px; font-weight: 700; }
+    .detail-val { font-size: 26px; font-weight: 800; color: #34D399; font-family: 'JetBrains Mono', monospace; }
+    .detail-sub { font-size: 17px; color: #94A3B8; }
+
+    /* Action CTA Button */
+    .cta-btn {
+      background: #10B981;
+      color: #FFFFFF;
+      height: 76px;
+      border-radius: 22px;
+      font-size: 24px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 12px 24px rgba(16, 185, 129, 0.35);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb-1"></div>
+  <div class="orb-2"></div>
+
+  <div class="header-box">
+    <div class="pill-badge">Theo Dõi Ca Làm Việc</div>
+    <h1 class="title">CHẤM CÔNG <span>1 CHẠM</span></h1>
+    <p class="subtitle">Quản lý ca sáng, ca tối, tăng ca OT chính xác từng phút</p>
+  </div>
+
+  <div class="phone-mockup">
+    <div class="phone-notch"></div>
+    <div class="phone-status">
+      <span>09:41</span>
+      <span>5G &bull; 100%</span>
+    </div>
+
+    <div class="screen-body">
+      <div class="app-topbar">
+        <div class="topbar-title">Lịch Chấm Công</div>
+        <div class="topbar-badge">24 Ngày Công</div>
+      </div>
+
+      <div class="cal-container">
+        <div class="cal-days-header">
+          <div>T2</div><div>T3</div><div>T4</div><div>T5</div><div>T6</div><div>T7</div><div>CN</div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-day shift-morning"><span>1</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-morning"><span>2</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-afternoon"><span>3</span><span class="tag">Chiều</span></div>
+          <div class="cal-day shift-morning"><span>4</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-ot"><span>5</span><span class="tag">+2.5h</span></div>
+          <div class="cal-day"><span>6</span><span style="font-size:11px;color:#94A3B8;">Nghỉ</span></div>
+          <div class="cal-day"><span>7</span><span style="font-size:11px;color:#94A3B8;">Nghỉ</span></div>
+
+          <div class="cal-day shift-morning"><span>8</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-morning"><span>9</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-afternoon"><span>10</span><span class="tag">Chiều</span></div>
+          <div class="cal-day shift-morning"><span>11</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-ot"><span>12</span><span class="tag">+3.0h</span></div>
+          <div class="cal-day"><span>13</span><span style="font-size:11px;color:#94A3B8;">Nghỉ</span></div>
+          <div class="cal-day"><span>14</span><span style="font-size:11px;color:#94A3B8;">Nghỉ</span></div>
+
+          <div class="cal-day shift-morning"><span>15</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-morning"><span>16</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-morning"><span>17</span><span class="tag">Sáng</span></div>
+          <div class="cal-day shift-afternoon"><span>18</span><span class="tag">Chiều</span></div>
+          <div class="cal-day shift-ot"><span>19</span><span class="tag">+2.0h</span></div>
+          <div class="cal-day"><span>20</span><span style="font-size:11px;color:#94A3B8;">Nghỉ</span></div>
+          <div class="cal-day"><span>21</span><span style="font-size:11px;color:#94A3B8;">Nghỉ</span></div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-row">
+          <div class="detail-title">Hôm nay: Ca Sáng + 2.5h OT</div>
+          <div class="detail-val">+650.000 đ</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-sub">Giờ vào: 08:00 &bull; Giờ ra: 19:30</div>
+          <div class="detail-sub" style="color: #FCD34D;">OT 150% Đạt chuẩn</div>
+        </div>
+      </div>
+
+      <div class="cta-btn">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+        <span>CHẤM CÔNG VÀO / RA</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

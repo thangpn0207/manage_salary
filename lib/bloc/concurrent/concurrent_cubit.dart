@@ -1,16 +1,21 @@
 import 'dart:ui';
 
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import '../../core/util/money_util.dart';
 
 class CurrencyCubit extends HydratedCubit<Locale> {
-  CurrencyCubit() : super(Locale("en"));
+  CurrencyCubit() : super(const Locale("vi")) {
+    MoneyUtil.setCurrency(state.languageCode);
+  }
 
   Future<void> setLocale(Locale locale) async {
+    MoneyUtil.setCurrency(locale.languageCode);
     emit(locale);
   }
 
   Future<void> resetToDefault() async {
-    emit(Locale("en"));
+    MoneyUtil.setCurrency("vi");
+    emit(const Locale("vi"));
   }
 
   bool isCurrentConcurrent(String languageCode) {
@@ -20,7 +25,9 @@ class CurrencyCubit extends HydratedCubit<Locale> {
   @override
   Locale? fromJson(Map<String, dynamic> json) {
     final String? languageCode = json['languageCode'];
-    return Locale(languageCode ?? "en");
+    final loc = Locale(languageCode ?? "vi");
+    MoneyUtil.setCurrency(loc.languageCode);
+    return loc;
   }
 
   @override

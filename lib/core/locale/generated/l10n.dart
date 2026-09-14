@@ -1284,6 +1284,786 @@ class S {
       args: [],
     );
   }
+
+  /// `x1.5 Normal Day`
+  String get otNormalDay {
+    return Intl.message(
+      'x1.5 Normal Day',
+      name: 'otNormalDay',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `x2.0 Weekend`
+  String get otWeekend {
+    return Intl.message('x2.0 Weekend', name: 'otWeekend', desc: '', args: []);
+  }
+
+  /// `x3.0 Holiday`
+  String get otHoliday {
+    return Intl.message('x3.0 Holiday', name: 'otHoliday', desc: '', args: []);
+  }
+
+  /// `Note for today (optional)`
+  String get noteToday {
+    return Intl.message(
+      'Note for today (optional)',
+      name: 'noteToday',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `8% Social + 1.5% Health + 1% Unemp`
+  String get autoDeductRules {
+    return Intl.message(
+      '8% Social + 1.5% Health + 1% Unemp',
+      name: 'autoDeductRules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `days`
+  String get daysSuffix {
+    return Intl.message('days', name: 'daysSuffix', desc: '', args: []);
+  }
+
+  /// `hours`
+  String get hoursSuffix {
+    return Intl.message('hours', name: 'hoursSuffix', desc: '', args: []);
+  }
+
+  /// `Auto-calculation preview:`
+  String get autoCalculationPreview {
+    return Intl.message(
+      'Auto-calculation preview:',
+      name: 'autoCalculationPreview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Salary & Attendance`
+  String get salaryAndAttendance {
+    return Intl.message(
+      'Salary & Attendance',
+      name: 'salaryAndAttendance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `1-Tap Check-in`
+  String get oneTapCheckIn {
+    return Intl.message(
+      '1-Tap Check-in',
+      name: 'oneTapCheckIn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Advance`
+  String get advanceStat {
+    return Intl.message('Advance', name: 'advanceStat', desc: '', args: []);
+  }
+
+  /// `Daily Check-in`
+  String get attendanceSheetTitle {
+    return Intl.message(
+      'Daily Check-in',
+      name: 'attendanceSheetTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Date`
+  String get workDate {
+    return Intl.message('Date', name: 'workDate', desc: '', args: []);
+  }
+
+  /// `Work Type`
+  String get workType {
+    return Intl.message('Work Type', name: 'workType', desc: '', args: []);
+  }
+
+  /// `Full Day`
+  String get workDay {
+    return Intl.message('Full Day', name: 'workDay', desc: '', args: []);
+  }
+
+  /// `Half Day`
+  String get workHalfDay {
+    return Intl.message('Half Day', name: 'workHalfDay', desc: '', args: []);
+  }
+
+  /// `Off`
+  String get workOff {
+    return Intl.message('Off', name: 'workOff', desc: '', args: []);
+  }
+
+  /// `Overtime Hours`
+  String get overtimeHours {
+    return Intl.message(
+      'Overtime Hours',
+      name: 'overtimeHours',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Salary Advance`
+  String get advanceAmount {
+    return Intl.message(
+      'Salary Advance',
+      name: 'advanceAmount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save Check-in`
+  String get saveAttendance {
+    return Intl.message(
+      'Save Check-in',
+      name: 'saveAttendance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter a note`
+  String get errorEmptyNote {
+    return Intl.message(
+      'Please enter a note',
+      name: 'errorEmptyNote',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Salary Settings`
+  String get salarySettingsTitle {
+    return Intl.message(
+      'Salary Settings',
+      name: 'salarySettingsTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Salary Type`
+  String get salaryType {
+    return Intl.message('Salary Type', name: 'salaryType', desc: '', args: []);
+  }
+
+  /// `Monthly`
+  String get salaryMonthly {
+    return Intl.message('Monthly', name: 'salaryMonthly', desc: '', args: []);
+  }
+
+  /// `Hourly`
+  String get salaryHourly {
+    return Intl.message('Hourly', name: 'salaryHourly', desc: '', args: []);
+  }
+
+  /// `Daily`
+  String get salaryDaily {
+    return Intl.message('Daily', name: 'salaryDaily', desc: '', args: []);
+  }
+
+  /// `Base Salary Amount`
+  String get baseSalaryAmount {
+    return Intl.message(
+      'Base Salary Amount',
+      name: 'baseSalaryAmount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Standard Working Days/Month`
+  String get standardWorkingDays {
+    return Intl.message(
+      'Standard Working Days/Month',
+      name: 'standardWorkingDays',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Standard Hours/Day`
+  String get standardHoursPerDay {
+    return Intl.message(
+      'Standard Hours/Day',
+      name: 'standardHoursPerDay',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily Rate`
+  String get autoDailyRate {
+    return Intl.message(
+      'Daily Rate',
+      name: 'autoDailyRate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hourly Rate`
+  String get autoHourlyRate {
+    return Intl.message(
+      'Hourly Rate',
+      name: 'autoHourlyRate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Converted to OT hourly rate`
+  String get otHourlyRateDesc {
+    return Intl.message(
+      'Converted to OT hourly rate',
+      name: 'otHourlyRateDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Auto-deduct insurance (10.5%)`
+  String get enableInsurance {
+    return Intl.message(
+      'Auto-deduct insurance (10.5%)',
+      name: 'enableInsurance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily reminder enabled`
+  String get dailyReminderEnabledMsg {
+    return Intl.message(
+      'Daily reminder enabled',
+      name: 'dailyReminderEnabledMsg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily reminder disabled`
+  String get dailyReminderDisabledMsg {
+    return Intl.message(
+      'Daily reminder disabled',
+      name: 'dailyReminderDisabledMsg',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily Reminder`
+  String get dailyReminder {
+    return Intl.message(
+      'Daily Reminder',
+      name: 'dailyReminder',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reminds you every day at 20:00`
+  String get dailyReminderDesc {
+    return Intl.message(
+      'Reminds you every day at 20:00',
+      name: 'dailyReminderDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `About App`
+  String get aboutApp {
+    return Intl.message('About App', name: 'aboutApp', desc: '', args: []);
+  }
+
+  /// `Privacy Policy`
+  String get privacyPolicy {
+    return Intl.message(
+      'Privacy Policy',
+      name: 'privacyPolicy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `How we protect your data`
+  String get privacyPolicyDesc {
+    return Intl.message(
+      'How we protect your data',
+      name: 'privacyPolicyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Terms of Service`
+  String get termsOfService {
+    return Intl.message(
+      'Terms of Service',
+      name: 'termsOfService',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `App Version`
+  String get appVersion {
+    return Intl.message('App Version', name: 'appVersion', desc: '', args: []);
+  }
+
+  /// `Export report`
+  String get exportExcelDesc {
+    return Intl.message(
+      'Export report',
+      name: 'exportExcelDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export report`
+  String get exportReport {
+    return Intl.message(
+      'Export report',
+      name: 'exportReport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Salary Profile`
+  String get salaryProfile {
+    return Intl.message(
+      'Salary Profile',
+      name: 'salaryProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Estimated Salary`
+  String get estimatedSalary {
+    return Intl.message(
+      'Estimated Salary',
+      name: 'estimatedSalary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Work Days`
+  String get workDaysStat {
+    return Intl.message('Work Days', name: 'workDaysStat', desc: '', args: []);
+  }
+
+  /// `OT Hours`
+  String get otHoursStat {
+    return Intl.message('OT Hours', name: 'otHoursStat', desc: '', args: []);
+  }
+
+  /// `Insurance`
+  String get insuranceStat {
+    return Intl.message('Insurance', name: 'insuranceStat', desc: '', args: []);
+  }
+
+  /// `Finalize Salary`
+  String get finalizeSalary {
+    return Intl.message(
+      'Finalize Salary',
+      name: 'finalizeSalary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Quick Check-in`
+  String get quickCheckIn {
+    return Intl.message(
+      'Quick Check-in',
+      name: 'quickCheckIn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Full Day`
+  String get checkInFull {
+    return Intl.message('Full Day', name: 'checkInFull', desc: '', args: []);
+  }
+
+  /// `Half Day`
+  String get checkInHalf {
+    return Intl.message('Half Day', name: 'checkInHalf', desc: '', args: []);
+  }
+
+  /// `Paid Leave`
+  String get leavePaid {
+    return Intl.message('Paid Leave', name: 'leavePaid', desc: '', args: []);
+  }
+
+  /// `Status`
+  String get workStatus {
+    return Intl.message('Status', name: 'workStatus', desc: '', args: []);
+  }
+
+  /// `Unpaid Leave`
+  String get leaveUnpaid {
+    return Intl.message(
+      'Unpaid Leave',
+      name: 'leaveUnpaid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Overtime`
+  String get overtimeSection {
+    return Intl.message(
+      'Overtime',
+      name: 'overtimeSection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Advance`
+  String get advanceSalary {
+    return Intl.message('Advance', name: 'advanceSalary', desc: '', args: []);
+  }
+
+  /// `Bonus`
+  String get bonusMoney {
+    return Intl.message('Bonus', name: 'bonusMoney', desc: '', args: []);
+  }
+
+  /// `Estimated Daily Income`
+  String get estimatedDailyIncome {
+    return Intl.message(
+      'Estimated Daily Income',
+      name: 'estimatedDailyIncome',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily Wage`
+  String get dailyWage {
+    return Intl.message('Daily Wage', name: 'dailyWage', desc: '', args: []);
+  }
+
+  /// `OT Pay`
+  String get dailyOtPay {
+    return Intl.message('OT Pay', name: 'dailyOtPay', desc: '', args: []);
+  }
+
+  /// `Notifications`
+  String get notifications {
+    return Intl.message(
+      'Notifications',
+      name: 'notifications',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checked in today`
+  String get checkedInToday {
+    return Intl.message(
+      'Checked in today',
+      name: 'checkedInToday',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not checked in today`
+  String get notCheckedInToday {
+    return Intl.message(
+      'Not checked in today',
+      name: 'notCheckedInToday',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to check in`
+  String get quickAttendanceSubtitle {
+    return Intl.message(
+      'Tap to check in',
+      name: 'quickAttendanceSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export PDF`
+  String get exportPdf {
+    return Intl.message('Export PDF', name: 'exportPdf', desc: '', args: []);
+  }
+
+  /// `Export report as PDF`
+  String get exportPdfDesc {
+    return Intl.message(
+      'Export report as PDF',
+      name: 'exportPdfDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export Excel`
+  String get exportExcel {
+    return Intl.message(
+      'Export Excel',
+      name: 'exportExcel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to finalize salary for {month} with the amount of {amount}?`
+  String confirmFinalizeSalary(String month, String amount) {
+    return Intl.message(
+      'Are you sure you want to finalize salary for $month with the amount of $amount?',
+      name: 'confirmFinalizeSalary',
+      desc: '',
+      args: [month, amount],
+    );
+  }
+
+  /// `ATTENDANCE & SALARY REPORT`
+  String get exportReportTitle {
+    return Intl.message(
+      'ATTENDANCE & SALARY REPORT',
+      name: 'exportReportTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Month:`
+  String get exportMonth {
+    return Intl.message('Month:', name: 'exportMonth', desc: '', args: []);
+  }
+
+  /// `Export Date:`
+  String get exportDate {
+    return Intl.message('Export Date:', name: 'exportDate', desc: '', args: []);
+  }
+
+  /// `SALARY PROFILE`
+  String get exportProfileSummary {
+    return Intl.message(
+      'SALARY PROFILE',
+      name: 'exportProfileSummary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Salary Type:`
+  String get exportSalaryType {
+    return Intl.message(
+      'Salary Type:',
+      name: 'exportSalaryType',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Base Salary:`
+  String get exportBaseSalary {
+    return Intl.message(
+      'Base Salary:',
+      name: 'exportBaseSalary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Standard Days:`
+  String get exportStandardDays {
+    return Intl.message(
+      'Standard Days:',
+      name: 'exportStandardDays',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `SUMMARY`
+  String get exportSummary {
+    return Intl.message('SUMMARY', name: 'exportSummary', desc: '', args: []);
+  }
+
+  /// `Total Work Days:`
+  String get exportTotalWorkDays {
+    return Intl.message(
+      'Total Work Days:',
+      name: 'exportTotalWorkDays',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total OT Hours:`
+  String get exportTotalOtHours {
+    return Intl.message(
+      'Total OT Hours:',
+      name: 'exportTotalOtHours',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `OT Pay:`
+  String get exportOtPay {
+    return Intl.message('OT Pay:', name: 'exportOtPay', desc: '', args: []);
+  }
+
+  /// `Bonus:`
+  String get exportBonus {
+    return Intl.message('Bonus:', name: 'exportBonus', desc: '', args: []);
+  }
+
+  /// `Advance Payment:`
+  String get exportAdvancePayment {
+    return Intl.message(
+      'Advance Payment:',
+      name: 'exportAdvancePayment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Insurance (10.5%):`
+  String get exportInsuranceDeduction {
+    return Intl.message(
+      'Insurance (10.5%):',
+      name: 'exportInsuranceDeduction',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `NET ESTIMATED SALARY:`
+  String get exportNetSalary {
+    return Intl.message(
+      'NET ESTIMATED SALARY:',
+      name: 'exportNetSalary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ATTENDANCE LOG`
+  String get exportAttendanceLog {
+    return Intl.message(
+      'ATTENDANCE LOG',
+      name: 'exportAttendanceLog',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Date`
+  String get exportDateColumn {
+    return Intl.message('Date', name: 'exportDateColumn', desc: '', args: []);
+  }
+
+  /// `Status`
+  String get exportStatusColumn {
+    return Intl.message(
+      'Status',
+      name: 'exportStatusColumn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `OT Hours`
+  String get exportOtHoursColumn {
+    return Intl.message(
+      'OT Hours',
+      name: 'exportOtHoursColumn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Advance`
+  String get exportAdvanceColumn {
+    return Intl.message(
+      'Advance',
+      name: 'exportAdvanceColumn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bonus`
+  String get exportBonusColumn {
+    return Intl.message('Bonus', name: 'exportBonusColumn', desc: '', args: []);
+  }
+
+  /// `Note`
+  String get exportNoteColumn {
+    return Intl.message('Note', name: 'exportNoteColumn', desc: '', args: []);
+  }
+
+  /// `No attendance records found.`
+  String get exportEmptyLog {
+    return Intl.message(
+      'No attendance records found.',
+      name: 'exportEmptyLog',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Report generated by Manage Salary - Expense & Salary App`
+  String get exportFooterTitle {
+    return Intl.message(
+      'Report generated by Manage Salary - Expense & Salary App',
+      name: 'exportFooterTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ATTENDANCE & SALARY REPORT {monthStr}`
+  String exportReportTitlePdf(String monthStr) {
+    return Intl.message(
+      'ATTENDANCE & SALARY REPORT $monthStr',
+      name: 'exportReportTitlePdf',
+      desc: '',
+      args: [monthStr],
+    );
+  }
+
+  /// `Auto-generated report from Manage Salary - Available on Google Play Store`
+  String get exportFooterDesc {
+    return Intl.message(
+      'Auto-generated report from Manage Salary - Available on Google Play Store',
+      name: 'exportFooterDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

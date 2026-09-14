@@ -1,0 +1,59 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- App Palette: Dark 0xFF0F172A, Surface 0xFF1E293B, Emerald 0xFF10B981, Amber 0xFFF59E0B, Light 0xFFF8FAFC -->
+    <filter id="dark-card-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <filter id="emerald-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="16" flood-color="#10B981" flood-opacity="0.45"/>
+    </filter>
+    <filter id="amber-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="#F59E0B" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- 1. Base Squircle: App Dark Background (#0F172A) -->
+  <rect width="512" height="512" rx="128" fill="#0F172A"/>
+  <rect x="2" y="2" width="508" height="508" rx="126" stroke="#1E293B" stroke-width="4"/>
+
+  <!-- 2. Timecard Slab: App Surface Dark Card (#1E293B) with crisp border -->
+  <g filter="url(#dark-card-shadow)">
+    <rect x="96" y="104" width="320" height="312" rx="48" fill="#1E293B" stroke="#334155" stroke-width="3"/>
+    
+    <!-- Top Binding Header (#0F172A) -->
+    <path d="M96 152 C96 125.49 117.49 104 144 104 H368 C394.51 104 416 125.49 416 152 V164 H96 V152 Z" fill="#0F172A"/>
+    
+    <!-- Calendar Rings (#64748B) -->
+    <rect x="168" y="88" width="20" height="36" rx="10" fill="#64748B"/>
+    <rect x="324" y="88" width="20" height="36" rx="10" fill="#64748B"/>
+
+    <!-- Shift Calendar Workday Grid Dots -->
+    <!-- Row 1 -->
+    <circle cx="156" cy="226" r="14" fill="#334155"/>
+    <circle cx="216" cy="226" r="14" fill="#334155"/>
+    <circle cx="276" cy="226" r="14" fill="#334155"/>
+    <circle cx="336" cy="226" r="14" fill="#334155"/>
+
+    <!-- Row 2 -->
+    <circle cx="156" cy="286" r="14" fill="#334155"/>
+    <circle cx="216" cy="286" r="14" fill="#334155"/>
+    <circle cx="276" cy="286" r="14" fill="#334155"/>
+    <circle cx="336" cy="286" r="14" fill="#334155"/>
+
+    <!-- Row 3 -->
+    <circle cx="156" cy="346" r="14" fill="#334155"/>
+    <circle cx="216" cy="346" r="14" fill="#334155"/>
+  </g>
+
+  <!-- 3. Luminous Accent Emerald Checkmark (#10B981) -->
+  <path d="M188 280 L250 342 L394 168" stroke="#10B981" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" filter="url(#emerald-glow)"/>
+
+  <!-- 4. Glowing Accent Amber Coin (#F59E0B) -->
+  <g filter="url(#amber-glow)">
+    <circle cx="368" cy="352" r="56" fill="#F59E0B"/>
+    <circle cx="368" cy="352" r="46" stroke="#FEF3C7" stroke-width="4" stroke-opacity="0.8"/>
+    
+    <!-- Currency Stamp ($) in #0F172A for high contrast -->
+    <path d="M368 324 V380 M354 338 C354 330 382 330 382 342 C382 356 354 352 354 366 C354 378 382 378 382 370" stroke="#0F172A" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -3,7 +3,6 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -17,66 +16,24 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "id.thangpn.manage_salary"
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
         buildConfig = true
-    }
-
-    flavorDimensions += "environment"
-    productFlavors {
-        create("development") {
-            dimension = "environment"
-            applicationId = "id.thangpn.manage_salary.dev"
-            resValue("string", "app_name", "Manage Salary Dev")
-            buildConfigField(
-                "String",
-                "FLUTTER_APP_NAME",
-                "\"Manage Salary Dev\""
-            )
-            buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
-            buildConfigField("boolean", "DEBUG", "true")
-            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary Dev"
-            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID")
-                ?: "ca-app-pub-2103558986527802~5808548229"
-        }
-        create("staging") {
-            dimension = "environment"
-            applicationId = "id.thangpn.manage_salary"
-            resValue("string", "app_name", "Manage Salary")
-            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary\"")
-            buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
-            buildConfigField("boolean", "DEBUG", "false")
-            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
-            manifestPlaceholders["ADMOB_APP_ID"] =
-                System.getenv("ADMOB_APP_ID") ?: ""
-        }
-        create("production") {
-            dimension = "environment"
-            applicationId = "id.thangpn.manage_salary"
-            resValue("string", "app_name", "Manage Salary")
-            buildConfigField("String", "FLUTTER_APP_NAME", "\"Manage Salary\"")
-            buildConfigField("String", "FLUTTER_ADS_KEY", "\"\"")
-            buildConfigField("boolean", "DEBUG", "false")
-            manifestPlaceholders["FLUTTER_APP_NAME"] = "Manage Salary"
-            manifestPlaceholders["ADMOB_APP_ID"] = System.getenv("ADMOB_APP_ID")
-                ?: "ca-app-pub-2103558986527802~5808548229"
-        }
+        resValues = true
     }
 
     defaultConfig {
+        applicationId = "id.thangpn.manage_salary"
         multiDexEnabled = true
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -86,7 +43,7 @@ android {
             create("release") {
                 keyAlias = keystoreProperties["keyAlias"] as String?
                 keyPassword = keystoreProperties["keyPassword"] as String?
-                storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+                storeFile = keystoreProperties["storeFile"]?.let { rootProject.file(it as String) }
                 storePassword = keystoreProperties["storePassword"] as String?
             }
         }
@@ -112,12 +69,19 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 flutter {
     source = "../.."
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("com.google.android.gms:play-services-ads:24.2.0")
+    implementation("com.google.android.gms:play-services-ads:25.4.0")
     implementation("androidx.multidex:multidex:2.0.1")
 }

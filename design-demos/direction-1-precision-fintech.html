@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Direction 1: Precision FinTech (Linear / Stripe inspired)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              primary: '#10B981',
+              emerald: '#059669',
+              slateBg: '#0B0F19',
+              slateCard: '#1E293B',
+              slateBorder: 'rgba(255,255,255,0.08)',
+              cobalt: '#2563EB',
+              danger: '#EF4444',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      user-select: none;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Smooth theme transitions */
+    * {
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+    }
+    /* Hide scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .bezier-curve {
+      filter: drop-shadow(0 4px 12px rgba(16, 185, 129, 0.25));
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
+
+  <!-- Direction Switcher & Control Header -->
+  <header class="max-w-md w-full mb-4 flex items-center justify-between">
+    <div>
+      <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        HƯỚNG 1: PRECISION FINTECH
+      </div>
+      <h1 class="text-lg font-bold text-white mt-1">Stripe & Linear Precision</h1>
+    </div>
+
+    <!-- Theme & Clean Number Controls -->
+    <div class="flex items-center gap-2">
+      <button id="toggleNumberFormat" title="Đổi định dạng số tiền" class="px-2.5 py-1.5 rounded-xl text-xs font-mono font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1">
+        <span id="numberFormatBadge" class="text-emerald-400">15.5M</span>
+      </button>
+      <button id="toggleTheme" title="Chuyển chế độ Sáng / Tối" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700">
+        <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+        <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-indigo-400"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Device Mockup (iPhone 15 Pro Ratio) -->
+  <div class="relative w-full max-w-[390px] h-[830px] rounded-[48px] overflow-hidden border-[8px] border-slate-800 shadow-[0_25px_60px_rgba(0,0,0,0.6)] flex flex-col bg-slate-50 dark:bg-[#0B0F19] transition-all">
+
+    <!-- iOS Dynamic Island & Status Bar -->
+    <div class="relative h-11 w-full flex items-center justify-between px-7 shrink-0 text-slate-900 dark:text-white text-xs font-semibold z-30 pt-1">
+      <span>9:41</span>
+      <!-- Dynamic Island pill -->
+      <div class="absolute left-1/2 -translate-x-1/2 top-2 w-28 h-6 bg-black rounded-full flex items-center justify-end px-2.5">
+        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
+      </div>
+      <div class="flex items-center gap-1.5 text-xs">
+        <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+        <i data-lucide="battery-charging" class="w-4 h-4"></i>
+      </div>
+    </div>
+
+    <!-- Screen Content: Tabs Container -->
+    <main id="appBody" class="flex-1 overflow-y-auto no-scrollbar px-4 pb-28 pt-2">
+
+      <!-- ================= TAB 1: DASHBOARD ================= -->
+      <div id="tab-dashboard" class="space-y-4">
+
+        <!-- Top Profile Bar -->
+        <div class="flex items-center justify-between py-1">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-sm shadow-sm">
+              NT
+            </div>
+            <div>
+              <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Chào buổi sáng,</p>
+              <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                Ngọc Thắng
+                <span class="text-[10px] px-1.5 py-0.5 rounded-md font-mono bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-normal">PRO</span>
+              </h2>
+            </div>
+          </div>
+          <!-- Active Currency Badge -->
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 border border-slate-300/80 dark:border-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              VND (₫)
+            </div>
+            <button class="w-9 h-9 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm relative">
+              <i data-lucide="bell" class="w-4 h-4"></i>
+              <span class="absolute top-2 right-2 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- HERO BENTO 1: TOTAL BALANCE & NET SURPLUS -->
+        <div class="p-5 rounded-3xl bg-white dark:bg-[#151D2A] border border-slate-200/80 dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] relative overflow-hidden">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                <i data-lucide="wallet-cards" class="w-4 h-4"></i>
+              </div>
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng số dư ròng</span>
+            </div>
+            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <i data-lucide="trending-up" class="w-3 h-3"></i>
+              +18.4%
+            </div>
+          </div>
+
+          <!-- Main Amount Display -->
+          <div class="mb-4">
+            <div class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mono amount-display" data-full="24.850.000 ₫" data-compact="24.8M ₫">
+              24.8M ₫
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+              Thặng dư tích lũy tháng 09/2026
+            </p>
+          </div>
+
+          <!-- Cashflow Bento Sub-grid (2 Columns) -->
+          <div class="grid grid-cols-2 gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div class="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-white/[0.04]">
+              <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                <span class="w-5 h-5 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                  <i data-lucide="arrow-down-left" class="w-3 h-3"></i>
+                </span>
+                <span>Thu nhập</span>
+              </div>
+              <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mono amount-display" data-full="32.500.000 ₫" data-compact="32.5M ₫">
+                32.5M ₫
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-white/[0.04]">
+              <div class="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                <span class="w-5 h-5 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
+                  <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+                </span>
+                <span>Chi tiêu</span>
+              </div>
+              <div class="text-sm font-bold text-rose-600 dark:text-rose-400 mono amount-display" data-full="7.650.000 ₫" data-compact="7.6M ₫">
+                7.6M ₫
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIGNATURE CHART: DUAL-WAVE CASHFLOW SPLINE -->
+        <div class="p-5 rounded-3xl bg-white dark:bg-[#151D2A] border border-slate-200/80 dark:border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Xu hướng Dòng tiền (Cashflow)</h3>
+              <p class="text-xs font-semibold text-slate-900 dark:text-white mt-0.5">Biến thiên thu - chi 4 tuần qua</p>
+            </div>
+            <!-- Interactive Tooltip Pill -->
+            <div id="chartTooltip" class="px-2.5 py-1 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono font-bold border border-emerald-500/20">
+              Tuần 3: +8.2M
+            </div>
+          </div>
+
+          <!-- Interactive SVG Spline Area Chart -->
+          <div class="relative w-full h-36 pt-2">
+            <svg viewBox="0 0 320 120" class="w-full h-full overflow-visible">
+              <defs>
+                <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0.0"/>
+                </linearGradient>
+                <linearGradient id="roseGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#EF4444" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#EF4444" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Subtle Grid lines -->
+              <line x1="0" y1="20" x2="320" y2="20" stroke="currentColor" class="text-slate-200 dark:text-slate-800" stroke-dasharray="3 3"/>
+              <line x1="0" y1="60" x2="320" y2="60" stroke="currentColor" class="text-slate-200 dark:text-slate-800" stroke-dasharray="3 3"/>
+              <line x1="0" y1="100" x2="320" y2="100" stroke="currentColor" class="text-slate-200 dark:text-slate-800" stroke-dasharray="3 3"/>
+
+              <!-- Area Fill: Income -->
+              <path d="M 0,90 Q 50,40 100,70 T 200,30 T 320,15 L 320,120 L 0,120 Z" fill="url(#emeraldGradient)" />
+
+              <!-- Line: Income Bezier -->
+              <path d="M 0,90 Q 50,40 100,70 T 200,30 T 320,15" fill="none" stroke="#10B981" stroke-width="2.5" class="bezier-curve" />
+
+              <!-- Line: Expense Bezier -->
+              <path d="M 0,110 Q 60,95 120,105 T 220,85 T 320,70" fill="none" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 3" opacity="0.8" />
+
+              <!-- Active Interactive Node on Week 3 -->
+              <circle cx="200" cy="30" r="5" fill="#10B981" stroke="#FFFFFF" stroke-width="2" class="cursor-pointer animate-pulse" />
+              <line x1="200" y1="30" x2="200" y2="120" stroke="#10B981" stroke-width="1.5" stroke-dasharray="2 2" opacity="0.6"/>
+            </svg>
+          </div>
+
+          <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono pt-1">
+            <span>T1 (01-07)</span>
+            <span>T2 (08-14)</span>
+            <span class="text-emerald-500 font-bold">T3 (15-21)</span>
+            <span>T4 (22-30)</span>
+          </div>
+        </div>
+
+        <!-- SALARY & ATTENDANCE 1-TAP QUICK BENTO -->
+        <div class="p-4 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white border border-slate-700 shadow-md relative overflow-hidden">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <i data-lucide="calendar-check" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-white">Chấm công & Lương tháng 9</h4>
+                <p class="text-[11px] text-slate-300">Đã tích lũy: 19/26 công • 8h OT</p>
+              </div>
+            </div>
+            <button id="quickCheckInBtn" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center gap-1 shadow-md shadow-emerald-500/20 transition-all">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span id="checkInStatusText">Chấm công hôm nay</span>
+            </button>
+          </div>
+
+          <!-- Mini Metrics -->
+          <div class="grid grid-cols-3 gap-2 text-center pt-2 border-t border-white/10">
+            <div>
+              <div class="text-[10px] text-slate-400">Lương ngày chuẩn</div>
+              <div class="text-xs font-bold text-white mono amount-display" data-full="769.230 ₫" data-compact="769k ₫">769k ₫</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400">Tiền OT x1.5</div>
+              <div class="text-xs font-bold text-amber-400 mono amount-display" data-full="1.153.846 ₫" data-compact="1.1M ₫">1.1M ₫</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-slate-400">Lương tạm tính</div>
+              <div class="text-xs font-bold text-emerald-400 mono amount-display" data-full="15.769.230 ₫" data-compact="15.7M ₫">15.7M ₫</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT TRANSACTIONS WITH PER-RECORD CURRENCY BADGES -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Giao dịch gần đây</h4>
+            <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400 cursor-pointer">Xem tất cả</span>
+          </div>
+
+          <!-- Transaction 1: USD Freelance record -->
+          <div class="p-3 rounded-2xl bg-white dark:bg-[#151D2A] border border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                <i data-lucide="laptop" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  Freelance Web UI
+                  <span class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">USD</span>
+                </div>
+                <div class="text-[10px] text-slate-400">Hôm nay, 14:20 • Upwork</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mono">+$450.00</div>
+              <div class="text-[9px] text-slate-400 mono">~ 11.250.000 ₫</div>
+            </div>
+          </div>
+
+          <!-- Transaction 2: VND Coffee Expense -->
+          <div class="p-3 rounded-2xl bg-white dark:bg-[#151D2A] border border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                <i data-lucide="coffee" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  Cà phê Highlands
+                  <span class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">VND</span>
+                </div>
+                <div class="text-[10px] text-slate-400">Hôm qua, 08:30 • Thẻ tín dụng</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs font-bold text-rose-500 mono">-55.000 ₫</div>
+              <div class="text-[9px] text-slate-400">Ăn uống</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPOSITIONED CLEAN AD CARD (Non-disruptive) -->
+        <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/40 border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500">
+          <div class="flex items-center gap-2">
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">AD</span>
+            <span>Mở thẻ tín dụng hoàn tiền 10% chi tiêu</span>
+          </div>
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        </div>
+
+      </div>
+
+      <!-- ================= TAB 2: SETTINGS (ENRICHED) ================= -->
+      <div id="tab-settings" class="hidden space-y-4">
+        <div class="flex items-center justify-between py-2">
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Cài Đặt & Pháp Lý</h2>
+          <span class="text-xs text-slate-400 font-mono">v1.2.0 (Build 42)</span>
+        </div>
+
+        <!-- Group 1: General Preferences -->
+        <div class="p-4 rounded-3xl bg-white dark:bg-[#151D2A] border border-slate-200 dark:border-white/[0.08] space-y-3">
+          <h5 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tùy chọn chung</h5>
+          <div class="flex items-center justify-between py-1">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="moon" class="w-4 h-4 text-indigo-400"></i>
+              <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Giao diện tối (Dark Mode)</span>
+            </div>
+            <div class="w-10 h-5 bg-emerald-500 rounded-full flex items-center justify-end px-0.5 cursor-pointer">
+              <div class="w-4 h-4 bg-white rounded-full"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-1 border-t border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="bell-ring" class="w-4 h-4 text-emerald-400"></i>
+              <div>
+                <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">Nhắc chấm công lúc 20:00</div>
+                <div class="text-[10px] text-slate-400">Thông báo cuối ngày ghi chép chi tiêu</div>
+              </div>
+            </div>
+            <div class="w-10 h-5 bg-emerald-500 rounded-full flex items-center justify-end px-0.5 cursor-pointer">
+              <div class="w-4 h-4 bg-white rounded-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 2: Regional & Multi-Currency -->
+        <div class="p-4 rounded-3xl bg-white dark:bg-[#151D2A] border border-slate-200 dark:border-white/[0.08] space-y-3">
+          <h5 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Ngôn ngữ & Tiền tệ</h5>
+          <div class="flex items-center justify-between py-1">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="languages" class="w-4 h-4 text-cyan-400"></i>
+              <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Ngôn ngữ hiển thị</span>
+            </div>
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Tiếng Việt (VN)</span>
+          </div>
+          <div class="flex items-center justify-between py-1 border-t border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i>
+              <div>
+                <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">Tiền tệ mặc định</div>
+                <div class="text-[10px] text-slate-400">Dữ liệu cũ tự động giữ nguyên currency lúc tạo</div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-emerald-500">VND (₫)</span>
+          </div>
+        </div>
+
+        <!-- Group 3: Legal & Policy (Crucial for Play Store / App Store Compliance) -->
+        <div class="p-4 rounded-3xl bg-white dark:bg-[#151D2A] border border-slate-200 dark:border-white/[0.08] space-y-2">
+          <h5 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pháp lý & Quyền riêng tư</h5>
+          <button class="w-full flex items-center justify-between py-2 text-left hover:text-emerald-400">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">Chính sách bảo mật (Privacy Policy)</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </button>
+          <button class="w-full flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 text-left hover:text-emerald-400">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="file-text" class="w-4 h-4 text-blue-400"></i>
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">Điều khoản dịch vụ (Terms of Service)</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </button>
+          <button class="w-full flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 text-left hover:text-emerald-400">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="database-backup" class="w-4 h-4 text-amber-400"></i>
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">Sao lưu & Xuất dữ liệu (JSON / Excel)</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </button>
+        </div>
+
+        <!-- Group 4: App Info & Rating -->
+        <div class="p-4 rounded-3xl bg-white dark:bg-[#151D2A] border border-slate-200 dark:border-white/[0.08] text-center space-y-2">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 mx-auto flex items-center justify-center text-slate-950 font-black text-xl shadow-lg">
+            S
+          </div>
+          <h4 class="text-xs font-bold text-slate-900 dark:text-white">Manager Salary & Cashflow</h4>
+          <p class="text-[10px] text-slate-400">Bản quyền © 2026. Thiết kế theo tiêu chuẩn FinTech cao cấp.</p>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- FLOATING 5-TAB DOCK BOTTOM NAVIGATION -->
+    <nav class="absolute bottom-4 left-4 right-4 h-16 rounded-3xl bg-white/95 dark:bg-[#151D2AE6] backdrop-blur-xl border border-slate-200/80 dark:border-white/[0.1] shadow-[0_12px_32px_rgba(0,0,0,0.15)] flex items-center justify-around px-2 z-40">
+      
+      <!-- Tab 1: Dashboard -->
+      <button class="nav-btn flex flex-col items-center gap-1 text-emerald-500" data-tab="tab-dashboard">
+        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold">Tổng quan</span>
+      </button>
+
+      <!-- Tab 2: Salary Hub -->
+      <button class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200" data-tab="tab-dashboard">
+        <i data-lucide="calendar-range" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Bảng lương</span>
+      </button>
+
+      <!-- Center Action Button (+) -->
+      <button class="w-12 h-12 -mt-6 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-slate-950 shadow-lg shadow-emerald-500/30 active:scale-95 transition-transform">
+        <i data-lucide="plus" class="w-6 h-6 stroke-[2.5]"></i>
+      </button>
+
+      <!-- Tab 4: Budget -->
+      <button class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200" data-tab="tab-dashboard">
+        <i data-lucide="pie-chart" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Ngân sách</span>
+      </button>
+
+      <!-- Tab 5: Settings -->
+      <button class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200" data-tab="tab-settings">
+        <i data-lucide="settings" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Cài đặt</span>
+      </button>
+    </nav>
+
+    <!-- iOS Home Indicator -->
+    <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-400/40 rounded-full z-50"></div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Dark/Light Theme Toggle
+    const toggleBtn = document.getElementById('toggleTheme');
+    toggleBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    // Clean Numbers Compact/Full Toggle
+    let isCompact = true;
+    const formatBtn = document.getElementById('toggleNumberFormat');
+    const badge = document.getElementById('numberFormatBadge');
+    formatBtn.addEventListener('click', () => {
+      isCompact = !isCompact;
+      badge.textContent = isCompact ? '15.5M' : '15.500.000';
+      document.querySelectorAll('.amount-display').forEach(el => {
+        el.textContent = isCompact ? el.getAttribute('data-compact') : el.getAttribute('data-full');
+      });
+    });
+
+    // Quick 1-Tap Attendance Check-in Toggle
+    const checkInBtn = document.getElementById('quickCheckInBtn');
+    const statusText = document.getElementById('checkInStatusText');
+    let checkedIn = false;
+    checkInBtn.addEventListener('click', () => {
+      checkedIn = !checkedIn;
+      if (checkedIn) {
+        checkInBtn.classList.remove('bg-emerald-500', 'text-slate-950');
+        checkInBtn.classList.add('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
+        statusText.textContent = 'Đã chấm công hôm nay ✓';
+      } else {
+        checkInBtn.classList.add('bg-emerald-500', 'text-slate-950');
+        checkInBtn.classList.remove('bg-emerald-500/20', 'text-emerald-400', 'border', 'border-emerald-500/30');
+        statusText.textContent = 'Chấm công hôm nay';
+      }
+    });
+
+    // Tab Navigation Switcher
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+        document.getElementById('tab-dashboard').classList.add('hidden');
+        document.getElementById('tab-settings').classList.add('hidden');
+        document.getElementById(targetTab).classList.remove('hidden');
+
+        navButtons.forEach(b => {
+          b.classList.remove('text-emerald-500');
+          b.classList.add('text-slate-400');
+          b.querySelector('span').classList.remove('font-bold');
+          b.querySelector('span').classList.add('font-medium');
+        });
+        btn.classList.add('text-emerald-500');
+        btn.classList.remove('text-slate-400');
+        btn.querySelector('span').classList.add('font-bold');
+      });
+    });
+  </script>
+</body>
+</html>

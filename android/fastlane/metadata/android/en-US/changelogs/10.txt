@@ -1,0 +1,9 @@
+✈️ Travel Note: Create trips, add members & split expenses automatically.
+
+💰 Improved salary calculation for overtime, advances & insurance.
+
+🌍 Dynamic multi-currency — history always shows original currency.
+
+🎨 Nordic 2.0 UI — lighter cards, smoother dark mode.
+
+🐛 Fixed crash on cache clear, improved performance.

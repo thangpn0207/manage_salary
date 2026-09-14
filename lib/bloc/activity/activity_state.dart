@@ -200,28 +200,6 @@ class ActivityState extends Equatable {
     return typeMap.map((key, value) => MapEntry(key.name, value));
   }
 
-  /// Deserializes JSON map to ActivityType map
-  static Map<ActivityType, double> _deserializeTypeMap(dynamic jsonMap) {
-    if (jsonMap == null) return {};
-
-    final result = <ActivityType, double>{};
-    final map = jsonMap as Map<String, dynamic>;
-
-    for (final entry in map.entries) {
-      try {
-        final activityType = ActivityType.values.firstWhere(
-          (type) => type.name == entry.key,
-        );
-        result[activityType] = (entry.value as num).toDouble();
-      } catch (e) {
-        // Skip invalid activity types
-        LogUtil.w('Unknown activity type: ${entry.key}');
-      }
-    }
-
-    return result;
-  }
-
   /// Parses activities from JSON
   static List<ActivityData> _parseActivities(dynamic json) {
     if (json == null) return [];

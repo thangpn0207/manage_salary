@@ -1,0 +1,9 @@
+✈️ Travel Note: Tạo chuyến đi, thêm thành viên, chia sẻ chi phí tự động.
+
+💰 Cải thiện tính lương tăng ca, ứng lương & bảo hiểm.
+
+🌍 Chuyển đổi đa tiền tệ linh hoạt, lịch sử giữ nguyên tiền gốc.
+
+🎨 Giao diện Nordic 2.0 — nhẹ hơn, tối mượt hơn.
+
+🐛 Sửa lỗi crash khi xóa cache, tối ưu hiệu suất.

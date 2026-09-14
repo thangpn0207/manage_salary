@@ -102,8 +102,8 @@ class ActivityListItem extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Text(
-        // Add sign based on nature for clarity
-        '${activity.nature == ActivityNature.income ? '+' : '-'}${MoneyUtil.formatDefault(activity.amount, currency: context.read<CurrencyCubit>().state.languageCode)}',
+        // Add sign based on nature for clarity, using per-record currency if available
+        '${activity.nature == ActivityNature.income ? '+' : '-'}${MoneyUtil.formatDefault(activity.amount, currency: activity.currencyCode ?? context.read<CurrencyCubit>().state.languageCode)}',
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w600,
           color: amountColor,
